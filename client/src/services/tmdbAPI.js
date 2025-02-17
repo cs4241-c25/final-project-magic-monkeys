@@ -9,7 +9,27 @@ export const tmdbAPI = {
 
   async getUpcoming() {
     const res = await fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&region=US&with_release_type=3`);
-    return res.json();
+    const data = await res.json();
+    
+    const today = new Date();
+    const sixMonthsFromNow = new Date();
+    sixMonthsFromNow.setMonth(today.getMonth() + 6);
+
+    const filteredMovies = data.results.filter(movie => {
+      const releaseDate = new Date(movie.release_date);
+      return releaseDate >= today && 
+             releaseDate <= sixMonthsFromNow && 
+             movie.poster_path !== null;
+    });
+
+    filteredMovies.sort((a, b) => 
+      new Date(a.release_date) - new Date(b.release_date)
+    );
+
+    return {
+      ...data,
+      results: filteredMovies
+    };
   },
 
   async searchMovie(query) {

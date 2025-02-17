@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { Modal } from './Modal';
+
 export const MovieDetails = ({ 
   movie, 
   ratings, 
@@ -7,6 +10,40 @@ export const MovieDetails = ({
   renderCast,
   renderReviews 
 }) => {
+  const [showApiDetails, setShowApiDetails] = useState(false);
+  const [apiData, setApiData] = useState(null);
+  const [director, setDirector] = useState(null);
+
+  useEffect(() => {
+    const fetchDirector = async () => {
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=e7b225b138e7b083d203ad7bc2819fec`
+        );
+        const data = await res.json();
+        const director = data.crew.find(person => person.job === 'Director');
+        setDirector(director);
+      } catch (err) {
+        console.error('Error fetching director:', err);
+      }
+    };
+
+    fetchDirector();
+  }, [movie.id]);
+
+  const fetchApiDetails = async () => {
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movie.id}?language=en-US&api_key=e7b225b138e7b083d203ad7bc2819fec`
+      );
+      const data = await res.json();
+      setApiData(data);
+      setShowApiDetails(true);
+    } catch (err) {
+      console.error('Error fetching API details:', err);
+    }
+  };
+
   return (
     <div className="search-result">
       <button onClick={handleCloseMovie} className="close-button">×</button>
@@ -20,7 +57,15 @@ export const MovieDetails = ({
         )}
         <div className="movie-info">
           <h1>{movie.title}</h1>
+          <button onClick={fetchApiDetails} className="api-details-button">
+            API Details
+          </button>
           <p className="overview">{movie.overview}</p>
+          {director && (
+            <p className="director">
+              <span>🎬 Director:</span> {director.name}
+            </p>
+          )}
           <div className="ratings">
             {ratings.rt && (
               <a
@@ -89,6 +134,114 @@ export const MovieDetails = ({
       {renderWatchProviders()}
       {renderCast()}
       {renderReviews()}
+
+      <Modal 
+        isOpen={showApiDetails} 
+        onClose={() => setShowApiDetails(false)}
+      >
+        <h2>Movie Details: {movie.title}</h2>
+        {apiData && (
+          <div className="api-details">
+            <div className="api-section">
+              <h3 className="section-header">Movie IDs</h3>
+              <ul>
+                <li><strong>TMDB ID:</strong> {apiData.id}</li>
+                <li><strong>IMDB ID:</strong> 
+                  <a 
+                    href={`https://www.imdb.com/title/${apiData.imdb_id}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    {apiData.imdb_id}
+                  </a>
+                </li>
+                {apiData.original_title !== apiData.title && (
+                  <li><strong>Original Title:</strong> {apiData.original_title}</li>
+                )}
+              </ul>
+            </div>
+
+            <div className="api-section">
+              <h3 className="section-header">Basic Information</h3>
+              <ul>
+                <li><strong>Release Date:</strong> {new Date(movie.release_date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}</li>
+                <li><strong>Runtime:</strong> {apiData.runtime} minutes</li>
+                <li><strong>Status:</strong> {apiData.status}</li>
+                <li><strong>Original Language:</strong> {apiData.spoken_languages.find(
+                  lang => lang.iso_639_1 === apiData.original_language
+                )?.english_name || apiData.original_language}</li>
+                {apiData.homepage && (
+                  <li><strong>Official Website:</strong> 
+                    <a 
+                      href={apiData.homepage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="website-link"
+                    >
+                      {apiData.homepage}
+                    </a>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            <div className="api-section">
+              <h3 className="section-header">Ratings & Metrics</h3>
+              <ul>
+                <li><strong>Vote Average:</strong> {apiData.vote_average.toFixed(1)} ({apiData.vote_count} votes)</li>
+                <li><strong>Popularity Score:</strong> {apiData.popularity.toFixed(1)}</li>
+                <li><strong>Adult Content:</strong> {apiData.adult ? 'Yes' : 'No'}</li>
+              </ul>
+            </div>
+
+            <div className="api-section">
+              <h3 className="section-header">Financial Information</h3>
+              <ul>
+                <li><strong>Budget:</strong> {apiData.budget > 0 ? 
+                  `$${apiData.budget.toLocaleString()}` : 
+                  'Not reported'}</li>
+                <li><strong>Revenue:</strong> {apiData.revenue > 0 ? 
+                  `$${apiData.revenue.toLocaleString()}` : 
+                  'Not reported'}</li>
+                {apiData.budget > 0 && apiData.revenue > 0 && (
+                  <li><strong>Profit/Loss:</strong> 
+                    <span className={apiData.revenue - apiData.budget > 0 ? 'profit' : 'loss'}>
+                      ${Math.abs(apiData.revenue - apiData.budget).toLocaleString()}
+                      {apiData.revenue - apiData.budget > 0 ? ' profit' : ' loss'}
+                    </span>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            <div className="api-section">
+              <h3 className="section-header">Genres</h3>
+              <div className="genre-tags">
+                {apiData.genres.map(genre => (
+                  <span key={genre.id} className="genre-tag">
+                    {genre.name} (ID: {genre.id})
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="api-section">
+              <h3 className="section-header">Languages</h3>
+              <div className="language-list">
+                {apiData.spoken_languages.map(lang => (
+                  <span key={lang.iso_639_1} className="language-tag">
+                    {lang.english_name} ({lang.iso_639_1})
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }; 
