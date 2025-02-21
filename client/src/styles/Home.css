@@ -22,7 +22,7 @@
 .hero-section h1 {
   font-size: clamp(2.5rem, 5vw, 4rem);
   margin-bottom: 20px;
-  background: linear-gradient(45deg, var(--dark-accent), #4fa8d1);
+  background: linear-gradient(45deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1.2;
@@ -31,7 +31,7 @@
 .hero-subtitle {
   font-size: clamp(1.1rem, 2vw, 1.4rem);
   margin-bottom: 40px;
-  color: var(--dark-text);
+  color: var(--white);
   opacity: 0.9;
   line-height: 1.6;
 }
@@ -102,8 +102,8 @@
 .cta-button {
   display: inline-block;
   padding: 15px 40px;
-  background: var(--dark-accent);
-  color: var(--dark-bg);
+  background: var(--primary);
+  color: var(--white);
   text-decoration: none;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -116,8 +116,8 @@
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   background: transparent;
-  border-color: var(--dark-accent);
-  color: var(--dark-accent);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .features-section {
@@ -129,7 +129,7 @@
   text-align: center;
   font-size: clamp(1.8rem, 3vw, 2.5rem);
   margin-bottom: 60px;
-  color: var(--dark-accent);
+  color: var(--primary);
 }
 
 .features-grid {
@@ -153,21 +153,24 @@
 }
 
 .feature-icon {
-  font-size: 3rem;
+  font-size: 3.5rem;
   margin-bottom: 20px;
-  /* background: linear-gradient(45deg, var(--dark-accent), #4fa8d1); */
-  /* -webkit-background-clip: text; */
-  /* -webkit-text-fill-color: transparent; */
+  color: var(--primary);
+}
+
+.feature-icon svg {
+  width: 60px;
+  height: 60px;
 }
 
 .feature-card h3 {
-  color: var(--dark-accent);
+  color: var(--primary);
   margin-bottom: 15px;
   font-size: 1.3rem;
 }
 
 .feature-card p {
-  color: var(--dark-text);
+  color: var(--white);
   opacity: 0.8;
   line-height: 1.6;
 }
@@ -180,7 +183,7 @@
 .how-it-works h2 {
   font-size: clamp(1.8rem, 3vw, 2.5rem);
   margin-bottom: 60px;
-  color: var(--dark-accent);
+  color: var(--primary);
 }
 
 .steps-container {
@@ -201,8 +204,8 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: var(--dark-accent);
-  color: var(--dark-bg);
+  background: var(--primary);
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,12 +215,12 @@
 }
 
 .step h3 {
-  color: var(--dark-text);
+  color: var(--white);
   margin-bottom: 10px;
 }
 
 .step p {
-  color: var(--dark-text);
+  color: var(--white);
   opacity: 0.8;
 }
 
@@ -230,41 +233,13 @@
 .cta-section h2 {
   font-size: clamp(1.8rem, 3vw, 2.5rem);
   margin-bottom: 20px;
-  color: var(--dark-accent);
+  color: var(--primary);
 }
 
 .cta-section p {
   font-size: 1.2rem;
   margin-bottom: 30px;
-  color: var(--dark-text);
-  opacity: 0.9;
-}
-
-.light-theme .hero-section {
-  background: linear-gradient(to right, var(--light-bg) 40%, rgba(138, 149, 165, 0.1) 100%);
-}
-
-.light-theme .hero-section h1 {
-  background: linear-gradient(45deg, var(--light-primary), var(--light-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.light-theme .hero-subtitle {
-  color: var(--light-primary);
-}
-
-.light-theme .feature-card {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.light-theme .feature-card:hover {
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-}
-
-.light-theme .hero-image::after {
-  background: radial-gradient(circle at center, transparent 30%, var(--light-bg) 100%);
+  color: var(--white);
   opacity: 0.9;
 }
 
@@ -277,7 +252,7 @@
 .social-proof h2 {
   font-size: clamp(1.8rem, 3vw, 2.5rem);
   margin-bottom: 40px;
-  color: var(--dark-accent);
+  color: var(--primary);
 }
 
 .stats-container {
@@ -296,32 +271,14 @@
 .stat-number {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--dark-accent);
+  color: var(--primary);
   margin-bottom: 10px;
 }
 
 .stat-label {
   font-size: 1.1rem;
-  color: var(--dark-text);
+  color: var(--white);
   opacity: 0.9;
-}
-
-.light-theme .social-proof {
-  background: rgba(138, 149, 165, 0.1);
-}
-
-.light-theme .stat-number {
-  color: var(--light-primary);
-}
-
-.light-theme .stat-label {
-  color: var(--light-secondary);
-}
-
-.light-theme .feature-icon {
-  background: linear-gradient(45deg, var(--light-primary), var(--light-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 @media (max-width: 768px) {

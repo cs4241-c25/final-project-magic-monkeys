@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SideNav } from '../components/SideNav';
 import '../styles/Dashboard.css';
 import { BiChevronDown, BiChevronUp, BiFilterAlt } from 'react-icons/bi';
+import { BsTicketFill, BsTicket } from "react-icons/bs";
 
 export const Dashboard = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -151,7 +152,9 @@ export const Dashboard = () => {
                   />
                   <div className="review-content">
                     <h4>{movieData[(i-1) % 4].title}</h4>
-                    <div className="rating-stars">★★★★{i === 4 ? '★' : '☆'}</div>
+                    <div className="rating-tickets">
+                      <BsTicketFill /><BsTicketFill /><BsTicketFill /><BsTicketFill />{i === 4 ? <BsTicketFill /> : <BsTicket />}
+                    </div>
                     <p>{"A masterpiece of modern cinema. The cinematography and acting..."}</p>
                   </div>
                 </div>

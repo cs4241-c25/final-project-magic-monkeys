@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { HeroImage } from '../components/HeroImage';
+import { MdGroups, MdStarRate, MdChat, MdRecommend } from 'react-icons/md';
 import '../styles/Home.css';
 
 export const Home = () => {
@@ -30,22 +31,30 @@ export const Home = () => {
         <h2>Watch Movies Better, Together</h2>
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">👥</div>
+            <div className="feature-icon">
+              <MdGroups />
+            </div>
             <h3>Create Watch Groups</h3>
             <p>Form movie clubs, join friends, and maintain shared watchlists for your next movie night</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🤝</div>
+            <div className="feature-icon">
+              <MdStarRate />
+            </div>
             <h3>Group Ratings</h3>
             <p>Rate movies together and see how your tastes align with your friends</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">💬</div>
+            <div className="feature-icon">
+              <MdChat />
+            </div>
             <h3>Social Reviews</h3>
             <p>Share your thoughts and compare opinions with your movie-watching circle</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🎯</div>
+            <div className="feature-icon">
+              <MdRecommend />
+            </div>
             <h3>Smart Recommendations</h3>
             <p>Get movie suggestions that everyone in your group will love</p>
           </div>
