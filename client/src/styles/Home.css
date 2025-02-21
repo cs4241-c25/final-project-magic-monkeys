@@ -240,7 +240,6 @@
   opacity: 0.9;
 }
 
-/* Light theme variations */
 .light-theme .hero-section {
   background: linear-gradient(to right, var(--light-bg) 40%, rgba(138, 149, 165, 0.1) 100%);
 }
@@ -307,7 +306,6 @@
   opacity: 0.9;
 }
 
-/* Light theme additions */
 .light-theme .social-proof {
   background: rgba(138, 149, 165, 0.1);
 }
@@ -360,4 +358,16 @@
     width: 100%;
     max-width: 100%;
   }
-} 
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  padding-left: 130px;
+}
+
+.cta-section .hero-buttons {
+  padding-left: 0;
+  justify-content: center;
+}

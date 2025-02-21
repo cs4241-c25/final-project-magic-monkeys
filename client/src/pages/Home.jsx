@@ -12,9 +12,14 @@ export const Home = () => {
             The social platform that brings friends together through movies. 
             Create groups, share ratings, and find the perfect movie for your next watch party.
           </p>
-          <Link to="/movies" className="cta-button">
-            Start Watching Together
-          </Link>
+          <div className="hero-buttons">
+            <Link to="/dashboard" className="cta-button">
+              Dashboard
+            </Link>
+            <Link to="/movies" className="cta-button">
+              Movies
+            </Link>
+          </div>
         </div>
         <div className="hero-image">
           <HeroImage />
@@ -89,9 +94,14 @@ export const Home = () => {
       <section className="cta-section">
         <h2>Ready to watch together?</h2>
         <p>Join Movie Mates and make movie nights better with friends</p>
-        <Link to="/movies" className="cta-button">
-          Get Started Free
-        </Link>
+        <div className="hero-buttons">
+          <Link to="/dashboard" className="cta-button">
+            Dashboard
+          </Link>
+          <Link to="/movies" className="cta-button">
+            Movies
+          </Link>
+        </div>
       </section>
     </div>
   );
