@@ -4,10 +4,13 @@ import { MdDashboard, MdFormatListBulleted } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
 import { FiLogOut } from 'react-icons/fi';
 import { useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+
 import '../styles/SideNav.css';
 
 export const SideNav = ({ isExpanded, setIsExpanded }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth0();
   const [groupsOpen, setGroupsOpen] = useState(false);
 
   const handleMouseLeave = () => {
@@ -19,7 +22,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
       className="sidenav"
       onMouseLeave={handleMouseLeave}
     >
-      <Link to="/" className="logo">
+      <Link to="/" state={{ stayOnHome: true }} className="logo">
         <span className="icon"><BiMoviePlay /></span>
         <span className="text">Movie Mates</span>
       </Link>
@@ -59,8 +62,8 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
         </div>
       </nav>
 
-      <div className="sign-out" onClick={() => navigate('/')}>
-        <span className="icon"><FiLogOut /></span>
+      <div className="sign-out" onClick={() => logout({returnTo: window.location.origin})}>
+        <span className="icon"><FiLogOut/></span>
         <span className="text">Sign out</span>
       </div>
     </aside>

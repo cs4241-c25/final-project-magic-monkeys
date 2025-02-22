@@ -19,17 +19,17 @@ export const NavBar = ({ currentFont, toggleFont, isDarkTheme, toggleTheme }) =>
       >
         {currentFont}
       </button>
-      <Link to="/" className="site-title-link">
-        <h1 className="site-title">Movie Mates</h1>
-      </Link>
-        {!isAuthenticated ? (
-            <button onClick={() => loginWithRedirect()}>Log In</button>
-        ) : (
-            <>
-                <p>Welcome, {user?.name}!</p>
-                <button onClick={handleLogout}>Log Out</button>
-            </>
-        )}
+        {/*<Link to={isAuthenticated ? "/dashboard" : "/"} className="site-title-link">*/}
+            <h1 className="site-title">Movie Mates</h1>
+        {/*</Link>*/}
+        {/*{!isAuthenticated ? (*/}
+        {/*    <button onClick={() => loginWithRedirect()}>Log In</button>*/}
+        {/*) : (*/}
+        {/*    <>*/}
+        {/*        <p>Welcome, {user?.name}!</p>*/}
+        {/*        <button onClick={handleLogout}>Log Out</button>*/}
+        {/*    </>*/}
+        {/*)}*/}
         <button onClick={toggleTheme} className="theme-toggle">
         {isDarkTheme ? '🌙' : '☀️'}
       </button>

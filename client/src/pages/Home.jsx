@@ -1,9 +1,27 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { HeroImage } from '../components/HeroImage';
 import { MdGroups, MdStarRate, MdChat, MdRecommend } from 'react-icons/md';
+import React, { useEffect } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
+
 import '../styles/Home.css';
 
 export const Home = () => {
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && !location.state?.stayOnHome) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate, location.state]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="home-page">
       <section className="hero-section">
@@ -14,9 +32,15 @@ export const Home = () => {
             Create groups, share ratings, and find the perfect movie for your next watch party.
           </p>
           <div className="hero-buttons">
-            <Link to="/dashboard" className="cta-button">
-              Dashboard
-            </Link>
+            {!isAuthenticated ? (
+                <button onClick={() => loginWithRedirect()} className="cta-button">
+                  Log In
+                </button>
+            ) : (
+                <Link to="/dashboard" className="cta-button">
+                  Dashboard
+                </Link>
+            )}
             <Link to="/movies" className="cta-button">
               Movies
             </Link>
