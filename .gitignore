@@ -21,9 +21,9 @@ client/build/
 server/dist/
 
 # Environment variables
-.env
-server/.env
-client/.env
+# .env
+# server/.env
+# client/.env
 
 # JetBrains / IntelliJ
 .idea/
@@ -31,3 +31,6 @@ client/.env
 # Other config or OS junk
 .DS_Store
 Thumbs.db
+
+App.test.js
+client/App.test.js

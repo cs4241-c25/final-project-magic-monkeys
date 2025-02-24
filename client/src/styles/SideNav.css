@@ -1,0 +1,151 @@
+.sidenav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 70px;
+  background: #242424;
+  transition: width 0.3s ease;
+  overflow: hidden;
+  padding: 30px 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.sidenav:hover {
+  width: 250px;
+}
+
+.nav-item, .logo, .sign-out {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.icon {
+  min-width:50px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
+.sidenav:hover .text {
+  opacity: 1;
+}
+
+.nav-menu {
+  width: 100%;
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  margin-bottom: 40px;
+}
+
+.logo {
+  color: #ff4b4b;
+  margin-bottom: 20px;
+  margin-left: 22px;
+}
+
+.sign-out {
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.nav-item:hover, .sign-out:hover {
+  color: #ff4b4b;
+}
+
+.nav-item.active {
+  color: #ff4b4b;
+}
+
+.icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.logo .icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.nav-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-section .nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.nav-item .text {
+  margin-left: 0px;
+}
+
+.sub-items {
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.nav-subitem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  color: #888;
+  margin-left: 78px;
+  padding: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.nav-section.open .sub-items {
+  max-height: 200px;
+}
+
+.nav-subitem:hover {
+  color: #ff4b4b;
+  transform: translateX(5px);
+}
+
+.dropdown-arrow {
+  margin-left: 8px;
+  margin-right: 16px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(90deg);
+}
+
+.dropdown-arrow {
+  opacity: 0;
+}
+
+.sidenav:hover .dropdown-arrow {
+  opacity: 1;
+} 
