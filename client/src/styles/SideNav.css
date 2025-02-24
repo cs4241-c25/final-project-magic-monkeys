@@ -30,7 +30,7 @@
 }
 
 .icon {
-  min-width: 70px;
+  min-width:50px;
   height: 40px;
   display: flex;
   justify-content: center;
@@ -62,6 +62,7 @@
 .logo {
   color: #ff4b4b;
   margin-bottom: 20px;
+  margin-left: 22px;
 }
 
 .sign-out {

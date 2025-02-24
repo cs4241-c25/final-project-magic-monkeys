@@ -159,7 +159,7 @@ export const Dashboard = () => {
                   />
                   <div className="review-content">
                     <h4>{movieData[(i-1) % 4].title}</h4>
-                    <div className="rating-tickets">
+                    <div className="rating-tickets flex flex-row gap-1 mb-2">
                       <BsTicketFill /><BsTicketFill /><BsTicketFill /><BsTicketFill />{i === 4 ? <BsTicketFill /> : <BsTicket />}
                     </div>
                     <p>{"A masterpiece of modern cinema. The cinematography and acting..."}</p>

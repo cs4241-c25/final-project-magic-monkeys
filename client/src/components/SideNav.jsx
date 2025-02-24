@@ -14,7 +14,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
   const [groupsOpen, setGroupsOpen] = useState(false);
 
   const handleMouseLeave = () => {
-    setGroupsOpen(false); // Close groups dropdown
+    setGroupsOpen(false);
   };
 
   return (
