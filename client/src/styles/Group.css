@@ -1,0 +1,309 @@
+/* Group page styles that extend Dashboard.css */
+
+.group-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.group-info h1 {
+    margin: 0;
+    color: var(--primary);
+}
+
+.group-members-preview {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.member-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--dark-card);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border: 1px solid var(--primary);
+}
+
+.add-member-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px dashed #888;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-member-button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.settings-button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.settings-button:hover {
+    color: var(--primary);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+/* Group sections */
+.dashboard-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    gap: 20px;
+}
+
+.group-activity {
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+}
+
+.group-watchlist {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+}
+
+.group-reviews {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+}
+
+.group-members {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+}
+
+/* Activity items */
+.happening-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.happening-item:last-child {
+    border-bottom: none;
+}
+
+.user {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.movie {
+    color: #fff;
+    font-weight: 500;
+}
+
+.action {
+    color: #888;
+}
+
+.activity-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary);
+}
+
+.rating-value {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.activity-comment {
+    flex-basis: 100%;
+    margin: 8px 0 4px 0;
+    color: #ccc;
+    font-style: italic;
+    padding-left: 16px;
+    border-left: 2px solid #333;
+}
+
+.timestamp {
+    color: #666;
+    font-size: 0.8rem;
+    margin-left: auto;
+}
+
+/* Add movie button */
+.add-movie-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.add-movie-button:hover {
+    background: var(--primary);
+}
+
+/* Review author */
+.review-author {
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0 0 4px 0;
+}
+
+/* Invite button */
+.invite-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    margin-left: auto;
+}
+
+.invite-button:hover {
+    background: var(--primary);
+}
+
+/* Members section */
+.members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #333;
+    border-radius: 6px;
+    border: 1px solid #444;
+}
+
+.member-item .member-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+}
+
+.member-name {
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Content section headers with actions */
+.content-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #333;
+}
+
+.section-chevron {
+    margin-left: 8px;
+    font-size: 1rem;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.section-chevron:hover {
+    opacity: 1;
+    color: var(--primary);
+}
+
+.filter-icon {
+    margin-left: auto;
+    font-size: 1.2rem;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.filter-icon:hover {
+    opacity: 1;
+    color: var(--primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .dashboard-content {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .group-activity {
+        grid-column: 1 / 3;
+    }
+
+    .group-members {
+        grid-column: 1 / 3;
+        grid-row: 3 / 4;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+    }
+
+    .group-activity,
+    .group-watchlist,
+    .group-reviews,
+    .group-members {
+        grid-column: 1;
+    }
+
+    .group-watchlist {
+        grid-row: 2;
+    }
+
+    .group-reviews {
+        grid-row: 3;
+    }
+
+    .group-members {
+        grid-row: 4;
+    }
+}
