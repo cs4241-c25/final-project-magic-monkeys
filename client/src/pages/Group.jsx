@@ -14,85 +14,152 @@ export const Group = () => {
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [groupData, setGroupData] = useState(null);
-    const [activeTab, setActiveTab] = useState('activity');
 
-    // Mock data for development
+    // Mock data
     const mockGroups = {
         '1': {
             id: '1',
             name: 'Movie Buffs',
             members: [
-                { id: '1', name: 'John Doe', avatar: 'J' },
-                { id: '2', name: 'Jane Smith', avatar: 'J' },
-                { id: '3', name: 'Sam Wilson', avatar: 'S' },
+                { id: '1', name: 'FatalSnipes_1', avatar: 'F' },
+                { id: '2', name: 'FatalSnipes_2', avatar: 'F' },
+                { id: '3', name: 'FatalSnipes_3', avatar: 'F' },
+                { id: '4', name: 'FatalSnipes_4', avatar: 'F' },
+                { id: '5', name: 'FatalSnipes_5', avatar: 'F' },
+                { id: '6', name: 'FatalSnipes_6', avatar: 'F' },
             ],
             activity: [
-                { id: '1', user: 'John', action: 'added', movie: 'Oppenheimer', timestamp: '2 hours ago' },
-                { id: '2', user: 'Jane', action: 'rated', movie: 'Dune', rating: 4.5, timestamp: '1 day ago' },
-                { id: '3', user: 'Sam', action: 'commented', movie: 'Interstellar', comment: 'This was amazing!', timestamp: '2 days ago' }
+                { id: '1', user: 'John', action: 'gave', movie: 'Nosferatu', rating: 4.5, timestamp: '2 hours ago' },
+                { id: '2', user: 'John', action: 'gave', movie: 'Nosferatu', rating: 4.5, timestamp: '1 day ago' },
+                { id: '3', user: 'John', action: 'gave', movie: 'Nosferatu', rating: 4.5, timestamp: '2 days ago' },
+                { id: '4', user: 'John', action: 'gave', movie: 'Nosferatu', rating: 4.5, timestamp: '3 days ago' },
+                { id: '5', user: 'John', action: 'gave', movie: 'Nosferatu', rating: 4.5, timestamp: '4 days ago' },
+                { id: '6', user: 'John', action: 'gave', movie: 'Nosferatu', rating: 4.5, timestamp: '5 days ago' },
             ],
-            watchlist: [
-                { id: '1', title: 'Dune: Part Two', poster: 'https://image.tmdb.org/t/p/w200/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg' },
-                { id: '2', title: 'Oppenheimer', poster: 'https://image.tmdb.org/t/p/w200/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg' },
-                { id: '3', title: 'Interstellar', poster: 'https://image.tmdb.org/t/p/w200/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg' },
-                { id: '4', title: 'Arrival', poster: 'https://image.tmdb.org/t/p/w200/x2FJsf1ElAgr63Y3PNPtJrcmpoe.jpg' },
-            ],
-            reviews: [
+            scores: [
                 {
                     id: '1',
-                    user: 'John',
-                    movie: 'Oppenheimer',
-                    poster: 'https://image.tmdb.org/t/p/w200/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
-                    rating: 5,
-                    content: 'A masterpiece of modern cinema. The cinematography and acting were superb.'
+                    movie: 'Moonlight',
+                    poster: 'https://image.tmdb.org/t/p/w200/93nKrUO92ONl8x6tWv7xj2qVPQz.jpg',
+                    rating: 4.5
                 },
                 {
                     id: '2',
-                    user: 'Jane',
-                    movie: 'Dune',
-                    poster: 'https://image.tmdb.org/t/p/w200/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg',
-                    rating: 4,
-                    content: 'Visually stunning with great world-building. Looking forward to Part Two!'
-                }
-            ]
+                    movie: 'Schindler\'s List',
+                    poster: 'https://image.tmdb.org/t/p/w200/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg',
+                    rating: 4.5
+                },
+                {
+                    id: '3',
+                    movie: 'Moonlight',
+                    poster: 'https://image.tmdb.org/t/p/w200/93nKrUO92ONl8x6tWv7xj2qVPQz.jpg',
+                    rating: 4.5
+                },
+                {
+                    id: '4',
+                    movie: 'Moonlight',
+                    poster: 'https://image.tmdb.org/t/p/w200/93nKrUO92ONl8x6tWv7xj2qVPQz.jpg',
+                    rating: 4.5
+                },
+            ],
+            showtime: {
+                date: 'Feb 16th',
+                time: '8:00 PM',
+                attending: [
+                    { id: '1', name: 'F', status: 'no' }
+                ]
+            }
         },
         '2': {
             id: '2',
             name: 'Sci-Fi Lovers',
             members: [
-                { id: '1', name: 'John Doe', avatar: 'J' },
-                { id: '4', name: 'Alex Johnson', avatar: 'A' },
+                { id: '1', name: 'FatalSnipes_1', avatar: 'F' },
+                { id: '4', name: 'FatalSnipes_4', avatar: 'F' },
             ],
             activity: [
                 { id: '1', user: 'Alex', action: 'added', movie: 'Blade Runner 2049', timestamp: '5 hours ago' },
                 { id: '2', user: 'John', action: 'rated', movie: 'The Matrix', rating: 5, timestamp: '3 days ago' },
             ],
-            watchlist: [
-                { id: '1', title: 'Blade Runner 2049', poster: 'https://image.tmdb.org/t/p/w200/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg' },
-                { id: '2', title: 'The Matrix', poster: 'https://image.tmdb.org/t/p/w200/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg' },
-                { id: '3', title: 'Interstellar', poster: 'https://image.tmdb.org/t/p/w200/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg' },
-            ],
-            reviews: [
+            scores: [
                 {
                     id: '1',
-                    user: 'Alex',
                     movie: 'Blade Runner 2049',
                     poster: 'https://image.tmdb.org/t/p/w200/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg',
-                    rating: 5,
-                    content: 'A worthy sequel to the original. The visuals are breathtaking.'
-                }
-            ]
+                    rating: 4.5
+                },
+                {
+                    id: '2',
+                    movie: 'The Matrix',
+                    poster: 'https://image.tmdb.org/t/p/w200/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg',
+                    rating: 4.5
+                },
+            ],
+            showtime: {
+                date: 'Mar 10th',
+                time: '7:30 PM',
+                attending: [
+                    { id: '1', name: 'F', status: 'yes' }
+                ]
+            }
         }
     };
+
+    const generateCalendar = () => {
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        // Get the first day of the month
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+        const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+
+        const dates = [];
+
+        // Add last month's days to fill the first row
+        const firstDayIndex = firstDayOfMonth.getDay();
+        for (let i = firstDayIndex - 1; i >= 0; i--) {
+            const date = new Date(currentYear, currentMonth, -i);
+            dates.push({
+                day: date.getDate(),
+                month: date.getMonth() + 1,
+                isCurrentMonth: false
+            });
+        }
+
+        // Add this month's days
+        for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+            dates.push({
+                day: i,
+                month: currentMonth + 1,
+                isCurrentMonth: true
+            });
+        }
+
+        // If needed, fill the last row with next month's days
+        const lastRowDays = 7 - (dates.length % 7);
+        if (lastRowDays < 7) {
+            for (let i = 1; i <= lastRowDays; i++) {
+                dates.push({
+                    day: i,
+                    month: currentMonth + 2 > 12 ? 1 : currentMonth + 2,
+                    isCurrentMonth: false
+                });
+            }
+        }
+
+        return { days, dates };
+    };
+
+    const calendar = generateCalendar();
 
     // Fetch group data
     useEffect(() => {
         if (groupId) {
-            // Simulate API call with mock data
             if (mockGroups[groupId]) {
                 setGroupData(mockGroups[groupId]);
             } else {
-                // Group not found or user doesn't have access
                 navigate('/dashboard');
             }
         }
@@ -109,136 +176,120 @@ export const Group = () => {
                 setIsExpanded={setIsExpanded}
             />
             <main className="dashboard-main">
-                <header className="dashboard-header">
-                    <div className="group-info">
-                        <h1>{groupData.name}</h1>
-                        <div className="group-members-preview">
-                            {groupData.members.map((member, index) => (
-                                <div key={index} className="member-avatar" title={member.name}>
-                                    {member.avatar}
-                                </div>
-                            ))}
-                            <button className="add-member-button">
-                                <BiPlus />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="header-actions">
-                        <button className="settings-button">
-                            <BiCog />
-                        </button>
-                    </div>
-                </header>
+                <div className="group-header">
+                    <h1>{groupData.name}</h1>
+                </div>
 
-                <div className="dashboard-content">
-                    {/* Activity Feed */}
-                    <div className="content-section group-activity">
-                        <h2>
-                            Group Activity
-                            <BiChevronDown className="section-chevron" />
-                        </h2>
-                        <div className="happenings-content">
-                            {groupData.activity.map((item) => (
-                                <div key={item.id} className="happening-item">
-                                    <span className="user">{item.user}</span>
-                                    <span className="action">{item.action}</span>
-                                    <span className="movie">{item.movie}</span>
-                                    {item.rating && (
-                                        <div className="activity-rating">
-                                            {Array(Math.floor(item.rating)).fill().map((_, i) => (
-                                                <BsTicketFill key={i} />
-                                            ))}
-                                            {item.rating % 1 !== 0 && <BsTicket />}
-                                            <span className="rating-value">({item.rating}/5)</span>
-                                        </div>
-                                    )}
-                                    {item.comment && (
-                                        <p className="activity-comment">"{item.comment}"</p>
-                                    )}
-                                    <span className="timestamp">{item.timestamp}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Group Watchlist */}
-                    <div className="content-section group-watchlist">
-                        <h2>
-                            Group Watchlist
-                            <BiChevronDown className="section-chevron" />
-                            <div className="header-actions">
-                                <button className="add-movie-button">
-                                    <BiPlus />
-                                    <span>Add Movie</span>
-                                </button>
-                                <BiFilterAlt className="filter-icon" />
-                            </div>
-                        </h2>
-                        <div className="watchlist-grid">
-                            {groupData.watchlist.map((movie) => (
-                                <div key={movie.id} className="watchlist-item">
-                                    <img src={movie.poster} alt={movie.title} />
-                                    <div className="movie-title">{movie.title}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Group Reviews */}
-                    <div className="content-section group-reviews">
-                        <h2>
-                            Group Reviews
-                            <BiChevronDown className="section-chevron" />
-                            <BiFilterAlt className="filter-icon" />
-                        </h2>
-                        <div className="reviews-list">
-                            {groupData.reviews.map((review) => (
-                                <div key={review.id} className="review-card">
-                                    <img
-                                        src={review.poster}
-                                        alt={review.movie}
-                                    />
-                                    <div className="review-content">
-                                        <h4>{review.movie}</h4>
-                                        <p className="review-author">by {review.user}</p>
-                                        <div className="rating-tickets">
-                                            {Array(review.rating).fill().map((_, i) => (
-                                                <BsTicketFill key={i} />
-                                            ))}
-                                            {Array(5 - review.rating).fill().map((_, i) => (
-                                                <BsTicket key={i} />
-                                            ))}
-                                        </div>
-                                        <p>{review.content}</p>
+                <div className="group-content">
+                    {/* Top Section */}
+                    <div className="group-top-section">
+                        <div className="group-showtime">
+                            <div className="showtime-date">{groupData.showtime.date}</div>
+                            <div className="showtime-time">{groupData.showtime.time}</div>
+                            <div className="showtime-status">
+                                <div className="status-icons">
+                                    <div className="status-icon no">
+                                        <span>F</span>
+                                        <span>F</span>
+                                        <span>F</span>
                                     </div>
                                 </div>
-                            ))}
+                            </div>
+                        </div>
+
+                        <div className="group-calendar">
+                            <div className="calendar-header">
+                                {calendar.days.map(day => (
+                                    <div key={day} className="calendar-day-name">{day}</div>
+                                ))}
+                            </div>
+                            <div className="calendar-grid">
+                                {calendar.dates.map((date, index) => (
+                                    <div
+                                        key={index}
+                                        className={`calendar-date ${date.isCurrentMonth ? 'current-month' : 'other-month'}`}
+                                    >
+                                        {date.day}
+                                        {date.month !== 5 ? null : date.day === 1 ?
+                                            <span className="month-label">May</span> : null}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Members List */}
-                    <div className="content-section group-members">
-                        <h2>
-                            Members
-                            <BiChevronDown className="section-chevron" />
-                            <button className="invite-button">
-                                <BiPlus />
-                                <span>Invite</span>
-                            </button>
-                        </h2>
-                        <div className="members-list">
-                            {groupData.members.map((member) => (
-                                <div key={member.id} className="member-item">
-                                    <div className="member-avatar">{member.avatar}</div>
-                                    <div className="member-name">{member.name}</div>
+                    {/* Middle Section */}
+                    <div className="group-middle-section">
+                        <div className="group-members-box">
+                            <h2>Members</h2>
+                            <div className="members-grid">
+                                {groupData.members.map(member => (
+                                    <div key={member.id} className="member-card">
+                                        <div className="member-avatar">{member.avatar}</div>
+                                        <div className="member-name">{member.name}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="group-activity-box">
+                            <div className="activity-header">
+                                <h2>The Happenings</h2>
+                            </div>
+                            <div className="activity-list-container">
+                                <div className="activity-list">
+                                    {groupData.activity.map(activity => (
+                                        <div key={activity.id} className="activity-item">
+                                            <span className="bullet">•</span>
+                                            <span className="activity-user">{activity.user}</span>
+                                            <span className="activity-action">{activity.action}</span>
+                                            <span className="activity-movie">{activity.movie}</span>
+                                            <span className="activity-text">a {activity.rating} out of 5 tickets</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                    {/* Bottom Section */}
+                    <div className="group-bottom-section">
+                        <div className="group-scores-box">
+                            <div className="scores-header">
+                                <h2>Group Scores</h2>
+                                <div className="scores-sort">
+                                    <span>Date</span>
+                                </div>
+                            </div>
+
+                            <div className="score-container">
+                                <div className="scores-list">
+                                    {groupData.scores.map(score => (
+                                        <div key={score.id} className="score-card">
+                                            <div className="score-poster">
+                                                <img src={score.poster} alt={score.movie}/>
+                                            </div>
+                                            <div className="score-info">
+                                                <div className="score-movie-name">Movie Name</div>
+                                                <div className="score-rating">{score.rating}</div>
+                                                {/*Tickets here*/}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                            <div className="group-tierlist-box">
+                                <h2>Tier List</h2>
+                                <div className="tierlist-placeholder">
+                                    {/* Placeholder */}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             </main>
         </div>
-    );
+);
 };
 
 export default Group;

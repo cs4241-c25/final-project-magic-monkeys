@@ -4,10 +4,7 @@ import { NavBar } from './components/NavBar';
 import { Home } from './pages/Home';
 import { MovieDemo } from './pages/MovieDemo';
 import { Dashboard } from './pages/Dashboard';
-<<<<<<< Updated upstream
 import { Tierlist } from './pages/Tierlist';
-=======
->>>>>>> Stashed changes
 import { Group } from './pages/Group';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import './App.css';
@@ -37,7 +34,7 @@ const AppContent = () => {
     });
   };
 
-  const hideNavBar = ['/dashboard', '/group', '/groups'].some(path =>
+  const hideNavBar = ['/dashboard', '/group', '/groups', '/tierlist'].some(path =>
       location.pathname.startsWith(path)
   );
 
@@ -46,34 +43,14 @@ const AppContent = () => {
       className={`App ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}
       style={{ fontFamily: `${currentFont}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif` }}
     >
-<<<<<<< Updated upstream
-      {location.pathname !== '/dashboard' & location.pathname !== '/tierlist' && (
-        <NavBar
-          currentFont={currentFont}
-          toggleFont={toggleFont}
-          isDarkTheme={isDarkTheme}
-          toggleTheme={toggleTheme}
-        />)}
-=======
->>>>>>> Stashed changes
-      {/*{location.pathname !== '/dashboard' && (*/}
+      {/*{location.pathname !== '/dashboard' & location.pathname !== '/tierlist' && (*/}
       {/*  <NavBar*/}
       {/*    currentFont={currentFont}*/}
       {/*    toggleFont={toggleFont}*/}
       {/*    isDarkTheme={isDarkTheme}*/}
       {/*    toggleTheme={toggleTheme}*/}
-      {/*  />*/}
-      {/*)}*/}
-<<<<<<< Updated upstream
-      {/*{!hideNavBar && (*/}
-      {/*    <NavBar*/}
-      {/*        currentFont={currentFont}*/}
-      {/*        toggleFont={toggleFont}*/}
-      {/*        isDarkTheme={isDarkTheme}*/}
-      {/*        toggleTheme={toggleTheme}*/}
-      {/*    />*/}
-      {/*)}*/}
-=======
+      {/*  />)}*/}
+
       {!hideNavBar && (
           <NavBar
               currentFont={currentFont}
@@ -82,7 +59,6 @@ const AppContent = () => {
               toggleTheme={toggleTheme}
           />
       )}
->>>>>>> Stashed changes
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<MovieDemo />} />
@@ -95,17 +71,18 @@ const AppContent = () => {
             }
         />
         <Route
-<<<<<<< Updated upstream
             path="/tierlist"
             element={
               <ProtectedRoute>
                 <Tierlist />
-=======
+              </ProtectedRoute>
+            }
+        />
+        <Route
             path="/group/:groupId"
             element={
               <ProtectedRoute>
                 <Group />
->>>>>>> Stashed changes
               </ProtectedRoute>
             }
         />

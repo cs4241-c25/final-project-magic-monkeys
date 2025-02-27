@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+  import { useEffect, useState } from 'react';
 import { tmdbAPI } from '../services/tmdbAPI';
 
 export const HeroImage = () => {

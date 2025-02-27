@@ -1,309 +1,466 @@
-/* Group page styles that extend Dashboard.css */
+.group-header {
+    margin-bottom: 20px;
+}
 
-.group-info {
+.group-header h1 {
+    color: #ffffff;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.group-content {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 20px;
 }
 
-.group-info h1 {
-    margin: 0;
-    color: var(--primary);
+.dashboard-container {
+    height: 100vh;
+    overflow: hidden;
 }
 
-.group-members-preview {
+.dashboard-main {
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 40px;
+}
+
+/* Top Section */
+.group-top-section {
+    display: flex;
+    background: #373737;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    height: 260px;
+}
+
+.group-showtime {
+    width: 350px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: #373737;
+}
+
+.group-calendar {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    background: #4C4C4C;
+}
+
+.showtime-date {
+    color: var(--primary);
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.showtime-time {
+    color: #ffffff;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.showtime-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.status-icons {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.status-icon {
+    display: flex;
+}
+
+.status-icon.no {
+    margin-right: 10px;
+}
+
+.status-icon span {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
     display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: -10px;
+    border: 2px solid #373737;
+}
+
+.status-text {
+    color: #ffffff;
+    font-size: 1.2rem;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding-bottom: 5px;
+}
+
+.calendar-day-name {
+    text-align: center;
+    color: #ffffff;
+    font-size: 1rem;
+    padding: 10px 0;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    flex-grow: 1;
+    gap: 1px;
+}
+
+.calendar-date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: #ffffff;
+    padding: 10px 0;
+    height: 35px;
+    font-size: 0.9rem;
+    border-right: 1px solid #555;
+    border-bottom: 1px solid #555;
+}
+
+.calendar-date.other-month {
+    color: #666666;
+}
+
+.month-label {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 0.7rem;
+    color: #aaaaaa;
+}
+
+/* Middle Section */
+.group-middle-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.group-members-box {
+    background: #373737;
+    border-radius: 8px;
+    padding: 20px;
+    height: 320px;
+}
+
+.group-members-box h2 {
+    color: #ffffff;
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.member-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .member-avatar {
-    width: 30px;
-    height: 30px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
-    background: var(--dark-card);
-    color: #fff;
+    background: var(--primary);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    border: 1px solid var(--primary);
-}
-
-.add-member-button {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px dashed #888;
-    color: #888;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.add-member-button:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.settings-button {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-.settings-button:hover {
-    color: var(--primary);
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: auto;
-}
-
-/* Group sections */
-.dashboard-content {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto;
-    gap: 20px;
-}
-
-.group-activity {
-    grid-column: 1 / 4;
-    grid-row: 1 / 2;
-}
-
-.group-watchlist {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-}
-
-.group-reviews {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-}
-
-.group-members {
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
-}
-
-/* Activity items */
-.happening-item {
-    padding: 12px 16px;
-    border-bottom: 1px solid #333;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-}
-
-.happening-item:last-child {
-    border-bottom: none;
-}
-
-.user {
-    color: var(--primary);
-    font-weight: 500;
-}
-
-.movie {
-    color: #fff;
-    font-weight: 500;
-}
-
-.action {
-    color: #888;
-}
-
-.activity-rating {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--primary);
-}
-
-.rating-value {
-    color: #888;
-    font-size: 0.9rem;
-}
-
-.activity-comment {
-    flex-basis: 100%;
-    margin: 8px 0 4px 0;
-    color: #ccc;
-    font-style: italic;
-    padding-left: 16px;
-    border-left: 2px solid #333;
-}
-
-.timestamp {
-    color: #666;
-    font-size: 0.8rem;
-    margin-left: auto;
-}
-
-/* Add movie button */
-.add-movie-button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.85rem;
-}
-
-.add-movie-button:hover {
-    background: var(--primary);
-}
-
-/* Review author */
-.review-author {
-    color: #888;
-    font-size: 0.85rem;
-    margin: 0 0 4px 0;
-}
-
-/* Invite button */
-.invite-button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.85rem;
-    margin-left: auto;
-}
-
-.invite-button:hover {
-    background: var(--primary);
-}
-
-/* Members section */
-.members-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-    padding-right: 8px;
-}
-
-.member-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    background: #333;
-    border-radius: 6px;
-    border: 1px solid #444;
-}
-
-.member-item .member-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .member-name {
-    color: #fff;
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.group-activity-box {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 320px;
+}
+
+.activity-header {
+    background: #373737;
+    padding: 20px;
+}
+
+.activity-header h2 {
+    color: #ffffff;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.activity-list-container {
+    flex: 1;
+    background: #4C4C4C;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.activity-list-container {
+    flex: 1;
+    background: #4C4C4C;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #aaaaaa;
+    padding: 5px 0;
+}
+
+.bullet {
+    color: var(--primary);
+    margin-right: 5px;
+}
+
+.activity-user {
+    color: var(--primary);
     font-weight: 500;
 }
 
-/* Content section headers with actions */
-.content-section h2 {
+.activity-movie {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.activity-text {
+    color: #aaaaaa;
+}
+
+/* Bottom Section */
+.group-bottom-section {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 20px;
+}
+
+.group-scores-box {
+    background: #373737;
+    border-radius: 8px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.scores-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #373737;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    z-index: 1;
+}
+
+.scores-header h2 {
+    color: #ffffff;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.scores-sort {
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.score-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 20px 20px;
+}
+
+.scores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.score-card {
+    display: flex;
+    gap: 15px;
+    background: #444444;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.score-poster img {
+    width: 80px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.score-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.score-movie-name {
+    color: #ffffff;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.score-rating {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.rating-tickets {
+    display: flex;
+    gap: 5px;
+}
+
+.ticket {
+    width: 30px;
+    height: 15px;
+    border-radius: 4px;
+}
+
+.ticket.filled {
+    background-color: var(--primary);
+}
+
+.ticket.partial {
+    background: linear-gradient(to right, var(--primary) 50%, transparent 50%);
+    border: 1px solid var(--primary);
+}
+
+.ticket.empty {
+    border: 1px solid var(--primary);
+}
+
+.group-tierlist-box {
+    background: #373737;
+    border-radius: 8px;
+    padding: 20px;
+    height: 500px;
+}
+
+.group-tierlist-box h2 {
+    color: #ffffff;
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.tierlist-placeholder {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-bottom: 1px solid #333;
+    justify-content: center;
+    height: 500px;
+    color: #666666;
+    font-size: 1.5rem;
+
 }
 
-.section-chevron {
-    margin-left: 8px;
-    font-size: 1rem;
-    opacity: 0.6;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-.section-chevron:hover {
-    opacity: 1;
-    color: var(--primary);
+::-webkit-scrollbar-track {
+    background: #222222;
+    border-radius: 4px;
 }
 
-.filter-icon {
-    margin-left: auto;
-    font-size: 1.2rem;
-    opacity: 0.6;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
+::-webkit-scrollbar-thumb {
+    background: #444444;
+    border-radius: 4px;
 }
 
-.filter-icon:hover {
-    opacity: 1;
-    color: var(--primary);
+::-webkit-scrollbar-thumb:hover {
+    background: #555555;
 }
 
 /* Responsive adjustments */
 @media (max-width: 1200px) {
-    .dashboard-content {
-        grid-template-columns: 1fr 1fr;
+    .group-top-section {
+        flex-direction: column;
+        height: auto;
     }
 
-    .group-activity {
-        grid-column: 1 / 3;
+    .group-showtime {
+        width: 100%;
+        height: 200px;
     }
 
-    .group-members {
-        grid-column: 1 / 3;
-        grid-row: 3 / 4;
+    .group-calendar {
+        height: 300px;
+    }
+
+    .group-middle-section {
+        grid-template-columns: 1fr;
+    }
+
+    .group-bottom-section {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 768px) {
-    .dashboard-content {
-        grid-template-columns: 1fr;
+    .members-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 
-    .group-activity,
-    .group-watchlist,
-    .group-reviews,
-    .group-members {
-        grid-column: 1;
+    .calendar-date {
+        font-size: 0.8rem;
     }
+}
 
-    .group-watchlist {
-        grid-row: 2;
-    }
-
-    .group-reviews {
-        grid-row: 3;
-    }
-
-    .group-members {
-        grid-row: 4;
+@media (max-width: 480px) {
+    .members-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

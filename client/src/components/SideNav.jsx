@@ -19,29 +19,17 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
     { id: '2', name: 'Sci-Fi Lovers' },
     ]);
 
-  useEffect(() => {
-    if (location.pathname.startsWith('/group/')) {
-      setGroupsOpen(true);
-    }
-  }, [location.pathname]);
-
-  // const handleMouseLeave = () => {
-  //   setGroupsOpen(false);
-  // };
-
   const handleMouseLeave = () => {
-    // Don't auto-close if we're on a group page
-    if (!location.pathname.startsWith('/group/')) {
-      setGroupsOpen(false);
-    }
+    setGroupsOpen(false);
   };
+
 
   const currentGroupId = location.pathname.startsWith('/group/')
       ? location.pathname.split('/')[2]
       : null;
 
   return (
-    <aside 
+    <aside
       className="sidenav"
       onMouseLeave={handleMouseLeave}
     >
@@ -49,20 +37,13 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
         <span className="icon"><BiMoviePlay /></span>
         <span className="text">Movie Mates</span>
       </Link>
-      
-      <nav className="nav-menu">
-        {/*<Link to="/dashboard" className="nav-item active">*/}
-        {/*  <span className="icon"><MdDashboard /></span>*/}
-        {/*  <span className="text">Dashboard</span>*/}
-        {/*</Link>*/}
 
-        <Link
-            to="/dashboard"
-            className={`nav-item ${location.pathname === '/dashboard' ? 'active' : ''}`}
-        >
+      <nav className="nav-menu">
+        <Link to="/dashboard" className="nav-item active">
           <span className="icon"><MdDashboard /></span>
           <span className="text">Dashboard</span>
         </Link>
+
 
         <div className={`nav-section ${groupsOpen ? 'open' : ''}`}>
           <div
@@ -87,52 +68,24 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
           </div>
         </div>
 
-        {/*<Link to="/movies" className="nav-item">*/}
-        {/*  <span className="icon"><BiMoviePlay /></span>*/}
-        {/*  <span className="text">Movies</span>*/}
-        {/*</Link>*/}
-
-        <Link
-            to="/movies"
-            className={`nav-item ${location.pathname === '/movies' ? 'active' : ''}`}
-        >
-          <span className="icon"><BiMoviePlay /></span>
-          <span className="text">Movies</span>
-        </Link>
-
-<<<<<<< Updated upstream
-        <Link to="/tierlist" className="nav-item">
-
-        {/*<Link*/}
-        {/*    to="/tierlist"*/}
-        {/*    className={`nav-item ${location.pathname === '/tierlist' ? 'active' : ''}`}*/}
-        {/*>*/}
-=======
-        {/*<Link to="/tierlist" className="nav-item">*/}
-        {/*  <span className="icon"><MdFormatListBulleted /></span>*/}
-        {/*  <span className="text">Tierlist</span>*/}
-        {/*</Link>*/}
-
         <Link
             to="/tierlist"
-            className={`nav-item ${location.pathname === '/tierlist' ? 'active' : ''}`}
+            className="nav-item"
         >
->>>>>>> Stashed changes
           <span className="icon"><MdFormatListBulleted /></span>
           <span className="text">Tierlist</span>
         </Link>
 
-        {/*<div className="nav-item">*/}
-        {/*  <span className="icon"><CgProfile /></span>*/}
-        {/*  <span className="text">Profile</span>*/}
-        {/*</div>*/}
-        <Link
-            to="/profile"
-            className={`nav-item ${location.pathname === '/profile' ? 'active' : ''}`}
-        >
+        <Link to="/movies" className="nav-item">
+          <span className="icon"><BiMoviePlay /></span>
+          <span className="text">Movies</span>
+        </Link>
+
+        <div className="nav-item">
           <span className="icon"><CgProfile /></span>
           <span className="text">Profile</span>
-        </Link>
+        </div>
+
       </nav>
 
       <div className="sign-out" onClick={() => logout({returnTo: window.location.origin})}>
