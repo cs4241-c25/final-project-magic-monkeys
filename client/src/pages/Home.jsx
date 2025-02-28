@@ -31,7 +31,7 @@ export const Home = () => {
             The social platform that brings friends together through movies. 
             Create groups, share ratings, and find the perfect movie for your next watch party.
           </p>
-          <div className="hero-buttons">
+          <div className="hero-buttons mb-5">
             {!isAuthenticated ? (
                 <button onClick={() => loginWithRedirect()} className="cta-button">
                   Log In
@@ -45,6 +45,9 @@ export const Home = () => {
               Movies
             </Link>
           </div>
+          <p className="hero-subtitle">
+            ***THIS IS A WPI STUDENT PROJECT***
+          </p>
         </div>
         <div className="hero-image">
           <HeroImage />
