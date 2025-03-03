@@ -1,5 +1,6 @@
 import Review from "../models/Review.js";
 import User from "../models/User.js";
+import UserGroup from "../models/UserGroups.js";
 
 export const createReview = async (req, res) => {
     try {
@@ -60,6 +61,32 @@ export const getReviewsByUser = async (req, res) => {
         }
 
         res.status(200).json(reviews);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+export const getGroupMovieAverageRating = async (req, res) => {
+    try {
+        const { groupId, movieId } = req.params;
+
+        const userGroups = await UserGroup.find({ groupId }).select("userId");
+        if (!userGroups.length) {
+            return res.status(404).json({ message: "No members found in this group." });
+        }
+
+        const userIds = userGroups.map(ug => ug.userId);
+
+        const reviews = await Review.find({ movieId, userId: { $in: userIds } });
+
+        if (!reviews.length) {
+            return res.status(404).json({ message: "No reviews found for this movie by group members." });
+        }
+
+        const totalRatings = reviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = totalRatings / reviews.length;
+
+        res.status(200).json({ averageRating: averageRating.toFixed(2), reviewCount: reviews.length });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
