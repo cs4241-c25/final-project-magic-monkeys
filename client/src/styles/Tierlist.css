@@ -1,0 +1,89 @@
+.tierlist-container {
+    padding-left: 70px;
+    min-height: 100vh;
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .tierlist-main {
+    padding: 20px;
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+  
+  .sidenav.expanded + .tierlist-main {
+    margin-left: 250px;
+  }
+
+  .tierlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    height: 20px;
+  }
+
+  .tier-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    height: 100%;
+  }
+  
+  .tier-row {
+    display: flex;
+    align-items: center;
+    background: #333;
+    border-radius: 1px;
+    height: calc((100% - 24px) / 3);
+  }
+  
+  .tier-label {
+    width: 75px;
+    height: 100px;
+    background: #ff5c5c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    /* border-radius: 4px 0px 0px 4px; */
+    font-weight: bold;
+    font-size: 1.4rem;
+  }
+  
+  .tier-movies {
+    display: flex;
+    gap: 10px;
+    padding: 4px;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  .content-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 4px;
+  }
+  
+  .tier-movies img {
+    width: 60x;
+    height: 90px;
+    border-radius: 4px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  
+  .tier-movies.dragging-over {
+    background-color: #444; /* Visual feedback when dragging over */
+  }
+  
+  .draggable-item {
+    position: relative;
+    transition: opacity 0.2s;
+  }
+  
+  .draggable-item.dragging {
+    opacity: 0.8;
+  }

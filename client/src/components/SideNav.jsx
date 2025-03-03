@@ -51,10 +51,10 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
           <span className="text">Movies</span>
         </Link>
 
-        <div className="nav-item">
+        <Link to="/tierlist" className="nav-item">
           <span className="icon"><MdFormatListBulleted /></span>
           <span className="text">Tierlist</span>
-        </div>
+        </Link>
 
         <div className="nav-item">
           <span className="icon"><CgProfile /></span>

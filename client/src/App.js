@@ -4,6 +4,7 @@ import { NavBar } from './components/NavBar';
 import { Home } from './pages/Home';
 import { MovieDemo } from './pages/MovieDemo';
 import { Dashboard } from './pages/Dashboard';
+import { Tierlist } from './pages/Tierlist';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import './App.css';
 import React from "react";
@@ -37,7 +38,7 @@ const AppContent = () => {
       className={`App ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}
       style={{ fontFamily: `${currentFont}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif` }}
     >
-      {location.pathname !== '/dashboard' && (
+      {location.pathname !== '/dashboard' & location.pathname !== '/tierlist' && (
         <NavBar
           currentFont={currentFont}
           toggleFont={toggleFont}
@@ -53,6 +54,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+        />
+        <Route
+            path="/tierlist"
+            element={
+              <ProtectedRoute>
+                <Tierlist />
               </ProtectedRoute>
             }
         />

@@ -104,17 +104,17 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          <div className="content-section tierlist">
+          <div className="content-section mini-tierlist">
             <h2>Tier List</h2>
-            <div className="tier-container">
+            <div className="mini-tier-container">
               {[
                 { tier: 'S', movies: [movieData[2], movieData[3], movieData[0], movieData[1]] },  // Arrival, Midsommar, Oppenheimer, Interstellar
                 { tier: 'A', movies: [movieData[0], movieData[1]] },  // Oppenheimer, Interstellar
                 { tier: 'B', movies: [movieData[0]] },  // Oppenheimer
               ].map(({ tier, movies }) => (
-                <div key={tier} className="tier-row">
-                  <div className="tier-label">{tier}</div>
-                  <div className="tier-movies">
+                <div key={tier} className="mini-tier-row">
+                  <div className="mini-tier-label">{tier}</div>
+                  <div className="mini-tier-movies">
                     {movies.map((movie, i) => (
                       <img 
                         key={`${tier}-${i}`}
