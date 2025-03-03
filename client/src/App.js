@@ -5,6 +5,7 @@ import { Home } from './pages/Home';
 import { MovieDemo } from './pages/MovieDemo';
 import { Dashboard } from './pages/Dashboard';
 import { Tierlist } from './pages/Tierlist';
+import { Group } from './pages/Group';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import './App.css';
 import React from "react";
@@ -33,18 +34,30 @@ const AppContent = () => {
     });
   };
 
+  const hideNavBar = ['/dashboard', '/group', '/groups', '/tierlist'].some(path =>
+      location.pathname.startsWith(path)
+  );
+
   return (
     <div
       className={`App ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}
       style={{ fontFamily: `${currentFont}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif` }}
     >
-      {location.pathname !== '/dashboard' & location.pathname !== '/tierlist' && (
-        <NavBar
-          currentFont={currentFont}
-          toggleFont={toggleFont}
-          isDarkTheme={isDarkTheme}
-          toggleTheme={toggleTheme}
-        />
+      {/*{location.pathname !== '/dashboard' & location.pathname !== '/tierlist' && (*/}
+      {/*  <NavBar*/}
+      {/*    currentFont={currentFont}*/}
+      {/*    toggleFont={toggleFont}*/}
+      {/*    isDarkTheme={isDarkTheme}*/}
+      {/*    toggleTheme={toggleTheme}*/}
+      {/*  />)}*/}
+
+      {!hideNavBar && (
+          <NavBar
+              currentFont={currentFont}
+              toggleFont={toggleFont}
+              isDarkTheme={isDarkTheme}
+              toggleTheme={toggleTheme}
+          />
       )}
       <Routes>
         <Route path="/" element={<Home />} />
@@ -62,6 +75,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Tierlist />
+              </ProtectedRoute>
+            }
+        />
+        <Route
+            path="/group/:groupId"
+            element={
+              <ProtectedRoute>
+                <Group />
               </ProtectedRoute>
             }
         />

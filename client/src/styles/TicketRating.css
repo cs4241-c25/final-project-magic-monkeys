@@ -1,0 +1,78 @@
+.ticket-rating-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 240px;
+}
+
+.ticket-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 6px;
+    position: relative;
+}
+
+.ticket-rating-container {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.ticket-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.ticket-icon:has(svg[data-icon="ticket"]) svg {
+    opacity: 0.35;
+}
+
+.ticket-rating.slider-enabled {
+    cursor: pointer;
+}
+
+.ticket-icon.interactive {
+    cursor: pointer;
+}
+
+.ticket-icon.interactive:hover {
+    transform: translateY(-2px);
+}
+
+.ticket-icon.dragging:hover {
+    transform: none;
+}
+
+.ticket-sm .ticket-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.ticket-md .ticket-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.ticket-lg .ticket-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.ticket-value {
+    margin-left: 8px;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.ticket-icon.pulse svg {
+    animation: pulse 0.3s ease;
+}
