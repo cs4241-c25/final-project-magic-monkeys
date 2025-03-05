@@ -2,14 +2,45 @@ import Group from "../models/Group.js";
 import UserGroup from "../models/UserGroups.js";
 import User from "../models/User.js";
 
+import crypto from "crypto";
+
+const generateInviteCode = async () => {
+    let inviteCode;
+    let isUnique = false;
+
+    while(!isUnique){
+        inviteCode = crypto.randomBytes(4).toString("hex");
+        const existingGroup = await Group.findOne({ inviteCode });
+        if(!existingGroup){
+            isUnique = true;
+        }
+    }
+
+    return inviteCode;
+}
+
 export const createGroup = async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, userId } = req.body;
 
-        const newGroup = new Group({ name });
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const inviteCode = await generateInviteCode();
+
+        const newGroup = new Group({ name, inviteCode });
         const savedGroup = await newGroup.save();
 
-        res.status(201).json(savedGroup);
+        const newUserGroup = new UserGroup({
+            userId,
+            groupId: savedGroup._id,
+            role: "owner"
+        });
+        await newUserGroup.save();
+
+        res.status(201).json({ group: savedGroup, userGroup: newUserGroup });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
