@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
+// import { useAuth0 } from "@auth0/auth0-react";
+import { useUser } from '../context/UserContext';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 export const MovieDetails = ({ 
   movie, 
@@ -11,8 +15,85 @@ export const MovieDetails = ({
   renderReviews 
 }) => {
   const [showApiDetails, setShowApiDetails] = useState(false);
+  // const { user } = useAuth0();
   const [apiData, setApiData] = useState(null);
   const [director, setDirector] = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const { dbUser } = useUser();
+
+  const addToWatchlist = async () => {
+    try {
+      // if (!dbUser) {
+      //   throw new Error('Please log in to add movies to your watchlist');
+      // }
+
+      const response = await fetch(`${BACKEND_URL}/api/watch-lists`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: dbUser._id,
+          movieId: movie.id,
+          watched: false
+        })
+      });
+      
+      if (response.ok) {
+        alert('Added to watchlist successfully!');
+      } else {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        alert(`Failed to add to watchlist: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error adding to watchlist:', error);
+      alert(`Failed to add to watchlist: ${error.message}`);
+    }
+  };
+
+  const addToTierList = async () => {
+    try {
+      const watchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: dbUser._id,
+          movieId: movie.id,
+          seenMovie: true
+        })
+      });
+
+      if (!watchlistResponse.ok) {
+        throw new Error('Failed to update watchlist');
+      }
+
+      const tierlistResponse = await fetch(`${BACKEND_URL}/api/tier-lists`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: dbUser._id,
+          movieId: movie.id,
+          rank: "U",
+          order: 1
+        })
+      });
+
+      if (tierlistResponse.ok) {
+        alert('Movie marked as watched!');
+      } else {
+        const errorData = await tierlistResponse.json();
+        throw new Error(errorData.message || 'Failed to update tier list');
+      }
+    } catch (error) {
+      console.error('Error marking movie as watched:', error);
+      alert(`Failed to mark movie as watched: ${error.message}`);
+    }
+  };
 
   useEffect(() => {
     const fetchDirector = async () => {
@@ -60,6 +141,19 @@ export const MovieDetails = ({
           <button onClick={fetchApiDetails} className="api-details-button">
             API Details
           </button>
+        <button 
+          onClick={addToWatchlist}
+          className="api-details-button"
+        >
+          Add to Watchlist
+        </button>
+        
+        <button
+          onClick={addToTierList}
+          className="api-details-button"
+        >
+          Have Watched
+        </button>
           <p className="overview">{movie.overview}</p>
           {director && (
             <p className="director">
