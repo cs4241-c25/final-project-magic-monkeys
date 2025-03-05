@@ -25,29 +25,6 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchUserGroups = async () => {
-  //     if (!isAuthenticated || !dbUser) return;
-  //
-  //     try {
-  //       setLoading(true);
-  //       const response = await axios.get(`${API_URL}/api/users/${dbUser._id}/groups`);
-  //       const groups = response.data;
-  //
-  //       setUserGroups(groups.map(group => ({
-  //         id: group._id,
-  //         name: group.name
-  //       })));
-  //     } catch (err) {
-  //       console.error('Error fetching user groups:', err);
-  //       setError(err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchUserGroups();
-  // }, [dbUser, isAuthenticated]);
-
   const fetchUserGroups = useCallback(async () => {
     if (!isAuthenticated || !dbUser) return;
 
@@ -67,9 +44,6 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
       setLoading(false);
     }
   }, [dbUser, isAuthenticated]);
-
-
-
 
   useEffect(() => {
     fetchUserGroups();
@@ -91,13 +65,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
     setGroupsOpen(false);
   };
 
-  // const handleGroupCreated = (newGroup) => {
-  //   setUserGroups(prevGroups => [...prevGroups, newGroup]);
-  //   handleCloseModal();
-  // };
-
   const handleGroupCreated = async (newGroup) => {
-    // Refresh the groups list instead of manually updating state
     await fetchUserGroups();
     handleCloseModal();
   };
@@ -105,11 +73,6 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
   const currentGroupId = location.pathname.startsWith('/group/')
       ? location.pathname.split('/')[2]
       : null;
-
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // const openModal = () => setIsModalOpen(true);
-  // const closeModal = () => setIsModalOpen(false);
 
   return (
     <aside
