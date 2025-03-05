@@ -61,6 +61,21 @@ export const getGroupById = async (req, res) => {
     }
 };
 
+export const getGroupByInviteCode = async (req, res) => {
+    try {
+        const { inviteCode } = req.params;
+        const group = await Group.findOne({ inviteCode });
+
+        if (!group) {
+            return res.status(404).json({ message: "Group not found." });
+        }
+
+        res.status(200).json(group);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
 export const getGroupMembers = async (req, res) => {
     try {
         const { id: groupId } = req.params;
