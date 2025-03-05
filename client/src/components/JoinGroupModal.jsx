@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { BiPlus, BiUserPlus } from 'react-icons/bi';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser } from '../context/UserContext';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     const [mode, setMode] = useState('select');
@@ -11,7 +12,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [groupToJoin, setGroupToJoin] = useState(null);
-    const { user } = useAuth0();
+    const { dbUser } = useUser();
 
     const handleCreateGroup = async (e) => {
         e.preventDefault();
@@ -19,12 +20,12 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/groups', {
+            const response = await fetch(`${API_URL}/api/groups`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name: groupName }),
+                body: JSON.stringify({ name: groupName, userId: dbUser._id }),
             });
 
             if (!response.ok) {
@@ -32,28 +33,8 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             }
             const groupData = await response.json();
 
-            const memberResponse = await fetch('/api/user-groups', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId: user.sub,
-                    groupId: groupData._id,
-                    role: 'owner'
-                }),
-            });
-
-            if (!memberResponse.ok) {
-                await fetch(`/api/groups/${groupData._id}`, { method: 'DELETE' });
-                throw new Error('Failed to set up group membership');
-            }
-
-
-            const memberData = await memberResponse.json();
             onGroupCreated({
-                ...groupData,
-                membership: memberData
+                ...groupData
             });
             resetForm();
             onClose();
@@ -72,24 +53,30 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
 
         try {
             // Fetch group details first
-            const groupResponse = await fetch(`/api/groups/${groupCode}`);
+            const groupResponse = await fetch(`${API_URL}/api/groups/invite/${groupCode}`);
             if (!groupResponse.ok) {
                 throw new Error('Group not found');
             }
 
             const groupData = await groupResponse.json();
 
-            // Get member count (you'll need to implement this endpoint)
-            const membersResponse = await fetch(`/api/groups/${groupCode}/members`);
-            if (!membersResponse.ok) {
-                throw new Error('Failed to fetch member details');
+            const joinResponse = await fetch(`${API_URL}/api/user-groups/check/${dbUser._id}/${groupData._id}`);
+            const joinData = await joinResponse.json();
+
+            if(joinData.isMember){
+                throw new Error('Already a member');
             }
 
-            const membersData = await membersResponse.json();
+            // // Get member count (you'll need to implement this endpoint)
+            // const membersResponse = await fetch(`${API_URL}/api/groups/${groupCode}/members`);
+            // if (!membersResponse.ok) {
+            //     throw new Error('Failed to fetch member details');
+            // }
+
+            // const membersData = await membersResponse.json();
 
             setGroupToJoin({
-                ...groupData,
-                memberCount: membersData.length
+                ...groupData
             });
             setMode('confirm');
         } catch (err) {
@@ -105,14 +92,14 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/user-groups', {
+            const response = await fetch(`${API_URL}/api/user-groups`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userId: user.sub,
-                    groupId: groupCode,
+                    userId: dbUser._id,
+                    groupId: groupToJoin._id,
                     role: 'member'
                 }),
             });
@@ -255,9 +242,9 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
                         <h2 className="modal-title">Confirm Join Group</h2>
                         <div className="group-preview">
                             <h3 className="group-preview-name">{groupToJoin.name}</h3>
-                            <p className="group-preview-members">
+                            {/* <p className="group-preview-members">
                                 {groupToJoin.memberCount} member{groupToJoin.memberCount !== 1 ? 's' : ''}
-                            </p>
+                            </p> */}
                             {/* Add more group details here if needed */}
                         </div>
                         {error && <p className="modal-error">{error}</p>}
