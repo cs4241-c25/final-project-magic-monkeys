@@ -165,3 +165,26 @@
   background-color: #ff4b4b;
   border-radius: 0 3px 3px 0;
 }
+
+.create-group-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  color: #888;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.create-group-button:hover {
+  color: #ff4b4b;
+  transform: translateX(5px);
+}
+
+.create-group-button .icon {
+  min-width: 20px;
+  margin-right: 8px;
+}
