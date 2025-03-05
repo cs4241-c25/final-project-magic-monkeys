@@ -34,8 +34,6 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
         const response = await axios.get(`${API_URL}/api/users/${dbUser._id}/groups`);
         const groups = response.data;
 
-        console.log(response);
-
         setUserGroups(groups.map(group => ({
           id: group._id,
           name: group.name

@@ -6,7 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 export const groupAPI = {
     async getGroupById(groupId) {
         try {
-            const res = await axios.get(`${API_URL}/groups/${groupId}`);
+            const res = await axios.get(`${API_URL}/api/groups/${groupId}`);
             return res.data;
         } catch (error) {
             console.error('Error fetching group:', error);
@@ -17,7 +17,7 @@ export const groupAPI = {
     // Get members of a group
     async getGroupMembers(groupId) {
         try {
-            const res = await axios.get(`${API_URL}/groups/${groupId}/members`);
+            const res = await axios.get(`${API_URL}/api/groups/${groupId}/members`);
             return res.data;
         } catch (error) {
             console.error('Error fetching group members:', error);
@@ -27,7 +27,7 @@ export const groupAPI = {
 
     async getUserGroups(userId) {
         try {
-            const res = await axios.get(`${API_URL}/users/${userId}/groups`);
+            const res = await axios.get(`${API_URL}/api/users/${userId}/groups`);
             return res.data;
         } catch (error) {
             console.error('Error fetching user groups:', error);
@@ -38,8 +38,8 @@ export const groupAPI = {
     // Get movie nights for a group
     async getGroupMovieNights(groupId) {
         try {
-            const res = await axios.get(`${API_URL}/groups/${groupId}/movie-nights`);
-            return res.data;
+            //const res = await axios.get(`${API_URL}/api/groups/${groupId}/movie-nights`);
+            //return res.data;
         } catch (error) {
             console.error('Error fetching movie nights:', error);
             throw error;
@@ -48,8 +48,8 @@ export const groupAPI = {
 
     async getMovieAverageRating(groupId, movieId) {
         try {
-            const res = await axios.get(`${API_URL}/groups/${groupId}/movies/${movieId}/average-rating`);
-            return res.data;
+            // const res = await axios.get(`${API_URL}/api/groups/${groupId}/movies/${movieId}/average-rating`);
+            // return res.data;
         } catch (error) {
             console.error('Error fetching movie average rating:', error);
             throw error;
@@ -58,8 +58,8 @@ export const groupAPI = {
 
     async getUserReviews(userId) {
         try {
-            const res = await axios.get(`${API_URL}/users/${userId}/reviews`);
-            return res.data;
+            // const res = await axios.get(`${API_URL}/api/users/${userId}/reviews`);
+            // return res.data;
         } catch (error) {
             console.error('Error fetching user reviews:', error);
             throw error;

@@ -12,7 +12,7 @@ import { TicketRating } from '../components/TicketRating';
 
 export const Group = () => {
     const { groupId } = useParams();
-    const { user, isLoading, isAuthenticated } = useAuth0();
+    const { isLoading, isAuthenticated } = useAuth0();
     const navigate = useNavigate();
 
     const [isExpanded, setIsExpanded] = useState(false);
