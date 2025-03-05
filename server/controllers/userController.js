@@ -6,10 +6,14 @@ import WatchList from "../models/WatchList.js";
 
 export const createUser = async (req, res) => {
     try {
+
+        console.log("Received request to create user: " + req.body);
+
         const { auth0Id, username, email, profilePicture, favoriteMovie } = req.body;
 
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
+            console.log("User already exists: " + existingUser);
             return res.status(400).json({ message: "Username or email already in use." });
         }
 
@@ -22,8 +26,10 @@ export const createUser = async (req, res) => {
         });
 
         await newUser.save();
+        console.log("User created successfully: ", newUser);
         res.status(201).json(newUser);
     } catch (error) {
+        console.log("Error creating user: ", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
