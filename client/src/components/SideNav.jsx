@@ -1,11 +1,12 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { BiMoviePlay, BiGroup, BiHome, BiChevronDown, BiChevronRight } from 'react-icons/bi';
+import { BiMoviePlay, BiGroup, BiHome, BiChevronDown, BiChevronRight, BiPlus } from 'react-icons/bi';
 import { MdDashboard, MdFormatListBulleted } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
 import { FiLogOut } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
+import {JoinGroupModal} from './JoinGroupModal';
 
 import '../styles/SideNav.css';
 
@@ -24,6 +25,8 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
   const [userGroups, setUserGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserGroups = async () => {
@@ -51,12 +54,34 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
   }, [user, isAuthenticated]);
 
   const handleMouseLeave = () => {
+    if (!isGroupModalOpen) {
+      setGroupsOpen(false);
+    }
+  };
+
+  const handleOpenModal = (e) => {
+    e.stopPropagation(); // Prevent the click from bubbling to parent elements
+    setIsGroupModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsGroupModalOpen(false);
     setGroupsOpen(false);
+  };
+
+  const handleGroupCreated = (newGroup) => {
+    setUserGroups(prevGroups => [...prevGroups, newGroup]);
+    handleCloseModal();
   };
 
   const currentGroupId = location.pathname.startsWith('/group/')
       ? location.pathname.split('/')[2]
       : null;
+
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // const openModal = () => setIsModalOpen(true);
+  // const closeModal = () => setIsModalOpen(false);
 
   return (
     <aside
@@ -100,6 +125,13 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
                     </Link>
                 ))
             )}
+            <button
+                onClick={handleOpenModal}
+                className="nav-subitem create-group-button"
+            >
+              <BiPlus className="icon"/>
+              <span className="text">Create or Join Group</span>
+            </button>
 
           </div>
         </div>
@@ -108,7 +140,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
             to="/tierlist"
             className={`nav-item ${location.pathname === '/tierlist' ? 'active' : ''}`}
         >
-          <span className="icon"><MdFormatListBulleted /></span>
+          <span className="icon"><MdFormatListBulleted/></span>
           <span className="text">Tierlist</span>
         </Link>
 
@@ -128,6 +160,12 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
         <span className="icon"><FiLogOut/></span>
         <span className="text">Sign out</span>
       </div>
+
+      <JoinGroupModal
+          isOpen={isGroupModalOpen}
+          onClose={handleCloseModal}
+          onGroupCreated={handleGroupCreated}
+      />
     </aside>
   );
 }; 
