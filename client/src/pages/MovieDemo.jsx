@@ -4,8 +4,12 @@ import { MovieCard } from '../components/MovieCard';
 import { MovieDetails } from '../components/MovieDetails';
 import { tmdbAPI } from '../services/tmdbAPI';
 import { omdbAPI } from '../services/omdbAPI';
+import { useUser } from '../context/UserContext';
+import { useAuth0 } from '@auth0/auth0-react';
 
 export const MovieDemo = () => {
+  const { isLoading } = useAuth0();
+  const { dbUser, isAuthenticated } = useUser();
   const [movie, setMovie] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTrailer, setSelectedTrailer] = useState(null);

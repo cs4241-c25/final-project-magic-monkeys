@@ -11,18 +11,18 @@ export const NavBar = ({ currentFont, toggleFont, isDarkTheme, toggleTheme }) =>
     };
 
     return (
-    <nav className="nav-bar">
-      <button 
+    <nav className="nav-bar flex items-center justify-between">
+      {/* <button 
         onClick={toggleFont} 
         className="font-toggle"
         style={{ fontFamily: currentFont }}
       >
         {currentFont}
-      </button>
-            <h1 className="site-title">Movie Mates</h1>
-        <button onClick={toggleTheme} className="theme-toggle">
+      </button> */}
+            <h1 className="site-title flex-1 text-center">Movie Mates</h1>
+        {/* <button onClick={toggleTheme} className="theme-toggle">
         {isDarkTheme ? '🌙' : '☀️'}
-      </button>
+      </button> */}
     </nav>
   );
 }; 
