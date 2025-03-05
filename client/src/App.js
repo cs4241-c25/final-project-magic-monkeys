@@ -10,6 +10,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import './App.css';
 import React from "react";
 // import { useAuth0 } from "@auth0/auth0-react";
+import { UserProvider } from './context/UserContext';
 import "./App.css";
 
 const AppContent = () => {
@@ -93,9 +94,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <UserProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </UserProvider>
   );
 
 }
