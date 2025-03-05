@@ -4,6 +4,10 @@ import '../styles/Dashboard.css';
 import { BiChevronDown, BiChevronUp, BiFilterAlt } from 'react-icons/bi';
 import { BsTicketFill, BsTicket } from "react-icons/bs";
 import { useAuth0 } from '@auth0/auth0-react';
+import { TicketRating } from '../components/TicketRating';
+import '../styles/TicketRating.css';
+
+
 
 
 export const Dashboard = () => {
@@ -11,8 +15,40 @@ export const Dashboard = () => {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState('Group Name');
+  const [movieRatings, setMovieRatings] = useState({
+    1: 4,
+    2: 5,
+    3: 4,
+    4: 5
+  });
+
+  const handleRatingChange = (movieId, newRating) => {
+    setMovieRatings(prevRatings => ({
+      ...prevRatings,
+      [movieId]: newRating
+    }));
+
+    console.log(`Movie ${movieId} rating updated to ${newRating}`);
+  };
 
   if (isLoading) return <div>Loading Dashboard...</div>;
+
+
+
+
+  //
+  // const handleRatingChange = (movie, newRating) => {
+  //   setMovieRating({
+  //     ...movieRating,
+  //     [movie]: newRating
+  //   });
+  // };
+  // const [movieRating, setMovieRating] = useState({
+  //   'Oppenheimer': 4,
+  //   'Interstellar': 5,
+  //   'Arrival': 3
+  // });
+
 
   const movieData = [
     {
@@ -151,20 +187,46 @@ export const Dashboard = () => {
               <BiFilterAlt className="menu-dots" />
             </h2>
             <div className="reviews-list">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="review-card">
-                  <img 
-                    src={movieData[(i-1) % 4].poster}
-                    alt={movieData[(i-1) % 4].title} 
-                  />
-                  <div className="review-content">
-                    <h4>{movieData[(i-1) % 4].title}</h4>
-                    <div className="rating-tickets flex flex-row gap-1 mb-2">
-                      <BsTicketFill /><BsTicketFill /><BsTicketFill /><BsTicketFill />{i === 4 ? <BsTicketFill /> : <BsTicket />}
+              {/*{[1, 2, 3, 4].map(i => (*/}
+              {movieData.map((movie, i) => (
+                  // <div key={i} className="review-card">
+                  //   <img
+                  //     src={movieData[(i-1) % 4].poster}
+                  //     alt={movieData[(i-1) % 4].title}
+                  //   />
+                  <div key={movie.id} className="review-card">
+                    <img
+                        src={movie.poster}
+                        alt={movie.title}
+                    />
+                    <div className="review-content">
+                      {/*<h4>{movieData[(i - 1) % 4].title}</h4>*/}
+                      <h4>{movie.title}</h4>
+
+                      {/*<div className="rating-tickets flex flex-row gap-1 mb-2">*/}
+                      {/*  /!*<BsTicketFill /><BsTicketFill /><BsTicketFill /><BsTicketFill />{i === 4 ? <BsTicketFill /> : <BsTicket />}*!/*/}
+                      {/*  /!*<TicketRating*!/*/}
+                      {/*  /!*    rating={movieRating}*!/*/}
+                      {/*  /!*    interactive={true}*!/*/}
+                      {/*  /!*    onChange={(newRating) => setMovieRating(newRating)}*!/*/}
+                      {/*/>*/}
+                      {/*  <TicketRating rating={i === 4 ? 5 : 4}/>*/}
+
+                      {/*</div>*/}
+                      <div className="ticket-rating-container">
+                        <TicketRating
+                            rating={movieRatings[movie.id]}
+                            interactive={true}
+                            onChange={(newRating) => handleRatingChange(movie.id, newRating)}
+                            size="md"
+                            color="#ff4b4b"
+                        />
+                          {/*<TicketRating rating={i === 4 ? 5 : 4}/>*/}
+
+                      </div>
+                      <p>{"A masterpiece of modern cinema. The cinematography and acting..."}</p>
                     </div>
-                    <p>{"A masterpiece of modern cinema. The cinematography and acting..."}</p>
                   </div>
-                </div>
               ))}
             </div>
           </div>

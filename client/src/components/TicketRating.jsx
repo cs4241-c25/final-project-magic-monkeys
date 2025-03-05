@@ -19,7 +19,6 @@ export const TicketRating = ({
     const [isDragging, setIsDragging] = useState(false);
     const ticketsContainerRef = useRef(null);
 
-    // Get appropriate CSS class based on size prop
     const getSizeClass = () => {
         switch(size) {
             case 'sm': return 'ticket-sm';
@@ -28,28 +27,24 @@ export const TicketRating = ({
         }
     };
 
-    // Handle click event for interactive mode on specific ticket
     const handleClick = (newRating) => {
         if (interactive) {
             onChange(newRating);
         }
     };
 
-    // Handle mouse enter for interactive mode
     const handleMouseEnter = (index) => {
         if (interactive && !isDragging) {
             setHoverRating(index);
         }
     };
 
-    // Reset hover rating when mouse leaves
     const handleMouseLeave = () => {
         if (interactive) {
             setHoverRating(0);
         }
     };
 
-    // Handle mouse down to start dragging
     const handleMouseDown = (e) => {
         if (interactive && ticketsContainerRef.current) {
             setIsDragging(true);
@@ -57,7 +52,6 @@ export const TicketRating = ({
         }
     };
 
-    // Update rating based on mouse position
     const updateRatingFromPosition = (e) => {
         if (ticketsContainerRef.current) {
             const rect = ticketsContainerRef.current.getBoundingClientRect();
@@ -130,11 +124,9 @@ export const TicketRating = ({
                 onMouseDown={interactive ? handleMouseDown : undefined}
             >
                 {renderTickets()}
-                {interactive && (
                     <div className="ticket-value">
                         {(hoverRating || rating || 0).toFixed(1)}/{maxRating.toFixed(1)}
                     </div>
-                )}
             </div>
         </div>
     );
