@@ -34,6 +34,33 @@ export const addUserToGroup = async (req, res) => {
     }
 };
 
+export const joinGroupByInvite = async (req, res) => {
+    try{
+        const { userId, inviteCode } = req.body;
+
+        const group = await Group.findOne({ inviteCode });
+        if(!group){
+            return res.status(404).json({ message: "Invalid invite code." });
+        }
+
+        const existingMembership = await UserGroup.findOne({ userId, groupId: group._id });
+        if(existingMembership){
+            return res.status(400).json({ message: "User is already a member of this group." });
+        }
+
+        const newMembership = new UserGroup({
+            userId,
+            groupId: group._id,
+            role: "member"
+        });
+
+        await newMembership.save();
+        res.status(201).json({ message: "Joined group successfully", group });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
+
 export const getUserGroupById = async (req, res) => {
     try {
         const { id } = req.params;
