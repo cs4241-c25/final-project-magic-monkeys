@@ -6,12 +6,14 @@ import { BsTicketFill, BsTicket } from "react-icons/bs";
 import { useAuth0 } from '@auth0/auth0-react';
 import { TicketRating } from '../components/TicketRating';
 import '../styles/TicketRating.css';
+import { useUser } from '../context/UserContext';
 
 
 
 
 export const Dashboard = () => {
-  const { user, isLoading } = useAuth0();
+  const { isLoading } = useAuth0();
+  const { dbUser, isAuthenticated } = useUser();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState('Group Name');
@@ -92,9 +94,9 @@ export const Dashboard = () => {
       />
       <main className="dashboard-main">
         <header className="dashboard-header">
-          <h1>Welcome Back, {user?.name || "User"}!</h1>
+          <h1>Welcome Back, {dbUser?.username || "User"}!</h1>
           {/*<div className="user-avatar">F</div>*/}
-          <div className="user-avatar">{user?.name ? user.name.charAt(0) : "U"}</div>
+          <div className="user-avatar">{dbUser?.username ? dbUser.username.charAt(0) : "U"}</div>
         </header>
 
         <div className="dashboard-content">
