@@ -6,6 +6,9 @@ import { BiChevronDown, BiFilterAlt, BiPlus, BiCog } from 'react-icons/bi';
 import { BsTicketFill, BsTicket } from "react-icons/bs";
 import '../styles/Dashboard.css';
 import '../styles/Group.css';
+import {useGroupData} from "../hooks/useGroupData";
+import { TicketRating } from '../components/TicketRating';
+
 
 export const Group = () => {
     const { groupId } = useParams();
@@ -13,7 +16,18 @@ export const Group = () => {
     const navigate = useNavigate();
 
     const [isExpanded, setIsExpanded] = useState(false);
-    const [groupData, setGroupData] = useState(null);
+
+    const {
+        groupData,
+        members,
+        activity,
+        scores,
+        movieNights,
+        showtime,
+        loading,
+        error,
+        refreshData
+    } = useGroupData(groupId);
 
     // Mock data
     const mockGroups = {
@@ -124,16 +138,27 @@ export const Group = () => {
             dates.push({
                 day: date.getDate(),
                 month: date.getMonth() + 1,
-                isCurrentMonth: false
+                isCurrentMonth: false,
+                hasEvent: false
             });
         }
 
         // Add this month's days
         for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+            const date = new Date(currentYear, currentMonth, i);
+            // Check if there's a movie night on this date
+            const hasEvent = movieNights.some(night => {
+                const nightDate = new Date(night.dateTime);
+                return nightDate.getDate() === i &&
+                    nightDate.getMonth() === currentMonth &&
+                    nightDate.getFullYear() === currentYear;
+            });
+
             dates.push({
                 day: i,
                 month: currentMonth + 1,
-                isCurrentMonth: true
+                isCurrentMonth: true,
+                hasEvent
             });
         }
 
@@ -144,7 +169,8 @@ export const Group = () => {
                 dates.push({
                     day: i,
                     month: currentMonth + 2 > 12 ? 1 : currentMonth + 2,
-                    isCurrentMonth: false
+                    isCurrentMonth: false,
+                    hasEvent: false
                 });
             }
         }
@@ -154,20 +180,26 @@ export const Group = () => {
 
     const calendar = generateCalendar();
 
-    // Fetch group data
-    useEffect(() => {
-        if (groupId) {
-            if (mockGroups[groupId]) {
-                setGroupData(mockGroups[groupId]);
-            } else {
-                navigate('/dashboard');
-            }
-        }
-    }, [groupId, navigate]);
+    if (isLoading || loading) return <div>Loading Group...</div>;
+    if (!isAuthenticated) {
+        navigate('/');
+        return null;
+    }
+    // if (!groupData) return <div>Loading Group Data...</div>;
 
-    if (isLoading) return <div>Loading Group...</div>;
-    if (!isAuthenticated) navigate('/');
-    if (!groupData) return <div>Loading Group Data...</div>;
+    if (error) {
+        return (
+            <div className="error-container">
+                <h2>Error loading group</h2>
+                <p>{error.message}</p>
+                <button onClick={refreshData} className="retry-button">
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+
+    if (!groupData) return <div>Group not found</div>;
 
     return (
         <div className="dashboard-container">
@@ -184,14 +216,24 @@ export const Group = () => {
                     {/* Top Section */}
                     <div className="group-top-section">
                         <div className="group-showtime">
-                            <div className="showtime-date">{groupData.showtime.date}</div>
-                            <div className="showtime-time">{groupData.showtime.time}</div>
+                            <div className="showtime-date">
+                                {showtime?.date || 'No showtime scheduled'}
+                            </div>
+                            {showtime?.time && (
+                                <div className="showtime-time">{showtime.time}</div>
+                            )}
+                            {showtime?.movieDetails && (
+                                <div className="showtime-movie">
+                                    {showtime.movieDetails.title}
+                                </div>
+                            )}
                             <div className="showtime-status">
                                 <div className="status-icons">
                                     <div className="status-icon no">
-                                        <span>F</span>
-                                        <span>F</span>
-                                        <span>F</span>
+                                    {showtime?.attending.map(attendee => (
+                                        <span key={attendee.id}>{attendee.profilePicture}</span>
+
+                                    ))}
                                     </div>
                                 </div>
                             </div>
@@ -207,11 +249,18 @@ export const Group = () => {
                                 {calendar.dates.map((date, index) => (
                                     <div
                                         key={index}
-                                        className={`calendar-date ${date.isCurrentMonth ? 'current-month' : 'other-month'}`}
+                                        className={`calendar-date 
+                                            ${date.isCurrentMonth ? 'current-month' : 'other-month'}
+                                            ${date.hasEvent ? 'has-event' : ''}`}
                                     >
                                         {date.day}
-                                        {date.month !== 5 ? null : date.day === 1 ?
-                                            <span className="month-label">May</span> : null}
+                                        {date.month !== new Date().getMonth() + 1 ? null :
+                                            date.day === 1 ? (
+                                                <span className="month-label">
+                                                    {new Date().toLocaleString('default', { month: 'short' })}
+                                                </span>
+                                            ) : null
+                                        }
                                     </div>
                                 ))}
                             </div>
@@ -223,7 +272,7 @@ export const Group = () => {
                         <div className="group-members-box">
                             <h2>Members</h2>
                             <div className="members-grid">
-                                {groupData.members.map(member => (
+                                {members.map(member => (
                                     <div key={member.id} className="member-card">
                                         <div className="member-avatar">{member.avatar}</div>
                                         <div className="member-name">{member.name}</div>
@@ -238,19 +287,23 @@ export const Group = () => {
                             </div>
                             <div className="activity-list-container">
                                 <div className="activity-list">
-                                    {groupData.activity.map(activity => (
-                                        <div key={activity.id} className="activity-item">
+                                    {activity.map(item => (
+                                        <div key={item.id} className="activity-item">
                                             <span className="bullet">•</span>
-                                            <span className="activity-user">{activity.user}</span>
-                                            <span className="activity-action">{activity.action}</span>
-                                            <span className="activity-movie">{activity.movie}</span>
-                                            <span className="activity-text">a {activity.rating} out of 5 tickets</span>
+                                            <span className="activity-user">{item.user}</span>
+                                            <span className="activity-action">{item.action}</span>
+                                            <span className="activity-movie">{item.movie}</span>
+                                            {item.rating && (
+                                                <span className="activity-text">a {item.rating} out of 5 tickets</span>
+                                            )}
+                                            <span className="activity-timestamp">{item.timestamp}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     {/* Bottom Section */}
                     <div className="group-bottom-section">
                         <div className="group-scores-box">
@@ -263,30 +316,47 @@ export const Group = () => {
 
                             <div className="score-container">
                                 <div className="scores-list">
-                                    {groupData.scores.map(score => (
-                                        <div key={score.id} className="score-card">
-                                            <div className="score-poster">
-                                                <img src={score.poster} alt={score.movie}/>
+
+                                    {scores.map(score => (
+                                        <div key={score.id} className="review-card">
+
+                                            {/*<div className="score-poster">*/}
+                                            {/*    <img src={score.poster} alt={score.movie}/>*/}
+                                            {/*    */}
+                                                <img
+                                                    src={score.poster}
+                                                    alt={score.movie}
+                                                />
+                                            {/*</div>*/}
+                                            <div className="review-content">
+                                                <h4>{score.movie}</h4>
+                                                {/*<div className="score-rating">{score.rating}</div>*/}
+                                                <div className="ticket-rating-container">
+                                                    <TicketRating
+                                                        rating={score.rating}
+                                                        size="lg"
+                                                        color="#ff4b4b"
+                                                    />
+                                                    {/*  <TicketRating rating={i === 4 ? 5 : 4}/>*/}
+
+                                                </div>
                                             </div>
-                                            <div className="score-info">
-                                                <div className="score-movie-name">Movie Name</div>
-                                                <div className="score-rating">{score.rating}</div>
-                                                {/*Tickets here*/}
-                                            </div>
+
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
 
-                            <div className="group-tierlist-box">
-                                <h2>Tier List</h2>
-                                <div className="tierlist-placeholder">
-                                    {/* Placeholder */}
-                                </div>
+                        <div className="group-tierlist-box">
+                            <h2>Tier List</h2>
+                            <div className="tierlist-placeholder">
+                                <span>Coming soon...</span>
+
                             </div>
                         </div>
                     </div>
+                </div>
             </main>
         </div>
 );
