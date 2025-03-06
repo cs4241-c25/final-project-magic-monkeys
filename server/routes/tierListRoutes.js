@@ -1,8 +1,9 @@
 import express from "express";
-import { createTierList, getTierListById, getTierListByUser, updateTierList, deleteTierList } from "../controllers/tierListController.js";
+import { createTierList, getTierListById, getTierListByUser, updateTierList, deleteTierList, bulkSaveTierList } from "../controllers/tierListController.js";
 
 const router = express.Router();
 
+router.post("/tier-lists/bulk-save", bulkSaveTierList);
 router.post("/tier-lists", createTierList);
 router.get("/tier-lists/:id", getTierListById);
 router.get("/users/:userId/tier-lists", getTierListByUser);

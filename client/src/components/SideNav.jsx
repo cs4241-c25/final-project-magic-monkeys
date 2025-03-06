@@ -3,7 +3,7 @@ import { BiMoviePlay, BiGroup, BiHome, BiChevronDown, BiChevronRight, BiPlus } f
 import { MdDashboard, MdFormatListBulleted } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
 import { FiLogOut } from 'react-icons/fi';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
@@ -46,6 +46,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
       }
     };
 
+  useEffect(() => {
     fetchUserGroups();
   }, [dbUser, isAuthenticated]);
 
@@ -65,19 +66,14 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
     setGroupsOpen(false);
   };
 
-  const handleGroupCreated = (newGroup) => {
-    setUserGroups(prevGroups => [...prevGroups, newGroup]);
+  const handleGroupCreated = async (newGroup) => {
+    await fetchUserGroups();
     handleCloseModal();
   };
 
   const currentGroupId = location.pathname.startsWith('/group/')
       ? location.pathname.split('/')[2]
       : null;
-
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // const openModal = () => setIsModalOpen(true);
-  // const closeModal = () => setIsModalOpen(false);
 
   return (
     <aside
@@ -145,10 +141,10 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
           <span className="text">Movies</span>
         </Link>
 
-        <div className="nav-item">
+        <Link to="/profile" className="nav-item">
           <span className="icon"><CgProfile /></span>
           <span className="text">Profile</span>
-        </div>
+        </Link>
 
       </nav>
 

@@ -247,20 +247,21 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
                             </p> */}
                             {/* Add more group details here if needed */}
                         </div>
-                        {error && <p className="modal-error">{error}</p>}
-                        <div className="modal-buttons">
+                        {error && <p className="text-[#ff5c5c] text-sm mt-2">{error}</p>}
+                        <div className="flex justify-end gap-4 mt-6">
                             <button
                                 type="button"
                                 onClick={() => setMode('join')}
-                                className="modal-button modal-button-secondary"
+                                className="px-4 py-2 text-white bg-[#373737] hover:bg-[#444444] rounded-lg transition-colors"
                             >
                                 Back
                             </button>
                             <button
                                 onClick={handleJoinConfirmed}
                                 disabled={loading}
-                                className="modal-button modal-button-primary"
+                                className="px-4 py-2 bg-[#ff5c5c] text-white rounded-lg hover:bg-[#ff716d] transition-colors disabled:opacity-50"
                             >
+
                                 {loading ? 'Joining...' : 'Join Group'}
                             </button>
                         </div>
