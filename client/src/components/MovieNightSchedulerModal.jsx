@@ -3,7 +3,7 @@ import { Modal } from './Modal';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData }) => {
+export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData, movieNightSchedule }) => {
     const [formData, setFormData] = useState({
         dateTime: "",
         recurring: false,
@@ -13,6 +13,49 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
         startTime: "",
         duration: "",
     });
+
+    useEffect(() => {
+        if(movieNightSchedule){
+            const formatDateForInput = (isoString) => {
+                if (!isoString) return "";
+                const date = new Date(isoString);
+                return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}T${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+            };
+    
+            const formatDateOnly = (isoString) => {
+                if (!isoString) return "";
+                const date = new Date(isoString);
+                return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+            };
+    
+            const formatTimeOnly = (isoString) => {
+                if (!isoString) return "";
+                const date = new Date(isoString);
+                return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+            };
+
+            setFormData({
+                dateTime: movieNightSchedule.dateTime ? formatDateForInput(movieNightSchedule.dateTime) : "",
+                recurring: movieNightSchedule.recurring || false,
+                recurrenceDays: movieNightSchedule.recurrenceDays || [],
+                startDate: movieNightSchedule.startDate ? formatDateOnly(movieNightSchedule.startDate) : "",
+                endDate: movieNightSchedule.endDate ? formatDateOnly(movieNightSchedule.endDate) : "",
+                startTime: movieNightSchedule.startTime ? formatTimeOnly(movieNightSchedule.startTime) : "",
+                duration: movieNightSchedule.duration || "",
+            });
+        }
+        else{
+            setFormData({
+                dateTime: "",
+                recurring: false,
+                recurrenceDays: [],
+                startDate: "",
+                endDate: "",
+                startTime: "",
+                duration: "",
+            });
+        }
+    }, [movieNightSchedule, isOpen]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -54,11 +97,18 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
         }
 
         try {
-            const response = await fetch(`${API_URL}/api/movie-night-schedules`, {
-                method: "POST",
+            const requestOptions = {
+                method: movieNightSchedule ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ...formattedFormData, groupId }),
-            });
+            };
+
+            const url = movieNightSchedule ?
+                `${API_URL}/api/movie-night-schedules/${movieNightSchedule._id}` :
+                `${API_URL}/api/movie-night-schedules`;
+                
+
+            const response = await fetch(url, requestOptions);
 
             if (response.ok) {
                 refreshData();
@@ -198,7 +248,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                             type="submit"
                             className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white rounded transition"
                         >
-                            Schedule
+                            {movieNightSchedule ? 'Update' : 'Schedule'}
                         </button>
                     </div>
                 </form>

@@ -22,6 +22,7 @@ export const Group = () => {
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSchedulerOpen, setSchedulerOpen] = useState(false);
+    const [selectedMovieNight, setSelectedMovieNight] = useState(null);
 
     const {
         groupData,
@@ -198,6 +199,7 @@ export const Group = () => {
                     eventDate.getMonth() + 1 === date.month &&
                     eventDate.getFullYear() === date.year){
                         date.events.push({
+                            movieNightSchedule: event,
                             time: eventTimeDisplay,
                             startTimestamp: new Date(event.startTime).getTime(),
                         });
@@ -222,6 +224,7 @@ export const Group = () => {
                         const eventTimeDisplay = eventEndTime ? `${eventStartTime} - ${eventEndTime}` : eventStartTime;
 
                         date.events.push({
+                            movieNightSchedule: event,
                             time: eventTimeDisplay,
                             startTimestamp: new Date(event.startTime).getTime()
                         });
@@ -244,6 +247,11 @@ export const Group = () => {
             throw error;
         }
     };
+
+    const openEditModal = (event) => {
+        setSelectedMovieNight(event);
+        setSchedulerOpen(true);
+    }
 
     const calendar = generateCalendar();
 
@@ -296,9 +304,13 @@ export const Group = () => {
                                 </button>
                                 <MovieNightSchedulerModal 
                                     isOpen={isSchedulerOpen} 
-                                    onClose={() => setSchedulerOpen(false)} 
+                                    onClose={() => {
+                                        setSchedulerOpen(false)
+                                        setSelectedMovieNight(null);
+                                    }} 
                                     groupId={groupId} 
-                                    refreshData={refreshData} 
+                                    refreshData={refreshData}
+                                    movieNightSchedule={selectedMovieNight} 
                                 />
                             </div>
                             <div className="showtime-date">
@@ -342,9 +354,13 @@ export const Group = () => {
                                         
                                         <div className="calendar-events-container flex flex-col items-center w-full">
                                             {date.events.map((event, eventIndex) => (
-                                                <div key={eventIndex} className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1">
+                                                <button
+                                                    key={eventIndex}
+                                                    onClick={() => openEditModal(event.movieNightSchedule)}
+                                                    className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1 hover:bg-gray-700 transition"
+                                                >
                                                     <span className="calendar-event-time font-semibold">{event.time}</span>
-                                                </div>
+                                                </button>
                                             ))}
                                         </div>
                                     </div>
