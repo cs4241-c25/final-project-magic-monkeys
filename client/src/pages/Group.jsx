@@ -9,6 +9,7 @@ import '../styles/Group.css';
 import {useGroupData} from "../hooks/useGroupData";
 import { TicketRating } from '../components/TicketRating';
 import { useUser } from '../context/UserContext';
+import { MovieNightSchedulerModal } from '../components/MovieNightSchedulerModal';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -20,12 +21,15 @@ export const Group = () => {
     const navigate = useNavigate();
 
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isSchedulerOpen, setSchedulerOpen] = useState(false);
+    const [selectedMovieNight, setSelectedMovieNight] = useState(null);
 
     const {
         groupData,
         members,
         activity,
         scores,
+        movieNightSchedules,
         movieNights,
         showtime,
         loading,
@@ -137,32 +141,28 @@ export const Group = () => {
 
         // Add last month's days to fill the first row
         const firstDayIndex = firstDayOfMonth.getDay();
+        const previousMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
         for (let i = firstDayIndex - 1; i >= 0; i--) {
-            const date = new Date(currentYear, currentMonth, -i);
+            const date = new Date(currentYear, currentMonth - 1, previousMonthLastDay - i);
             dates.push({
                 day: date.getDate(),
                 month: date.getMonth() + 1,
+                year: date.getFullYear(),
                 isCurrentMonth: false,
-                hasEvent: false
+                events: []
             });
         }
 
         // Add this month's days
         for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
             const date = new Date(currentYear, currentMonth, i);
-            // Check if there's a movie night on this date
-            const hasEvent = movieNights.some(night => {
-                const nightDate = new Date(night.dateTime);
-                return nightDate.getDate() === i &&
-                    nightDate.getMonth() === currentMonth &&
-                    nightDate.getFullYear() === currentYear;
-            });
-
             dates.push({
                 day: i,
                 month: currentMonth + 1,
+                year: currentYear,
                 isCurrentMonth: true,
-                hasEvent
+                events: []
             });
         }
 
@@ -173,11 +173,67 @@ export const Group = () => {
                 dates.push({
                     day: i,
                     month: currentMonth + 2 > 12 ? 1 : currentMonth + 2,
+                    year: currentMonth + 2 > 12 ? currentYear + 1 : currentYear,
                     isCurrentMonth: false,
-                    hasEvent: false
+                    events: []
                 });
             }
         }
+
+        const calculateEndTime = (startTime, duration) => {
+            if(!startTime || !duration) return null;
+            const startDate = new Date(startTime);
+            startDate.setMinutes(startDate.getMinutes() + duration);
+            return startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
+
+        dates.forEach(date => {
+            movieNightSchedules.forEach(event => {
+                const eventDate = new Date(event.dateTime);
+                const eventStartTime = new Date(event.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const eventEndTime = calculateEndTime(event.dateTime, event.duration);
+                const eventTimeDisplay = eventEndTime ? `${eventStartTime} - ${eventEndTime}` : eventStartTime;
+
+                if(!event.recurring){
+                    if(eventDate.getDate() === date.day &&
+                    eventDate.getMonth() + 1 === date.month &&
+                    eventDate.getFullYear() === date.year){
+                        date.events.push({
+                            movieNightSchedule: event,
+                            time: eventTimeDisplay,
+                            startTimestamp: new Date(event.startTime).getTime(),
+                        });
+                    }
+                }
+            });
+
+            movieNightSchedules.forEach(event => {
+                if(event.recurring && event.recurrenceDays){
+                    const startDate = new Date(event.startDate);
+                    const endDate = event.endDate ? new Date(event.endDate) : null;
+                    const weekday = new Date(date.year, date.month - 1, date.day).toLocaleDateString('en-US', { weekday: 'long' });
+
+                    if(date.year >= startDate.getFullYear() && 
+                    (endDate ? date.year <= endDate.getFullYear() : true) &&
+                    (date.month >= startDate.getMonth() + 1) &&
+                    (endDate ? date.month <= endDate.getMonth() + 1 : true) &&
+                    event.recurrenceDays.includes(weekday)){
+
+                        const eventStartTime = new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const eventEndTime = calculateEndTime(event.startTime, event.duration);
+                        const eventTimeDisplay = eventEndTime ? `${eventStartTime} - ${eventEndTime}` : eventStartTime;
+
+                        date.events.push({
+                            movieNightSchedule: event,
+                            time: eventTimeDisplay,
+                            startTimestamp: new Date(event.startTime).getTime()
+                        });
+                    }
+                }
+            });
+
+            date.events.sort((a, b) => b.startTimestamp - a.startTimestamp);
+        });
 
         return { days, dates };
     };
@@ -191,6 +247,11 @@ export const Group = () => {
             throw error;
         }
     };
+
+    const openEditModal = (event) => {
+        setSelectedMovieNight(event);
+        setSchedulerOpen(true);
+    }
 
     const calendar = generateCalendar();
 
@@ -235,6 +296,23 @@ export const Group = () => {
                     {/* Top Section */}
                     <div className="group-top-section">
                         <div className="group-showtime">
+                            <div>
+                                <button 
+                                    onClick={() => setSchedulerOpen(true)}
+                                    className="bg-green-500 text-white px-4 py-2 rounded">
+                                    Schedule Movie Night
+                                </button>
+                                <MovieNightSchedulerModal 
+                                    isOpen={isSchedulerOpen} 
+                                    onClose={() => {
+                                        setSchedulerOpen(false)
+                                        setSelectedMovieNight(null);
+                                    }} 
+                                    groupId={groupId} 
+                                    refreshData={refreshData}
+                                    movieNightSchedule={selectedMovieNight} 
+                                />
+                            </div>
                             <div className="showtime-date">
                                 {showtime?.date || 'No showtime scheduled'}
                             </div>
@@ -268,18 +346,23 @@ export const Group = () => {
                                 {calendar.dates.map((date, index) => (
                                     <div
                                         key={index}
-                                        className={`calendar-date 
+                                        className={`calendar-date flex flex-col items-center justify-start p-2
                                             ${date.isCurrentMonth ? 'current-month' : 'other-month'}
-                                            ${date.hasEvent ? 'has-event' : ''}`}
+                                            ${date.events.length > 0 ? 'has-event' : ''}`}
                                     >
-                                        {date.day}
-                                        {date.month !== new Date().getMonth() + 1 ? null :
-                                            date.day === 1 ? (
-                                                <span className="month-label">
-                                                    {new Date().toLocaleString('default', { month: 'short' })}
-                                                </span>
-                                            ) : null
-                                        }
+                                        <span className="calendar-day-number font-bold text-lg">{date.day}</span>
+                                        
+                                        <div className="calendar-events-container flex flex-col items-center w-full">
+                                            {date.events.map((event, eventIndex) => (
+                                                <button
+                                                    key={eventIndex}
+                                                    onClick={() => openEditModal(event.movieNightSchedule)}
+                                                    className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1 hover:bg-gray-700 transition"
+                                                >
+                                                    <span className="calendar-event-time font-semibold">{event.time}</span>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
