@@ -25,25 +25,64 @@ export const Group = () => {
     const [selectedMovieNight, setSelectedMovieNight] = useState(null);
     const [expandedDay, setExpandedDay] = useState(null);
 
-    const toggleExpand = (index) => {
+    const toggleExpandDay = (index) => {
         setExpandedDay((prev) => (prev === index ? null : index));
+    }
+
+    const [expandedRow, setExpandedRow] = useState(null);
+
+    const toggleExpandRow = (index) => {
+        const rowIndex = Math.floor(index / 7);
+        setExpandedRow((prev) => (prev === rowIndex ? null : rowIndex));
     };
+
+    const [isCalendarCondensed, setIsCalendarCondensed] = useState(true);
+
+    const toggleCalendarView = () => {
+        setIsCalendarCondensed((prev) => !prev);
+
+        if(!isCalendarCondensed) {
+            const today = new Date();
+            setCurrentMonth(today.getMonth());
+            setCurrentYear(today.getFullYear());
+        }
+    }
 
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     const changeMonth = (direction) => {
-        setCurrentMonth((prev) => {
-            let newMonth = prev + direction;
+        if(isCalendarCondensed) return;
+
+        setCurrentMonth((prevMonth) => {
+            let newMonth = prevMonth + direction;
 
             if(newMonth < 0){
-                setCurrentYear((year) => year - 1);
                 return 11;
             } else if(newMonth > 11){
-                setCurrentYear((year) => year + 1);
                 return 0;
             }
             return newMonth;
+        });
+
+        setCurrentYear((prevYear) => {
+            if(direction === -1 && currentMonth === 0){
+                return prevYear - 1;
+            } else if(direction === 1 && currentMonth === 11){
+                return prevYear + 1
+            }
+            return prevYear
+        });
+    };
+
+    const getCurrentWeek = (dates) => {
+        const today = new Date();
+        return dates.filter(date => {
+            const thisWeekStart = new Date(today.setDate(today.getDate() - today.getDay() - 1));
+            const thisWeekEnd = new Date(today.setDate(thisWeekStart.getDate() + 7));
+
+            const dateObj = new Date(date.year, date.month - 1, date.day);
+            return dateObj >= thisWeekStart && dateObj <= thisWeekEnd;
         })
     }
 
@@ -277,6 +316,7 @@ export const Group = () => {
     }
 
     const calendar = generateCalendar();
+    const displayedDates = isCalendarCondensed ? getCurrentWeek(calendar.dates) : calendar.dates;
 
     if (isLoading || loading) return <div>Loading Group...</div>;
     if (!isAuthenticated) {
@@ -317,110 +357,127 @@ export const Group = () => {
 
                 <div className="group-content">
                     {/* Top Section */}
-                    <div className="group-top-section">
-                        <div className="group-showtime">
-                            <div>
-                                <button 
-                                    onClick={() => setSchedulerOpen(true)}
-                                    className="bg-green-500 text-white px-4 py-2 rounded">
-                                    Schedule Movie Night
-                                </button>
-                                <MovieNightSchedulerModal 
-                                    isOpen={isSchedulerOpen} 
-                                    onClose={() => {
-                                        setSchedulerOpen(false)
-                                        setSelectedMovieNight(null);
-                                    }} 
-                                    groupId={groupId} 
-                                    refreshData={refreshData}
-                                    movieNightSchedule={selectedMovieNight} 
-                                />
-                            </div>
-                            <div className="showtime-date">
-                                {showtime?.date || 'No showtime scheduled'}
-                            </div>
-                            {showtime?.time && (
-                                <div className="showtime-time">{showtime.time}</div>
-                            )}
-                            {showtime?.movieDetails && (
-                                <div className="showtime-movie">
-                                    {showtime.movieDetails.title}
+                    <div className={`group-top-section ${isCalendarCondensed ? 'condensed' : 'expanded'}`}>
+                        <div className="group-top-content">
+                            <div className="group-showtime">
+                                <div>
+                                    <button 
+                                        onClick={() => setSchedulerOpen(true)}
+                                        className="bg-green-500 text-white px-4 py-2 rounded">
+                                        Schedule Movie Night
+                                    </button>
+                                    <MovieNightSchedulerModal 
+                                        isOpen={isSchedulerOpen} 
+                                        onClose={() => {
+                                            setSchedulerOpen(false)
+                                            setSelectedMovieNight(null);
+                                        }} 
+                                        groupId={groupId} 
+                                        refreshData={refreshData}
+                                        movieNightSchedule={selectedMovieNight} 
+                                    />
                                 </div>
-                            )}
-                            <div className="showtime-status">
-                                <div className="status-icons">
-                                    <div className="status-icon no">
-                                    {showtime?.attending.map(attendee => (
-                                        <span key={attendee.id}>{attendee.profilePicture}</span>
+                                <div className="showtime-date">
+                                    {showtime?.date || 'No showtime scheduled'}
+                                </div>
+                                {showtime?.time && (
+                                    <div className="showtime-time">{showtime.time}</div>
+                                )}
+                                {showtime?.movieDetails && (
+                                    <div className="showtime-movie">
+                                        {showtime.movieDetails.title}
+                                    </div>
+                                )}
+                                <div className="showtime-status">
+                                    <div className="status-icons">
+                                        <div className="status-icon no">
+                                        {showtime?.attending.map(attendee => (
+                                            <span key={attendee.id}>{attendee.profilePicture}</span>
 
-                                    ))}
+                                        ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="group-calendar">
-                            <div className="calendar-navigation">
-                                <button onClick={() => changeMonth(-1)} className="calendar-nav-btn">{"<"}</button>
-                                <span className="calendar-month">
-                                    {new Date(currentYear, currentMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-                                </span>
-                                <button onClick={() => changeMonth(1)} className="calendar-nav-btn">{">"}</button>
-                            </div>
-                            <div className="calendar-header">
-                                {calendar.days.map(day => (
-                                    <div key={day} className="calendar-day-name">{day}</div>
-                                ))}
-                            </div>
-                            <div className="calendar-grid">
-                                {calendar.dates.map((date, index) => {
-                                    const isExpanded = expandedDay === index;
-                                    const maxVisibleEvents = 2;
+                            <div className="group-calendar">
+                                <div className="calendar-navigation">
+                                    {!isCalendarCondensed && (
+                                        <button onClick={() => changeMonth(-1)} className="calendar-nav-btn">{"<"}</button>
+                                    )}
+                                    <span className="calendar-month">
+                                        {new Date(currentYear, currentMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                                    </span>
+                                    {!isCalendarCondensed && (
+                                        <button onClick={() => changeMonth(1)} className="calendar-nav-btn">{">"}</button>
+                                    )}
+                                </div>
+                                <div className="calendar-header">
+                                    {calendar.days.map(day => (
+                                        <div key={day} className="calendar-day-name">{day}</div>
+                                    ))}
+                                </div>
+                                <div className="calendar-grid">
+                                    {displayedDates.map((date, index) => {
+                                        const isExpanded = expandedDay === index;
+                                        const rowIndex = Math.floor(index / 7);
+                                        const isRowExpanded = expandedRow === rowIndex;
+                                        const maxVisibleEvents = 2;
 
-                                    return (
-                                        <div
-                                            key={index}
-                                            className={`calendar-date flex flex-col items-center justify-start p-2
-                                                ${date.isCurrentMonth ? 'current-month' : 'other-month'}
-                                                ${date.events.length > 0 ? 'has-event' : ''}`}
-                                                style={{ minHeight: isExpanded ? "auto" : "80px" }}
-                                        >
-                                            <span className="calendar-day-number font-bold text-lg">{date.day}</span>
+                                        return (
+                                            <div
+                                                key={index}
+                                                className={`calendar-date flex flex-col items-center justify-start p-2
+                                                    ${date.isCurrentMonth ? 'current-month' : 'other-month'}
+                                                    ${date.events.length > 0 ? 'has-event' : ''}
+                                                    ${isRowExpanded ? 'expanded' : ''}`}
+                                            >
+                                                <span className="calendar-day-number font-bold text-lg">{date.day}</span>
 
-                                            <div className="calendar-events-container flex flex-col items-center w-full">
-                                                {date.events.slice(0, isExpanded ? date.events.length : maxVisibleEvents - (date.events.length > maxVisibleEvents ? 1 : 0)).map((event, eventIndex) => (
-                                                    <button
-                                                        key={eventIndex}
-                                                        onClick={() => openEditModal(event.movieNightSchedule)}
-                                                        className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1 hover:bg-gray-700 transition"
-                                                    >
-                                                        <span className="calendar-event-time font-semibold">{event.time}</span>
-                                                    </button>
-                                                ))}
+                                                <div className="calendar-events-container flex flex-col items-center w-full">
+                                                    {date.events.slice(0, isExpanded ? date.events.length : maxVisibleEvents - (date.events.length > maxVisibleEvents ? 1 : 0)).map((event, eventIndex) => (
+                                                        <button
+                                                            key={eventIndex}
+                                                            onClick={() => openEditModal(event.movieNightSchedule)}
+                                                            className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1 hover:bg-gray-700 transition"
+                                                        >
+                                                            <span className="calendar-event-time font-semibold">{event.time}</span>
+                                                        </button>
+                                                    ))}
 
-                                                {date.events.length > maxVisibleEvents && !isExpanded && (
-                                                    <button
-                                                        className="calendar-more-events text-xs text-gray-300 mt-1 underline"
-                                                        onClick={() => toggleExpand(index)}
-                                                    >
-                                                        +{date.events.length - maxVisibleEvents + 1} more
-                                                    </button>
-                                                )}
+                                                    {date.events.length > maxVisibleEvents && !isExpanded && (
+                                                        <button
+                                                            className="calendar-more-events text-xs text-gray-300 mt-1 underline"
+                                                            onClick={() => {
+                                                                toggleExpandRow(index);
+                                                                toggleExpandDay(index);
+                                                            }}
+                                                        >
+                                                            +{date.events.length - maxVisibleEvents + 1} more
+                                                        </button>
+                                                    )}
 
-                                                {isExpanded && (
-                                                    <button
-                                                        className="calendar-less-events text-xs text-gray-300 mt-1 underline"
-                                                        onClick={() => toggleExpand(index)}
-                                                    >
-                                                        Show Less
-                                                    </button>
-                                                )}
+                                                    {isExpanded && (
+                                                        <button
+                                                            className="calendar-less-events text-xs text-gray-300 mt-1 underline"
+                                                            onClick={() => {
+                                                                toggleExpandRow(index);
+                                                                toggleExpandDay(index);
+                                                            }}
+                                                        >
+                                                            Show Less
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
+                        <button onClick={toggleCalendarView} className="calendar-toggle-btn">
+                            {isCalendarCondensed ? "Show Full Calendar" : "Minimize Calendar"}
+                        </button>
                     </div>
 
                     {/* Middle Section */}

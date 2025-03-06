@@ -28,11 +28,29 @@
 /* Top Section */
 .group-top-section {
     display: flex;
+    flex-direction: column;
     background: #373737;
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 20px;
-    height: 700px;
+    position: relative;
+    transition: min-height 0.3s ease-in-out;
+    min-height: auto;
+}
+
+.group-top-section.expanded{
+    min-height: auto;
+}
+
+.group-top-section.condensed{
+    min-height: auto;
+}
+
+.group-top-content{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .group-showtime {
@@ -50,6 +68,7 @@
     display: flex;
     flex-direction: column;
     background: #4C4C4C;
+    min-height: auto;
 }
 
 .showtime-date {
@@ -119,7 +138,7 @@
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    flex-grow: 1;
+    grid-auto-rows: minmax(100px, auto);
     gap: 5px;
     position: relative;
 }
@@ -130,13 +149,17 @@
     align-items: center;
     justify-content: start;
     padding: 8px;
-    min-height: 80px;
+    height: 100px;
     border-radius: 5px;
     text-align: center;
-    transition: min-height 0.3s ease-in-out;
+    transition: height 0.3s ease-in-out;
     position: relative;
     border-right: 1px solid #555;
     border-bottom: 1px solid #555;
+}
+
+.calendar-date.expanded{
+    height: auto;
 }
 
 .calendar-events-container {
@@ -189,8 +212,9 @@
 .calendar-navigation {
     display: flex;
     align-items: center;
-    justify-content: center; /* ✅ Centers the entire navigation bar */
-    gap: 15px; /* ✅ Adds space between the buttons and the title */
+    justify-content: center;
+    height: 50px;
+    gap: 10px;
     padding: 10px;
     background-color: #3a3a3a;
     border-radius: 5px;
@@ -214,6 +238,28 @@
     color: white;
     font-size: 1.2rem;
     font-weight: bold;
+}
+
+.calendar-expand-btn {
+    position: relative;
+    align-self: center;
+    background: #555;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+    transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+    margin-top: 10px;
+}
+
+.calendar-expand-btn:hover {
+    background: #777;
+}
+
+.calendar-expand-btn:active {
+    transform: scale(0.9);
 }
 
 /* Middle Section */
