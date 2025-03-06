@@ -140,10 +140,10 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
           <span className="text">Movies</span>
         </Link>
 
-        <div className="nav-item">
+        <Link to="/profile" className="nav-item">
           <span className="icon"><CgProfile /></span>
           <span className="text">Profile</span>
-        </div>
+        </Link>
 
       </nav>
 
