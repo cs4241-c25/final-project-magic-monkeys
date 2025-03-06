@@ -23,6 +23,11 @@ export const Group = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSchedulerOpen, setSchedulerOpen] = useState(false);
     const [selectedMovieNight, setSelectedMovieNight] = useState(null);
+    const [expandedDay, setExpandedDay] = useState(null);
+
+    const toggleExpand = (index) => {
+        setExpandedDay((prev) => (prev === index ? null : index));
+    };
 
     const {
         groupData,
@@ -346,28 +351,52 @@ export const Group = () => {
                                 ))}
                             </div>
                             <div className="calendar-grid">
-                                {calendar.dates.map((date, index) => (
-                                    <div
-                                        key={index}
-                                        className={`calendar-date flex flex-col items-center justify-start p-2
-                                            ${date.isCurrentMonth ? 'current-month' : 'other-month'}
-                                            ${date.events.length > 0 ? 'has-event' : ''}`}
-                                    >
-                                        <span className="calendar-day-number font-bold text-lg">{date.day}</span>
-                                        
-                                        <div className="calendar-events-container flex flex-col items-center w-full">
-                                            {date.events.map((event, eventIndex) => (
-                                                <button
-                                                    key={eventIndex}
-                                                    onClick={() => openEditModal(event.movieNightSchedule)}
-                                                    className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1 hover:bg-gray-700 transition"
-                                                >
-                                                    <span className="calendar-event-time font-semibold">{event.time}</span>
-                                                </button>
-                                            ))}
+                                {calendar.dates.map((date, index) => {
+                                    const isExpanded = expandedDay === index;
+                                    const maxVisibleEvents = 2;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`calendar-date flex flex-col items-center justify-start p-2
+                                                ${date.isCurrentMonth ? 'current-month' : 'other-month'}
+                                                ${date.events.length > 0 ? 'has-event' : ''}`}
+                                                style={{ minHeight: isExpanded ? "auto" : "80px" }}
+                                        >
+                                            <span className="calendar-day-number font-bold text-lg">{date.day}</span>
+
+                                            <div className="calendar-events-container flex flex-col items-center w-full">
+                                                {date.events.slice(0, isExpanded ? date.events.length : maxVisibleEvents - 1).map((event, eventIndex) => (
+                                                    <button
+                                                        key={eventIndex}
+                                                        onClick={() => openEditModal(event.movieNightSchedule)}
+                                                        className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1 hover:bg-gray-700 transition"
+                                                    >
+                                                        <span className="calendar-event-time font-semibold">{event.time}</span>
+                                                    </button>
+                                                ))}
+
+                                                {date.events.length > maxVisibleEvents && !isExpanded && (
+                                                    <button
+                                                        className="calendar-more-events text-xs text-gray-300 mt-1 underline"
+                                                        onClick={() => toggleExpand(index)}
+                                                    >
+                                                        +{date.events.length - maxVisibleEvents + 1} more
+                                                    </button>
+                                                )}
+
+                                                {isExpanded && (
+                                                    <button
+                                                        className="calendar-less-events text-xs text-gray-300 mt-1 underline"
+                                                        onClick={() => toggleExpand(index)}
+                                                    >
+                                                        Show Less
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

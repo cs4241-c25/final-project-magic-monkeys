@@ -119,22 +119,59 @@
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(5, 1fr);
     flex-grow: 1;
-    gap: 1px;
+    gap: 5px;
+    position: relative;
 }
 
 .calendar-date {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: start;
+    padding: 8px;
+    min-height: 80px;
+    border-radius: 5px;
+    text-align: center;
+    transition: min-height 0.3s ease-in-out;
     position: relative;
-    color: #ffffff;
-    padding: 10px 0;
-    height: 35px;
-    font-size: 0.9rem;
     border-right: 1px solid #555;
     border-bottom: 1px solid #555;
+}
+
+.calendar-events-container {
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+}
+
+.calendar-event {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s ease-in-out;
+}
+
+.calendar-more-events,
+.calendar-less-events {
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    background: none;
+    border: none;
+    padding: 2px;
+    text-decoration: underline;
+}
+
+.calendar-more-events:hover,
+.calendar-less-events:hover {
+    color: #ddd;
 }
 
 .calendar-date.other-month {
@@ -464,34 +501,4 @@
     .members-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-}
-
-.calendar-date {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: start;
-    padding: 8px;
-    min-height: 100px; /* Increased height for multiple events */
-    border-radius: 5px;
-    text-align: center;
-    transition: background 0.3s ease-in-out;
-}
-
-.calendar-day-number {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 4px; /* Adds spacing between day number and events */
-}
-
-.calendar-event {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    padding: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    width: 100%;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
