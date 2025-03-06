@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SideNav } from '../components/SideNav';
 import { useAuth0 } from '@auth0/auth0-react';
-import { BiChevronDown, BiFilterAlt, BiPlus, BiCog } from 'react-icons/bi';
+import { BiChevronDown, BiFilterAlt, BiPlus, BiCog, BiMenu } from 'react-icons/bi';
 import { BsTicketFill, BsTicket } from "react-icons/bs";
 import '../styles/Dashboard.css';
 import '../styles/Group.css';
@@ -19,9 +19,12 @@ export const Group = () => {
     const { isLoading, isAuthenticated } = useAuth0();
     const { dbUser } = useUser();
     const navigate = useNavigate();
+    const menuRef = useRef(null);
+
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSchedulerOpen, setSchedulerOpen] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
     const {
         groupData,
@@ -125,6 +128,19 @@ export const Group = () => {
             }
         }
     };
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowMenu(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [menuRef]);
 
     const generateCalendar = () => {
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -245,27 +261,46 @@ export const Group = () => {
             />
             <main className="dashboard-main">
                 <div className="group-header">
+                    <div></div>
                     <h1>{groupData.name}</h1>
-                    <button
-                        type="button"
-                        onClick={leaveGroup}
-                        class="px-4 py-2 text-white bg-[#373737] hover:bg-[#444444] rounded-lg transition-colors"
-                    >Leave Group</button>
+                    {/*<button*/}
+                    {/*    type="button"*/}
+                    {/*    onClick={leaveGroup}*/}
+                    {/*    class="px-4 py-2 text-white bg-[#373737] hover:bg-[#444444] rounded-lg transition-colors"*/}
+                    {/*>Leave Group</button>*/}
+                    <div className="group-menu" ref={menuRef}>
+                        <button
+                            className="menu-button"
+                            onClick={() => setShowMenu(!showMenu)}
+                        >
+                            <BiMenu size={24}/>
+                        </button>
+                        {showMenu && (
+                            <div className="menu-dropdown">
+                                <button
+                                    className="menu-item"
+                                    onClick={leaveGroup}
+                                >
+                                    Leave Group
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="group-content">
-                    {/* Top Section */}
+                {/* Top Section */}
                     <div className="group-top-section">
                         <div className="group-showtime">
                             <div>
-                                <button 
+                                <button
                                     onClick={() => setSchedulerOpen(true)}
                                     className="bg-green-500 text-white px-4 py-2 rounded">
                                     Schedule Movie Night
                                 </button>
-                                <MovieNightSchedulerModal 
-                                    isOpen={isSchedulerOpen} 
-                                    onClose={() => setSchedulerOpen(false)} 
+                                <MovieNightSchedulerModal
+                                    isOpen={isSchedulerOpen}
+                                    onClose={() => setSchedulerOpen(false)}
                                     groupId={groupId} 
                                     refreshData={refreshData} 
                                 />

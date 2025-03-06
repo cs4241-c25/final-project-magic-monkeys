@@ -1,11 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { BsTicketFill, BsTicket } from "react-icons/bs";
 import '../styles/TicketRating.css';
 
 /**
  * TicketRating component for displaying and setting movie ratings
- *
- * Currently very finicky when it comes to 'sliding', so the granulairty is also finicky.
  */
 export const TicketRating = ({
                                  rating = 0,
@@ -16,8 +14,9 @@ export const TicketRating = ({
                                  color = '#ff4b4b'
                              }) => {
     const [hoverRating, setHoverRating] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const ticketsContainerRef = useRef(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editValue, setEditValue] = useState('');
+    const inputRef = useRef(null);
 
     const getSizeClass = () => {
         switch(size) {
@@ -28,13 +27,13 @@ export const TicketRating = ({
     };
 
     const handleClick = (newRating) => {
-        if (interactive) {
-            onChange(newRating);
-        }
+        if (!interactive) return;
+
+        onChange(newRating);
     };
 
     const handleMouseEnter = (index) => {
-        if (interactive && !isDragging) {
+        if (interactive) {
             setHoverRating(index);
         }
     };
@@ -45,69 +44,71 @@ export const TicketRating = ({
         }
     };
 
-    const handleMouseDown = (e) => {
-        if (interactive && ticketsContainerRef.current) {
-            setIsDragging(true);
-            updateRatingFromPosition(e);
+    const handleValueClick = () => {
+        if (!interactive) return;
+
+        setIsEditing(true);
+        setEditValue((hoverRating || rating || 0).toFixed(2));
+
+        setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus();
+                inputRef.current.select();
+            }
+        }, 10);
+    };
+
+    const handleInputChange = (e) => {
+        const value = e.target.value.replace(/[^0-9.]/g, '');
+        setEditValue(value);
+    };
+
+    const handleInputBlur = () => {
+        finishEditing();
+    };
+
+    const handleInputKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            finishEditing();
+        } else if (e.key === 'Escape') {
+            setIsEditing(false);
         }
     };
 
-    const updateRatingFromPosition = (e) => {
-        if (ticketsContainerRef.current) {
-            const rect = ticketsContainerRef.current.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const width = rect.width;
+    const finishEditing = () => {
+        if (!isEditing) return;
 
-            let newRating = (x / width) * maxRating;
-            newRating = Math.max(0, Math.min(maxRating, newRating));
-            // THIS IS WHERE CHANGE TO 2 DECIMALS
-            newRating = Math.round(newRating * 10) / 10;
+        let newValue = parseFloat(editValue);
 
-            onChange(newRating);
+        if (isNaN(newValue)) {
+            newValue = rating || 0;
+        } else {
+            newValue = Math.max(0, Math.min(maxRating, newValue));
+            newValue = Math.round(newValue * 100) / 100;
         }
+
+        onChange(newValue);
+        setIsEditing(false);
     };
-
-    useEffect(() => {
-        const handleDocumentMouseMove = (e) => {
-            if (isDragging) {
-                updateRatingFromPosition(e);
-            }
-        };
-
-        const handleDocumentMouseUp = () => {
-            if (isDragging) {
-                setIsDragging(false);
-            }
-        };
-
-        if (interactive) {
-            document.addEventListener('mousemove', handleDocumentMouseMove);
-            document.addEventListener('mouseup', handleDocumentMouseUp);
-
-            return () => {
-                document.removeEventListener('mousemove', handleDocumentMouseMove);
-                document.removeEventListener('mouseup', handleDocumentMouseUp);
-            };
-        }
-    }, [isDragging, interactive]);
 
     const renderTickets = () => {
         const tickets = [];
         const currentRating = hoverRating || rating || 0;
 
         for (let i = 1; i <= maxRating; i++) {
-            const fillPercentage = Math.max(0, Math.min(1, currentRating - (i - 1)));
-            const isFilled = fillPercentage > 0;
+            const isFilled = i <= currentRating;
 
             tickets.push(
                 <div
                     key={i}
-                    className={`ticket-icon ${interactive ? 'interactive' : ''} ${isDragging ? 'dragging' : ''}`}
+                    className={`ticket-icon ${interactive ? 'interactive' : ''}`}
                     onClick={() => handleClick(i)}
                     onMouseEnter={() => handleMouseEnter(i)}
-                    style={{ color: isFilled ? color : 'inherit' }}
                 >
-                    {isFilled ? <BsTicketFill /> : <BsTicket />}
+                    {isFilled ?
+                        <BsTicketFill style={{ color }} /> :
+                        <BsTicket style={{ opacity: 0.35 }} />
+                    }
                 </div>
             );
         }
@@ -118,15 +119,30 @@ export const TicketRating = ({
     return (
         <div className={`ticket-rating-wrapper ${interactive ? 'interactive' : ''}`}>
             <div
-                ref={ticketsContainerRef}
-                className={`ticket-rating ${getSizeClass()} ${interactive ? 'slider-enabled' : ''}`}
+                className={`ticket-rating ${getSizeClass()}`}
                 onMouseLeave={handleMouseLeave}
-                onMouseDown={interactive ? handleMouseDown : undefined}
             >
                 {renderTickets()}
-                    <div className="ticket-value">
-                        {(hoverRating || rating || 0).toFixed(1)}/{maxRating.toFixed(1)}
+
+                {isEditing ? (
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        className="ticket-value-input"
+                        value={editValue}
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+                        onKeyDown={handleInputKeyDown}
+                        maxLength={4}
+                    />
+                ) : (
+                    <div
+                        className={`ticket-value ${interactive ? 'editable' : ''}`}
+                        onClick={interactive ? handleValueClick : undefined}
+                    >
+                        {(hoverRating || rating || 0).toFixed(2)} / {maxRating.toFixed(0)}
                     </div>
+                )}
             </div>
         </div>
     );

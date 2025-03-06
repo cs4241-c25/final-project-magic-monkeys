@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 // import { useAuth0 } from "@auth0/auth0-react";
 import { useUser } from '../context/UserContext';
+import { ReviewModal } from './ReviewModal';
+import { BsTicket } from "react-icons/bs";
+import { TicketRating } from './TicketRating';
+
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
@@ -19,7 +23,10 @@ export const MovieDetails = ({
   const [apiData, setApiData] = useState(null);
   const [director, setDirector] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const { dbUser } = useUser();
+  const [userReview, setUserReview] = useState(null);
+
 
   const addToWatchlist = async () => {
     try {
@@ -125,6 +132,14 @@ export const MovieDetails = ({
     }
   };
 
+
+  const handleReviewSubmitted = async () => {
+    // Refresh the reviews section if it exists
+    if (renderReviews) {
+      renderReviews();
+    }
+  };
+
   return (
     <div className="search-result">
       <button onClick={handleCloseMovie} className="close-button">×</button>
@@ -137,89 +152,105 @@ export const MovieDetails = ({
           />
         )}
         <div className="movie-info">
-          <h1>{movie.title}</h1>
+          <div className="flex items-center justify-between">
+
+            <h1>{movie.title}</h1>
+            <button
+                onClick={() => setShowReviewModal(true)}
+                className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
+            >
+              <BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>
+              <span className="text-white font-medium">Rate & Review</span>
+            </button>
+          </div>
           <button onClick={fetchApiDetails} className="api-details-button">
             API Details
           </button>
-        <button 
-          onClick={addToWatchlist}
-          className="api-details-button"
-        >
-          Add to Watchlist
-        </button>
-        
-        <button
-          onClick={addToTierList}
-          className="api-details-button"
-        >
-          Have Watched
-        </button>
+          <button
+              onClick={addToWatchlist}
+              className="api-details-button"
+          >
+            Add to Watchlist
+          </button>
+
+          <button
+              onClick={addToTierList}
+              className="api-details-button"
+          >
+            Have Watched
+          </button>
+          {/*<button*/}
+          {/*    onClick={() => setShowReviewModal(true)}*/}
+          {/*    className="api-details-button"*/}
+          {/*>*/}
+          {/*  Rate & Review*/}
+          {/*</button>*/}
           <p className="overview">{movie.overview}</p>
           {director && (
-            <p className="director">
-              <span>🎬 Director:</span> {director.name}
-            </p>
+              <p className="director">
+                <span>🎬 Director:</span> {director.name}
+              </p>
           )}
           <div className="ratings">
             {ratings.rt && (
-              <a
-                href={`https://www.rottentomatoes.com/m/${movie.title.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rating rt-rating"
-              >
-                <img 
-                  src={parseInt(ratings.rt) >= 60 ? 
-                    'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg' : 
-                    'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/tomatometer-rotten.f1ef4f02ce3.svg'
-                  } 
-                  alt="Tomato Score"
-                  className="tomato-icon"
-                />
-                <span>Score:</span> {ratings.rt}
-              </a>
+                <a
+                    href={`https://www.rottentomatoes.com/m/${movie.title.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rating rt-rating"
+                >
+                  <img
+                      src={parseInt(ratings.rt) >= 60 ?
+                          'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg' :
+                          'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/tomatometer-rotten.f1ef4f02ce3.svg'
+                      }
+                      alt="Tomato Score"
+                      className="tomato-icon"
+                  />
+                  <span>Score:</span> {ratings.rt}
+                </a>
             )}
             {ratings.imdb && ratings.imdbId && (
-              <a
-                href={`https://www.imdb.com/title/${ratings.imdbId}`}
+                <a
+                    href={`https://www.imdb.com/title/${ratings.imdbId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rating imdb-rating"
+                >
+                  <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
+                      alt="IMDb"
+                      className="imdb-icon"
+                  />
+                  <span>Rating:</span> {ratings.imdb}/10
+                </a>
+            )}
+            <a
+                href={`https://www.themoviedb.org/movie/${movie.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rating imdb-rating"
-              >
-                <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
-                  alt="IMDb"
-                  className="imdb-icon"
-                />
-                <span>Rating:</span> {ratings.imdb}/10
-              </a>
-            )}
-            <a 
-              href={`https://www.themoviedb.org/movie/${movie.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rating tmdb-rating"
+                className="rating tmdb-rating"
             >
               <span>⭐ TMDB Rating:</span> {movie.vote_average.toFixed(1)}/10
             </a>
           </div>
           <p className="release-date">
             <span>🗓 Release Date:</span> {new Date(movie.release_date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
           </p>
         </div>
         {selectedTrailer && (
-          <div className="trailer-container">
-            <iframe
-              title="Movie Trailer"
-              width="560"
-              height="315"
-              src={`https://www.youtube.com/embed/${selectedTrailer.key}`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            <div className="trailer-container">
+              <iframe
+                  title="Movie Trailer"
+                  width="560"
+                  height="315"
+                  src={`https://www.youtube.com/embed/${selectedTrailer.key}`}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             ></iframe>
           </div>
@@ -336,6 +367,14 @@ export const MovieDetails = ({
           </div>
         )}
       </Modal>
+
+      <ReviewModal
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          movieId={movie.id}
+          movieTitle={movie.title}
+          onReviewSubmitted={handleReviewSubmitted}
+      />
     </div>
   );
 }; 

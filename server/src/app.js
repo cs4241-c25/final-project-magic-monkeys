@@ -8,6 +8,7 @@ import userGroupRoutes from '../routes/userGroupRoutes.js';
 import tierListRoutes from '../routes/tierListRoutes.js';
 import watchListRoutes from '../routes/watchListRoutes.js';
 import movieNightScheduleRoutes from '../routes/movieNightScheduleRoutes.js'
+import reviewRoutes from "../routes/reviewRoutes.js";
 
 const app = express();
 app.use(cors());
@@ -20,6 +21,7 @@ app.use('/api', tierListRoutes);
 app.use('/api', watchListRoutes);
 
 app.use('/api', movieNightScheduleRoutes);
+app.use('/api', reviewRoutes);
 
 // Example route
 app.get('/', (req, res) => {
