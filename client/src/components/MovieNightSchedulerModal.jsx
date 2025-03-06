@@ -79,16 +79,24 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const convertToUTCDate = (dateString) => {
+            if(!dateString) return null;
+            const [year, month, day] = dateString.split("-").map(Number);
+            return new Date(Date.UTC(year, month - 1, day + 1)).toISOString();
+        };
+
         const convertTimeToISO = (timeString) => {
             if (!timeString) return null;
-            const today = new Date();
             const [hours, minutes] = timeString.split(":");
-            today.setHours(hours, minutes, 0, 0);
-            return today.toISOString();
+            const utcTime = new Date();
+            utcTime.setHours(hours, minutes, 0, 0);
+            return utcTime.toISOString();
         };
 
         const formattedFormData = {
             ...formData,
+            startDate: convertToUTCDate(formData.startDate),
+            endDate: formData.endDate ? convertToUTCDate(formData.endDate) : null,
             startTime: formData.recurring ? convertTimeToISO(formData.startTime) : null,
         };
 
