@@ -147,8 +147,8 @@ export const Group = () => {
             const date = new Date(currentYear, currentMonth - 1, previousMonthLastDay - i);
             dates.push({
                 day: date.getDate(),
-                month: date.getMonth() + 1,
-                year: date.getFullYear(),
+                month: date.getMonth() + 1 < 1 ? 12 : date.getMonth() + 1,
+                year: date.getMonth() + 1 < 1 ? date.getFullYear() - 1 : date.getFullYear(),
                 isCurrentMonth: false,
                 events: []
             });
@@ -156,7 +156,6 @@ export const Group = () => {
 
         // Add this month's days
         for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-            const date = new Date(currentYear, currentMonth, i);
             dates.push({
                 day: i,
                 month: currentMonth + 1,
@@ -201,7 +200,7 @@ export const Group = () => {
                         date.events.push({
                             movieNightSchedule: event,
                             time: eventTimeDisplay,
-                            startTimestamp: new Date(event.startTime).getTime(),
+                            startTimestamp: new Date(event.dateTime).getTime(),
                         });
                     }
                 }
@@ -213,11 +212,15 @@ export const Group = () => {
                     const endDate = event.endDate ? new Date(event.endDate) : null;
                     const weekday = new Date(date.year, date.month - 1, date.day).toLocaleDateString('en-US', { weekday: 'long' });
 
-                    if(date.year >= startDate.getFullYear() && 
-                    (endDate ? date.year <= endDate.getFullYear() : true) &&
-                    (date.month >= startDate.getMonth() + 1) &&
-                    (endDate ? date.month <= endDate.getMonth() + 1 : true) &&
-                    event.recurrenceDays.includes(weekday)){
+                    if(
+                        (date.year > startDate.getFullYear() ||
+                        (date.year === startDate.getFullYear() && date.month > startDate.getMonth() + 1) ||
+                        (date.year === startDate.getFullYear() && date.month === startDate.getMonth() + 1 && date.day >= startDate.getDate())) &&
+                        (endDate ? (date.year < endDate.getFullYear() ||
+                        (date.year === endDate.getFullYear() && date.month < endDate.getMonth() + 1) ||
+                        (date.year === endDate.getFullYear() && date.month === endDate.getMonth() + 1 && date.day <= endDate.getDate())) : true) &&
+                        event.recurrenceDays.includes(weekday)
+                    ){
 
                         const eventStartTime = new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         const eventEndTime = calculateEndTime(event.startTime, event.duration);
