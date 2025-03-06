@@ -29,6 +29,24 @@ export const Group = () => {
         setExpandedDay((prev) => (prev === index ? null : index));
     };
 
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+    const changeMonth = (direction) => {
+        setCurrentMonth((prev) => {
+            let newMonth = prev + direction;
+
+            if(newMonth < 0){
+                setCurrentYear((year) => year - 1);
+                return 11;
+            } else if(newMonth > 11){
+                setCurrentYear((year) => year + 1);
+                return 0;
+            }
+            return newMonth;
+        })
+    }
+
     const {
         groupData,
         members,
@@ -134,9 +152,6 @@ export const Group = () => {
 
     const generateCalendar = () => {
         const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
 
         // Get the first day of the month
         const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
@@ -345,6 +360,13 @@ export const Group = () => {
                         </div>
 
                         <div className="group-calendar">
+                            <div className="calendar-navigation">
+                                <button onClick={() => changeMonth(-1)} className="calendar-nav-btn">{"<"}</button>
+                                <span className="calendar-month">
+                                    {new Date(currentYear, currentMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                                </span>
+                                <button onClick={() => changeMonth(1)} className="calendar-nav-btn">{">"}</button>
+                            </div>
                             <div className="calendar-header">
                                 {calendar.days.map(day => (
                                     <div key={day} className="calendar-day-name">{day}</div>
@@ -366,7 +388,7 @@ export const Group = () => {
                                             <span className="calendar-day-number font-bold text-lg">{date.day}</span>
 
                                             <div className="calendar-events-container flex flex-col items-center w-full">
-                                                {date.events.slice(0, isExpanded ? date.events.length : maxVisibleEvents - 1).map((event, eventIndex) => (
+                                                {date.events.slice(0, isExpanded ? date.events.length : maxVisibleEvents - (date.events.length > maxVisibleEvents ? 1 : 0)).map((event, eventIndex) => (
                                                     <button
                                                         key={eventIndex}
                                                         onClick={() => openEditModal(event.movieNightSchedule)}
