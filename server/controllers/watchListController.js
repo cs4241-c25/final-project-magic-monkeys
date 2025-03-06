@@ -116,3 +116,18 @@ export const deleteWatchList = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const deleteWatchListByUser = async (req, res) => {
+    try {
+        const { userId, movieId } = req.params;
+        const deletedEntry = await WatchList.findOneAndDelete({ userId, movieId });
+
+        if (!deletedEntry) {
+            return res.status(404).json({ message: "Watch list entry not found." });
+        }
+
+        res.status(200).json({ message: "Watch list entry deleted successfully." });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
