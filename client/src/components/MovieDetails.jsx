@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 // import { useAuth0 } from "@auth0/auth0-react";
 import { useUser } from '../context/UserContext';
+import { ReviewModal } from './ReviewModal';
+import { BsTicket } from "react-icons/bs";
+import { TicketRating } from './TicketRating';
+
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
@@ -19,13 +23,93 @@ export const MovieDetails = ({
   const [apiData, setApiData] = useState(null);
   const [director, setDirector] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const { dbUser } = useUser();
+  const [userReview, setUserReview] = useState(null);
 
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [isWatched, setIsWatched] = useState(false);
+  const [watchlistEntryId, setWatchlistEntryId] = useState(null);
+  const [isInTierList, setIsInTierList] = useState(false);
+  const [tierListEntryId, setTierListEntryId] = useState(null);
+
+  const checkMovieStatus = async () => {
+    try {
+      // Get user's watchlist
+      console.log(`Checking movie status for movie ID: ${movie.id}`);
+      const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/watch-lists`);
+
+      console.log("Watchlist response status:", response.status);
+
+      if (response.ok) {
+        const watchlist = await response.json();
+        console.log("Full watchlist data:", watchlist);
+
+        const entry = watchlist.find(item => item.movieId === movie.id);
+        console.log('Found entry for this movie:', entry);
+
+        if (entry) {
+          console.log('Entry seenMovie value:', entry.seenMovie, 'Type:', typeof entry.seenMovie);
+          console.log('Boolean conversion:', Boolean(entry.seenMovie));
+
+          setIsInWatchlist(true);
+          setIsWatched(Boolean(entry.seenMovie)); // Ensure it's a boolean
+          setWatchlistEntryId(entry._id);
+          console.log('Updated state - isInWatchlist:', true, 'isWatched:', Boolean(entry.seenMovie), 'watchlistEntryId:', entry._id);
+        } else {
+          setIsInWatchlist(false);
+          setIsWatched(false);
+          setWatchlistEntryId(null);
+          console.log('Updated state - isInWatchlist:', false, 'isWatched:', false, 'watchlistEntryId:', null);
+        }
+      } else {
+        console.error("Failed to fetch watchlist:", response.status);
+      }
+
+      // Also check if movie is in tier list
+      await checkIsInTierList();
+    } catch (error) {
+      console.error('Error checking movie status:', error);
+    }
+  };
+
+  const checkIsInTierList = async () => {
+    try {
+      console.log(`Checking if movie ${movie.id} is in tier list`);
+      const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/tier-lists`);
+
+      if (response.ok) {
+        const tierList = await response.json();
+        console.log("Full tier list data:", tierList);
+
+        const entry = tierList.find(item => item.movieId === movie.id);
+        console.log('Found tier list entry:', entry);
+
+        if (entry) {
+          setIsInTierList(true);
+          setTierListEntryId(entry._id);
+          console.log('Updated state - isInTierList:', true, 'tierListEntryId:', entry._id);
+        } else {
+          setIsInTierList(false);
+          setTierListEntryId(null);
+          console.log('Updated state - isInTierList:', false, 'tierListEntryId:', null);
+        }
+      } else {
+        console.error("Failed to fetch tier list:", response.status);
+      }
+    } catch (error) {
+      console.error('Error checking tier list status:', error);
+    }
+  };
+
+  useEffect(() => {
+    checkMovieStatus();
+  }, [movie.id, dbUser._id]);
+
+  // Simple function to add to watchlist with seenMovie=false
   const addToWatchlist = async () => {
     try {
-      // if (!dbUser) {
-      //   throw new Error('Please log in to add movies to your watchlist');
-      // }
+      console.log("Adding to watchlist with seenMovie=false");
 
       const response = await fetch(`${BACKEND_URL}/api/watch-lists`, {
         method: 'POST',
@@ -35,16 +119,23 @@ export const MovieDetails = ({
         body: JSON.stringify({
           userId: dbUser._id,
           movieId: movie.id,
-          watched: false
+          seenMovie: false // Explicitly set to false
         })
       });
       
       if (response.ok) {
+        const data = await response.json();
+        console.log("Watchlist entry created:", data);
+
+        // Update UI state
+        setIsInWatchlist(true);
+        setIsWatched(false);
+        setWatchlistEntryId(data._id);
+
         alert('Added to watchlist successfully!');
       } else {
         const errorData = await response.json();
-        console.error('Server error:', errorData);
-        alert(`Failed to add to watchlist: ${errorData.message || 'Unknown error'}`);
+        throw new Error(errorData.message || 'Unknown error');
       }
     } catch (error) {
       console.error('Error adding to watchlist:', error);
@@ -52,25 +143,44 @@ export const MovieDetails = ({
     }
   };
 
-  const addToTierList = async () => {
+  // Simple function to remove from watchlist
+  const removeFromWatchlist = async () => {
     try {
-      const watchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: dbUser._id,
-          movieId: movie.id,
-          seenMovie: true
-        })
-      });
-
-      if (!watchlistResponse.ok) {
-        throw new Error('Failed to update watchlist');
+      if (!isInWatchlist || !watchlistEntryId) {
+        throw new Error('Movie is not in your watchlist');
       }
 
-      const tierlistResponse = await fetch(`${BACKEND_URL}/api/tier-lists`, {
+      console.log("Removing from watchlist");
+
+      // Delete the watchlist entry
+      const response = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error('Failed to remove from watchlist: ' + (errorData.message || 'Unknown error'));
+      }
+
+      // Update UI state
+      setIsInWatchlist(false);
+      setIsWatched(false);
+      setWatchlistEntryId(null);
+
+      await checkMovieStatus();
+      alert('Removed from watchlist!');
+    } catch (error) {
+      console.error('Error removing from watchlist:', error);
+      alert(`Failed to remove from watchlist: ${error.message}`);
+    }
+  };
+
+  // Simple function to add to tier list with rank "U"
+  const addToTierList = async () => {
+    try {
+      console.log("Adding to tier list with rank U");
+
+      const response = await fetch(`${BACKEND_URL}/api/tier-lists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,15 +193,54 @@ export const MovieDetails = ({
         })
       });
 
-      if (tierlistResponse.ok) {
-        alert('Movie marked as watched!');
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Tier list entry created:", data);
+
+        // Update UI state
+        setIsInTierList(true);
+        setTierListEntryId(data._id);
+
+        await checkMovieStatus();
+        alert('Added to tier list successfully!');
       } else {
-        const errorData = await tierlistResponse.json();
-        throw new Error(errorData.message || 'Failed to update tier list');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Unknown error');
       }
     } catch (error) {
-      console.error('Error marking movie as watched:', error);
-      alert(`Failed to mark movie as watched: ${error.message}`);
+      console.error('Error adding to tier list:', error);
+      alert(`Failed to add to tier list: ${error.message}`);
+    }
+  };
+
+  // Simple function to remove from tier list
+  const removeFromTierList = async () => {
+    try {
+      if (!isInTierList || !tierListEntryId) {
+        throw new Error('Movie is not in your tier list');
+      }
+
+      console.log("Removing from tier list");
+
+      // Delete the tier list entry
+      const response = await fetch(`${BACKEND_URL}/api/tier-lists/${tierListEntryId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error('Failed to remove from tier list: ' + (errorData.message || 'Unknown error'));
+      }
+
+      // Update UI state
+      setIsInTierList(false);
+      setTierListEntryId(null);
+
+      await checkMovieStatus();
+      alert('Removed from tier list!');
+    } catch (error) {
+      console.error('Error removing from tier list:', error);
+      alert(`Failed to remove from tier list: ${error.message}`);
     }
   };
 
@@ -125,6 +274,151 @@ export const MovieDetails = ({
     }
   };
 
+
+  const handleReviewSubmitted = async () => {
+    // Refresh the reviews section if it exists
+    if (renderReviews) {
+      renderReviews();
+    }
+  };
+
+  const toggleWatchlist = async () => {
+    try {
+      if (isInWatchlist) {
+        // Delete the watchlist entry
+        const response = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          await checkMovieStatus();
+          alert('Removed from watchlist!');
+        }
+      } else {
+        // Add to watchlist
+        const response = await fetch(`${BACKEND_URL}/api/watch-lists`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: dbUser._id,
+            movieId: movie.id,
+            seenMovie: false
+          })
+        });
+
+        if (response.ok) {
+          await checkMovieStatus();
+          alert('Added to watchlist successfully!');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating watchlist:', error);
+      alert(`Failed to update watchlist: ${error.message}`);
+    }
+  };
+
+  const toggleWatched = async () => {
+    try {
+      if (isWatched) {
+        // Update watchlist entry to unwatched
+        const watchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            seenMovie: false
+          })
+        });
+
+        if (watchlistResponse.ok) {
+          // Find and remove from tierlist using userId and movieId
+          const tierlistResponse = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/tier-lists`);
+          if (tierlistResponse.ok) {
+            const tierlist = await tierlistResponse.json();
+            const tierEntry = tierlist.find(item => item.movieId === movie.id);
+
+            if (tierEntry) {
+              // Delete the tier list entry
+              const deleteResponse = await fetch(`${BACKEND_URL}/api/tier-lists/${tierEntry._id}`, {
+                method: 'DELETE'
+              });
+
+              if (!deleteResponse.ok) {
+                console.error('Failed to remove from tier list');
+              }
+            }
+          }
+
+          setIsWatched(false);
+          await checkMovieStatus();
+          alert('Movie marked as unwatched!');
+        }
+      } else {
+        // If not in watchlist, create a watchlist entry first
+        if (!isInWatchlist) {
+          const createWatchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: dbUser._id,
+              movieId: movie.id,
+              seenMovie: true
+            })
+          });
+
+          if (!createWatchlistResponse.ok) {
+            throw new Error('Failed to create watchlist entry');
+          }
+
+          await checkMovieStatus();
+        } else {
+          // Update existing watchlist entry to watched
+          const watchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              seenMovie: true
+            })
+          });
+
+          if (!watchlistResponse.ok) {
+            throw new Error('Failed to update watchlist');
+          }
+        }
+
+        // Add to tierlist
+        const tierlistResponse = await fetch(`${BACKEND_URL}/api/tier-lists`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: dbUser._id,
+            movieId: movie.id,
+            rank: 'U',
+            order: 1
+          })
+        });
+
+        if (tierlistResponse.ok) {
+          setIsWatched(true);
+          await checkMovieStatus();
+          alert('Movie marked as watched!');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating movie status:', error);
+      alert(`Failed to update movie status: ${error.message}`);
+    }
+  };
+
   return (
     <div className="search-result">
       <button onClick={handleCloseMovie} className="close-button">×</button>
@@ -137,23 +431,34 @@ export const MovieDetails = ({
           />
         )}
         <div className="movie-info">
-          <h1>{movie.title}</h1>
+          <div className="flex items-center justify-between">
+
+            <h1>{movie.title}</h1>
+            <button
+                onClick={() => setShowReviewModal(true)}
+                className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
+            >
+              <BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>
+              <span className="text-white font-medium">Rate & Review</span>
+            </button>
+          </div>
           <button onClick={fetchApiDetails} className="api-details-button">
             API Details
           </button>
-        <button 
-          onClick={addToWatchlist}
-          className="api-details-button"
-        >
-          Add to Watchlist
-        </button>
-        
-        <button
-          onClick={addToTierList}
-          className="api-details-button"
-        >
-          Have Watched
-        </button>
+
+          <button
+            onClick={isInWatchlist ? removeFromWatchlist : addToWatchlist}
+            className="api-details-button mx-2"
+          >
+            {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+          </button>
+
+          <button
+            onClick={isInTierList ? removeFromTierList : addToTierList}
+            className="api-details-button mx-2"
+          >
+            {isInTierList ? "Haven't Watched" : 'Have Watched'}
+          </button>
           <p className="overview">{movie.overview}</p>
           {director && (
             <p className="director">
@@ -336,6 +641,14 @@ export const MovieDetails = ({
           </div>
         )}
       </Modal>
+
+      <ReviewModal
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          movieId={movie.id}
+          movieTitle={movie.title}
+          onReviewSubmitted={handleReviewSubmitted}
+      />
     </div>
   );
 }; 

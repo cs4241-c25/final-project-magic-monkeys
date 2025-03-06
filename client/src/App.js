@@ -7,9 +7,10 @@ import { Dashboard } from './pages/Dashboard';
 import { Tierlist } from './pages/Tierlist';
 import { Group } from './pages/Group';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { Profile } from './pages/Profile';
 import './App.css';
 import React from "react";
-// import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth0 } from "@auth0/auth0-react";
 import { UserProvider } from './context/UserContext';
 import "./App.css";
 
@@ -17,6 +18,7 @@ const AppContent = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [currentFont, setCurrentFont] = useState('Raleway');
   const location = useLocation();
+  const { isAuthenticated } = useAuth0();
 
   const toggleTheme = () => {
     setIsDarkTheme(!isDarkTheme);
@@ -35,9 +37,9 @@ const AppContent = () => {
     });
   };
 
-  const hideNavBar = ['/dashboard', '/group', '/groups', '/tierlist'].some(path =>
+  const hideNavBar = ['/dashboard', '/group', '/groups', '/tierlist', '/profile'].some(path =>
       location.pathname.startsWith(path)
-  );
+  ) || (location.pathname === '/movies' && isAuthenticated);
 
   return (
     <div
@@ -76,6 +78,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Tierlist />
+              </ProtectedRoute>
+            }
+        />
+        <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
         />

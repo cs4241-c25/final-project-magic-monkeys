@@ -56,7 +56,8 @@ export const getTierListByUser = async (req, res) => {
         const tierList = await TierList.find({ userId }).sort({ order: 1 });
 
         if (!tierList.length) {
-            return res.status(404).json({ message: "No tier list entries found for this user." });
+            // Return an empty array with 200 OK
+            return res.status(200).json([]);
         }
 
         res.status(200).json(tierList);
@@ -100,3 +101,65 @@ export const deleteTierList = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const bulkSaveTierList = async (req, res) => {
+    try {
+        /*
+          The request body should look like:
+          {
+            userId: "someObjectIdForUser",
+            tiers: {
+              S: { items: [...] },
+              A: { items: [...] },
+              B: { items: [...] },
+              C: { items: [...] },
+              D: { items: [...] },
+              F: { items: [...] },
+            }
+          }
+        */
+        const { userId, tiers } = req.body;
+
+        // Confirm user actually exists
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Remove existing tier list for this user
+        await TierList.deleteMany({ userId });
+
+        const validRanks = ["S", "A", "B", "C", "D", "F"];
+        
+        let results = [];
+
+        for (const rank of validRanks) {
+            if (!tiers[rank]) continue;
+
+            // Insert each movie in the tier, preserving index as 'order'
+            const items = tiers[rank].items || [];
+            for (let i = 0; i < items.length; i++) {
+                const movie = items[i];
+                
+                const movieId = Number(movie.id);
+
+                // Create a new TierList document
+                const newEntry = await TierList.create({
+                    userId: user._id,
+                    movieId: movieId,
+                    rank: rank,
+                    order: i
+                });
+                results.push(newEntry);
+            }
+        }
+
+        res.status(200).json({
+            message: "Tier list saved successfully.",
+            data: results
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
