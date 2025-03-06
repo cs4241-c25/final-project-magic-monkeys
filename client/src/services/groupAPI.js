@@ -35,6 +35,17 @@ export const groupAPI = {
         }
     },
 
+    async getGroupMovieNightSchedules(groupId) {
+        try {
+            console.log(groupId);
+            const res = await axios.get(`${API_URL}/api/groups/${groupId}/movie-night-schedules`);
+            return res.data;
+        } catch (error) {
+            console.error('Error fetching movie night schedules:', error);
+            throw error;
+        }
+    },
+
     // Get movie nights for a group
     async getGroupMovieNights(groupId) {
         try {

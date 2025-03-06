@@ -72,8 +72,8 @@ export const getMovieNightScheduleByGroup = async (req, res) => {
 
         const schedules = await MovieNightSchedule.find({ groupId });
 
-        if (!schedules.length) {
-            return res.status(404).json({ message: "No schedules found for this group." });
+        if (!schedules || schedules.length === 0) {
+            return res.status(200).json([]);
         }
 
         res.status(200).json(schedules);

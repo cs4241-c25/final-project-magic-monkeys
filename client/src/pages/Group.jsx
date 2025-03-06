@@ -28,6 +28,7 @@ export const Group = () => {
         members,
         activity,
         scores,
+        movieNightSchedules,
         movieNights,
         showtime,
         loading,
@@ -152,13 +153,32 @@ export const Group = () => {
         // Add this month's days
         for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
             const date = new Date(currentYear, currentMonth, i);
-            // Check if there's a movie night on this date
-            const hasEvent = movieNights.some(night => {
-                const nightDate = new Date(night.dateTime);
-                return nightDate.getDate() === i &&
-                    nightDate.getMonth() === currentMonth &&
-                    nightDate.getFullYear() === currentYear;
-            });
+            let hasEvent = false;
+            
+            if(movieNightSchedules){
+                movieNightSchedules.forEach(night => {
+                    const nightDate = new Date(night.dateTime);
+                    if(!night.recurring && nightDate.getDate() === i &&
+                        nightDate.getMonth() === currentMonth &&
+                        nightDate.getFullYear() === currentYear) {
+                            hasEvent = true;
+                        }
+                });
+            }
+
+            if(movieNightSchedules){
+                movieNightSchedules.forEach(night => {
+                    if(night.recurring && night.recurrenceDays) {
+                        const startDate = new Date(night.startDate);
+                        const endDate = night.endDate ? new Date(night.endDate) : null;
+                        const weekday = date.toLocaleDateString('en-US', { weekday: "long" });
+
+                        if(date >= startDate && (!endDate || date <= endDate) && night.recurrenceDays.includes(weekday)) {
+                            hasEvent = true;
+                        }
+                    }
+                });
+            }
 
             dates.push({
                 day: i,
@@ -243,7 +263,12 @@ export const Group = () => {
                                     className="bg-green-500 text-white px-4 py-2 rounded">
                                     Schedule Movie Night
                                 </button>
-                                <MovieNightSchedulerModal isOpen={isSchedulerOpen} onClose={() => setSchedulerOpen(false)} groupId={groupId} />
+                                <MovieNightSchedulerModal 
+                                    isOpen={isSchedulerOpen} 
+                                    onClose={() => setSchedulerOpen(false)} 
+                                    groupId={groupId} 
+                                    refreshData={refreshData} 
+                                />
                             </div>
                             <div className="showtime-date">
                                 {showtime?.date || 'No showtime scheduled'}
@@ -280,16 +305,12 @@ export const Group = () => {
                                         key={index}
                                         className={`calendar-date 
                                             ${date.isCurrentMonth ? 'current-month' : 'other-month'}
-                                            ${date.hasEvent ? 'has-event' : ''}`}
+                                            ${date.hasEvent ? 'has-event bg-blue-500 text-white font-bold' : ''}`}
                                     >
                                         {date.day}
-                                        {date.month !== new Date().getMonth() + 1 ? null :
-                                            date.day === 1 ? (
-                                                <span className="month-label">
-                                                    {new Date().toLocaleString('default', { month: 'short' })}
-                                                </span>
-                                            ) : null
-                                        }
+                                        {date.hasEvent && (
+                                            <span className="event-indicator">🎬</span>
+                                        )}
                                     </div>
                                 ))}
                             </div>

@@ -3,7 +3,7 @@ import { Modal } from './Modal';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId }) => {
+export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData }) => {
     const [formData, setFormData] = useState({
         dateTime: "",
         recurring: false,
@@ -57,6 +57,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId }) => {
             });
 
             if (response.ok) {
+                refreshData();
                 onClose();
             }
         } catch (error) {
