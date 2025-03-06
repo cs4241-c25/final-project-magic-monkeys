@@ -48,26 +48,21 @@ export const Tierlist = () => {
     },
   });
 
-  // 1) On mount (or when dbUser changes), fetch the user’s saved tier list
   useEffect(() => {
-    if (!dbUser) return; // Wait until user data is available
+    if (!dbUser) return;
 
     const fetchTierList = async () => {
-      try {
-        // GET /api/tier-lists/:userId (adjust if your route differs)        
+      try {       
         const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/tier-lists`);
         if (!response.ok) {
-          // If no tier list found or some error, just skip
           console.log("No existing tier list or error fetching it.");
           return;
         }
 
-        const savedData = await response.json(); // array of docs like { movieId, rank, order }
+        const savedData = await response.json(); 
 
-        // Create a fresh copy of initialTiers
         const newTiers = structuredClone(initialTiers);
 
-        // We'll assume the same 6 known movies are in the pool. Let's gather them for easy lookup:
         const poolMovies = [
           { id: '1', title: "Oppenheimer", poster: "https://image.tmdb.org/t/p/w200/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg" },
           { id: '2', title: "Interstellar", poster: "https://image.tmdb.org/t/p/w200/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
@@ -77,22 +72,17 @@ export const Tierlist = () => {
           { id: '6', title: "Eternal Sunshine of the Spotless Mind", poster: "https://www.themoviedb.org/t/p/w200/5MwkWH9tYHv3mV9OdYTMR5qreIz.jpg" },
         ];
 
-        // 2) Place each saved item in the appropriate rank array
         savedData.forEach(item => {
-          // Find the corresponding movie in our known pool
           const foundMovie = poolMovies.find(m => m.id === String(item.movieId));
           if (foundMovie && newTiers[item.rank]) {
             newTiers[item.rank].items.push(foundMovie);
           }
         });
 
-        // 3) Remove placed movies from the pool
         newTiers.pool.items = poolMovies.filter(m => {
-          // Only keep movies that aren't placed in any rank
           return !savedData.some(d => String(d.movieId) === m.id);
         });
 
-        // 4) Sort each tier’s items by their `order` from DB
         for (const rank of ['S', 'A', 'B', 'C', 'D', 'F']) {
           // Sort by the `order` field in savedData
           newTiers[rank].items.sort((a, b) => {
@@ -102,7 +92,6 @@ export const Tierlist = () => {
           });
         }
 
-        // 5) Update state
         setTiers(newTiers);
       } catch (error) {
         console.error("Error fetching tier list:", error);

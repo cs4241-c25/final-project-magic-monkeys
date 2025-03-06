@@ -1,0 +1,130 @@
+/* Container for the entire page (side nav + main content) */
+.profile-page-container {
+    display: flex;
+    min-height: 100vh;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: Arial, sans-serif; /* or your chosen font */
+  }
+  
+  /* SideNav container. If you have an "expanded" state, you can shift the content accordingly. */
+  .profile-sidenav {
+    width: 70px; /* collapsed width */
+    transition: width 0.2s ease;
+    overflow: hidden; /* hide text when collapsed */
+    border-right: 1px solid #333;
+  }
+  
+  .profile-sidenav.expanded {
+    width: 250px; /* expanded width */
+  }
+  
+  /* Main area after the SideNav */
+  .profile-main {
+    flex: 1;
+    padding: 20px;
+    transition: margin-left 0.2s ease;
+  }
+  
+  /* If you want the main area to shift when nav is expanded */
+  .profile-sidenav.expanded + .profile-main {
+    margin-left: 250px;
+  }
+  
+  /* Header with avatar and basic user info */
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  /* The circle avatar with the user's initial */
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    background: #ff4b4b; /* accent color */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-right: 16px;
+  }
+  
+  /* Username styles */
+  .profile-username {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  
+  /* Email styles */
+  .profile-email {
+    margin: 4px 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  /* Profile info container */
+  .profile-info {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    margin-bottom: 16px;
+  }
+  
+  .profile-info h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #ff4b4b; /* accent color for headings */
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+  }
+  
+  /* Profile settings container */
+  .profile-settings {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+  }
+  
+  .profile-settings h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #ff4b4b;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+  }
+  
+  .profile-settings ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  
+  .profile-settings li {
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .profile-settings li:hover {
+    color: #ff4b4b; /* accent on hover */
+  }
+  
+  /* Loading state */
+  .profile-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #1a1a1a;
+    color: #ff4b4b;
+    font-size: 1.2rem;
+  }
+  
