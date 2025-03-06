@@ -58,7 +58,7 @@ export const getTierListByUser = async (req, res) => {
         if (!tierList.length) {
             // Return an empty array with 200 OK
             return res.status(200).json([]);
-        }        
+        }
 
         res.status(200).json(tierList);
     } catch (error) {

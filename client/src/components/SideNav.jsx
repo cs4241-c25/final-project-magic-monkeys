@@ -25,26 +25,25 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchUserGroups = async () => {
-      if (!isAuthenticated || !dbUser) return;
+  const fetchUserGroups = async () => {
+    if (!isAuthenticated || !dbUser) return;
 
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_URL}/api/users/${dbUser._id}/groups`);
-        const groups = response.data;
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/api/users/${dbUser._id}/groups`);
+      const groups = response.data;
 
-        setUserGroups(groups.map(group => ({
-          id: group._id,
-          name: group.name
-        })));
-      } catch (err) {
-        console.error('Error fetching user groups:', err);
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setUserGroups(groups.map(group => ({
+        id: group._id,
+        name: group.name
+      })));
+    } catch (err) {
+      console.error('Error fetching user groups:', err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchUserGroups();
@@ -160,4 +159,4 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
       />
     </aside>
   );
-}; 
+};

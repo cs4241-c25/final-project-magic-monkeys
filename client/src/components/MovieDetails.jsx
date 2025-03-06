@@ -3,7 +3,7 @@ import { Modal } from './Modal';
 // import { useAuth0 } from "@auth0/auth0-react";
 import { useUser } from '../context/UserContext';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_API_URL;
 
 export const MovieDetails = ({ 
   movie, 
@@ -20,12 +20,32 @@ export const MovieDetails = ({
   const [director, setDirector] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const { dbUser } = useUser();
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+
+  // Check if movie is in watchlist when component mounts or movie changes
+  useEffect(() => {
+    const checkWatchlist = async () => {
+      if (!dbUser || !movie) return;
+      
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/watch-lists/user/${dbUser._id}/movie/${movie.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setIsInWatchlist(!!data);
+        }
+      } catch (error) {
+        console.error('Error checking watchlist:', error);
+      }
+    };
+    
+    checkWatchlist();
+  }, [dbUser, movie]);
 
   const addToWatchlist = async () => {
     try {
-      // if (!dbUser) {
-      //   throw new Error('Please log in to add movies to your watchlist');
-      // }
+      if (!dbUser) {
+        throw new Error('Please log in to add movies to your watchlist');
+      }
 
       const response = await fetch(`${BACKEND_URL}/api/watch-lists`, {
         method: 'POST',
@@ -40,6 +60,7 @@ export const MovieDetails = ({
       });
       
       if (response.ok) {
+        setIsInWatchlist(true);
         alert('Added to watchlist successfully!');
       } else {
         const errorData = await response.json();
@@ -54,22 +75,33 @@ export const MovieDetails = ({
 
   const addToTierList = async () => {
     try {
-      const watchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: dbUser._id,
-          movieId: movie.id,
-          seenMovie: true
-        })
-      });
-
-      if (!watchlistResponse.ok) {
-        throw new Error('Failed to update watchlist');
+      if (!dbUser) {
+        throw new Error('Please log in to mark movies as watched');
       }
 
+      // If movie is in watchlist, remove it first
+      if (isInWatchlist) {
+        try {
+          const deleteResponse = await fetch(`${BACKEND_URL}/api/watch-lists/user/${dbUser._id}/movie/${movie.id}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+          if (!deleteResponse.ok) {
+            console.warn('Could not remove from watchlist, continuing anyway');
+            // Don't throw error, just continue with adding to tier list
+          } else {
+            setIsInWatchlist(false);
+          }
+        } catch (error) {
+          console.warn('Error removing from watchlist:', error);
+          // Don't throw error, just continue with adding to tier list
+        }
+      }
+
+      // Add to tier list
       const tierlistResponse = await fetch(`${BACKEND_URL}/api/tier-lists`, {
         method: 'POST',
         headers: {
@@ -84,7 +116,7 @@ export const MovieDetails = ({
       });
 
       if (tierlistResponse.ok) {
-        alert('Movie marked as watched!');
+        alert('Movie added to your watched list!');
       } else {
         const errorData = await tierlistResponse.json();
         throw new Error(errorData.message || 'Failed to update tier list');
@@ -141,19 +173,19 @@ export const MovieDetails = ({
           <button onClick={fetchApiDetails} className="api-details-button">
             API Details
           </button>
-        <button 
-          onClick={addToWatchlist}
-          className="api-details-button"
-        >
-          Add to Watchlist
-        </button>
-        
-        <button
-          onClick={addToTierList}
-          className="api-details-button"
-        >
-          Have Watched
-        </button>
+          <button 
+            onClick={addToWatchlist}
+            className="api-details-button"
+          >
+            Add to Watchlist
+          </button>
+          
+          <button
+            onClick={addToTierList}
+            className="api-details-button"
+          >
+            {isInWatchlist ? "Move to Watched" : "Have Watched"}
+          </button>
           <p className="overview">{movie.overview}</p>
           {director && (
             <p className="director">

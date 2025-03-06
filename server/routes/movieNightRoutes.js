@@ -11,4 +11,9 @@ router.get("/movie-nights/:id/attendance", getMovieNightAttendance);
 router.put("/movie-nights/:id", updateMovieNight);
 router.delete("/movie-nights/:id", deleteMovieNight);
 
+// Add this test route
+router.get("/test-movie-night-route", (req, res) => {
+  res.status(200).json({ message: "Movie night routes are working!" });
+});
+
 export default router;
