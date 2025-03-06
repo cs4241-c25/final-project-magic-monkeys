@@ -99,6 +99,7 @@ export const useGroupData = (groupId) => {
     const [members, setMembers] = useState([]);
     const [activity, setActivity] = useState([]);
     const [scores, setScores] = useState([]);
+    const [movieNightSchedules, setMovieNightSchedules] = useState([]);
     const [movieNights, setMovieNights] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -151,6 +152,9 @@ export const useGroupData = (groupId) => {
                 avatar: (member.username || member.name).charAt(0).toUpperCase()
             }));
             setMembers(transformedMembers);
+
+            const schedules = await groupAPI.getGroupMovieNightSchedules(groupId);
+            setMovieNightSchedules(schedules || []);
 
             const nights = await groupAPI.getGroupMovieNights(groupId);
             setMovieNights(nights || []);
@@ -251,6 +255,7 @@ export const useGroupData = (groupId) => {
         members,
         activity,
         scores,
+        movieNightSchedules,
         movieNights,
         // showtime: getNextShowtime(),
         showtime,

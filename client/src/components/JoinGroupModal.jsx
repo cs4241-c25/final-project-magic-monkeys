@@ -238,10 +238,10 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
                 )}
 
                 {mode === 'confirm' && groupToJoin && (
-                    <div>
-                        <h2 className="text-2xl font-bold text-white text-center mb-8">Confirm Join Group</h2>
-                        <div className="p-4 bg-[#373737] rounded-lg border border-[#444444] mb-6">
-                            <h3 className="text-xl font-semibold text-[#ff5c5c]">{groupToJoin.name}</h3>
+                    <div className="modal-form">
+                        <h2 className="modal-title">Confirm Join Group</h2>
+                        <div className="group-preview">
+                            <h3 className="group-preview-name">{groupToJoin.name}</h3>
                             {/* <p className="group-preview-members">
                                 {groupToJoin.memberCount} member{groupToJoin.memberCount !== 1 ? 's' : ''}
                             </p> */}

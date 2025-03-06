@@ -25,29 +25,30 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
-  const fetchUserGroups = useCallback(async () => {
-    if (!isAuthenticated || !dbUser) return;
+  useEffect(() => {
+    const fetchUserGroups = async () => {
+      if (!isAuthenticated || !dbUser) return;
 
-    try {
-      setLoading(true);
-      const response = await axios.get(`${API_URL}/api/users/${dbUser._id}/groups`);
-      const groups = response.data;
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_URL}/api/users/${dbUser._id}/groups`);
+        const groups = response.data;
 
-      setUserGroups(groups.map(group => ({
-        id: group._id,
-        name: group.name
-      })));
-    } catch (err) {
-      console.error('Error fetching user groups:', err);
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [dbUser, isAuthenticated]);
+        setUserGroups(groups.map(group => ({
+          id: group._id,
+          name: group.name
+        })));
+      } catch (err) {
+        console.error('Error fetching user groups:', err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   useEffect(() => {
     fetchUserGroups();
-  }, [fetchUserGroups]);
+  }, [dbUser, isAuthenticated]);
 
   const handleMouseLeave = () => {
     if (!isGroupModalOpen) {

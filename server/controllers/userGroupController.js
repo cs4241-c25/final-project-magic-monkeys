@@ -107,3 +107,19 @@ export const removeUserFromGroup = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const removeUserByIds = async (req, res) => {
+    try{
+        const { userId, groupId } = req.params;
+
+        const deletedMembership = await UserGroup.findOneAndDelete({ userId, groupId });
+        if(!deletedMembership){
+            return res.status(404).json({ message: "User group entry not found." });
+        }
+
+        res.status(200).json({ message: "User removed from group successfully." });
+    }
+    catch(error){
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
