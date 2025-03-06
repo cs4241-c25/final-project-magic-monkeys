@@ -140,51 +140,28 @@ export const Group = () => {
 
         // Add last month's days to fill the first row
         const firstDayIndex = firstDayOfMonth.getDay();
+        const previousMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
         for (let i = firstDayIndex - 1; i >= 0; i--) {
-            const date = new Date(currentYear, currentMonth, -i);
+            const date = new Date(currentYear, currentMonth - 1, previousMonthLastDay - i);
             dates.push({
                 day: date.getDate(),
                 month: date.getMonth() + 1,
+                year: date.getFullYear(),
                 isCurrentMonth: false,
-                hasEvent: false
+                events: []
             });
         }
 
         // Add this month's days
         for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
             const date = new Date(currentYear, currentMonth, i);
-            let hasEvent = false;
-            
-            if(movieNightSchedules){
-                movieNightSchedules.forEach(night => {
-                    const nightDate = new Date(night.dateTime);
-                    if(!night.recurring && nightDate.getDate() === i &&
-                        nightDate.getMonth() === currentMonth &&
-                        nightDate.getFullYear() === currentYear) {
-                            hasEvent = true;
-                        }
-                });
-            }
-
-            if(movieNightSchedules){
-                movieNightSchedules.forEach(night => {
-                    if(night.recurring && night.recurrenceDays) {
-                        const startDate = new Date(night.startDate);
-                        const endDate = night.endDate ? new Date(night.endDate) : null;
-                        const weekday = date.toLocaleDateString('en-US', { weekday: "long" });
-
-                        if(date >= startDate && (!endDate || date <= endDate) && night.recurrenceDays.includes(weekday)) {
-                            hasEvent = true;
-                        }
-                    }
-                });
-            }
-
             dates.push({
                 day: i,
                 month: currentMonth + 1,
+                year: currentYear,
                 isCurrentMonth: true,
-                hasEvent
+                events: []
             });
         }
 
@@ -195,11 +172,65 @@ export const Group = () => {
                 dates.push({
                     day: i,
                     month: currentMonth + 2 > 12 ? 1 : currentMonth + 2,
+                    year: currentMonth + 2 > 12 ? currentYear + 1 : currentYear,
                     isCurrentMonth: false,
-                    hasEvent: false
+                    events: []
                 });
             }
         }
+
+        const calculateEndTime = (startTime, duration) => {
+            if(!startTime || !duration) return null;
+            const startDate = new Date(startTime);
+            startDate.setMinutes(startDate.getMinutes() + duration);
+            return startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
+
+        dates.forEach(date => {
+            movieNightSchedules.forEach(event => {
+                const eventDate = new Date(event.dateTime);
+                const eventStartTime = new Date(event.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const eventEndTime = calculateEndTime(event.dateTime, event.duration);
+                const eventTimeDisplay = eventEndTime ? `${eventStartTime} - ${eventEndTime}` : eventStartTime;
+
+                if(!event.recurring){
+                    if(eventDate.getDate() === date.day &&
+                    eventDate.getMonth() + 1 === date.month &&
+                    eventDate.getFullYear() === date.year){
+                        date.events.push({
+                            time: eventTimeDisplay,
+                            startTimestamp: new Date(event.startTime).getTime(),
+                        });
+                    }
+                }
+            });
+
+            movieNightSchedules.forEach(event => {
+                if(event.recurring && event.recurrenceDays){
+                    const startDate = new Date(event.startDate);
+                    const endDate = event.endDate ? new Date(event.endDate) : null;
+                    const weekday = new Date(date.year, date.month - 1, date.day).toLocaleDateString('en-US', { weekday: 'long' });
+
+                    if(date.year >= startDate.getFullYear() && 
+                    (endDate ? date.year <= endDate.getFullYear() : true) &&
+                    (date.month >= startDate.getMonth() + 1) &&
+                    (endDate ? date.month <= endDate.getMonth() + 1 : true) &&
+                    event.recurrenceDays.includes(weekday)){
+
+                        const eventStartTime = new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const eventEndTime = calculateEndTime(event.startTime, event.duration);
+                        const eventTimeDisplay = eventEndTime ? `${eventStartTime} - ${eventEndTime}` : eventStartTime;
+
+                        date.events.push({
+                            time: eventTimeDisplay,
+                            startTimestamp: new Date(event.startTime).getTime()
+                        });
+                    }
+                }
+            });
+
+            date.events.sort((a, b) => b.startTimestamp - a.startTimestamp);
+        });
 
         return { days, dates };
     };
@@ -303,14 +334,19 @@ export const Group = () => {
                                 {calendar.dates.map((date, index) => (
                                     <div
                                         key={index}
-                                        className={`calendar-date 
+                                        className={`calendar-date flex flex-col items-center justify-start p-2
                                             ${date.isCurrentMonth ? 'current-month' : 'other-month'}
-                                            ${date.hasEvent ? 'has-event bg-blue-500 text-white font-bold' : ''}`}
+                                            ${date.events.length > 0 ? 'has-event' : ''}`}
                                     >
-                                        {date.day}
-                                        {date.hasEvent && (
-                                            <span className="event-indicator">🎬</span>
-                                        )}
+                                        <span className="calendar-day-number font-bold text-lg">{date.day}</span>
+                                        
+                                        <div className="calendar-events-container flex flex-col items-center w-full">
+                                            {date.events.map((event, eventIndex) => (
+                                                <div key={eventIndex} className="calendar-event bg-gray-800 text-white text-xs p-1 rounded w-full text-center mt-1">
+                                                    <span className="calendar-event-time font-semibold">{event.time}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
