@@ -8,11 +8,15 @@ import '../styles/Dashboard.css';
 import '../styles/Group.css';
 import {useGroupData} from "../hooks/useGroupData";
 import { TicketRating } from '../components/TicketRating';
+import { useUser } from '../context/UserContext';
+import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export const Group = () => {
     const { groupId } = useParams();
-    const { user, isLoading, isAuthenticated } = useAuth0();
+    const { isLoading, isAuthenticated } = useAuth0();
+    const { dbUser } = useUser();
     const navigate = useNavigate();
 
     const [isExpanded, setIsExpanded] = useState(false);
@@ -178,6 +182,16 @@ export const Group = () => {
         return { days, dates };
     };
 
+    const leaveGroup = async () => {
+        try {
+            await axios.delete(`${API_URL}/api/user-groups/${dbUser._id}/${groupId}`);
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Error deleting group membership:', error);
+            throw error;
+        }
+    };
+
     const calendar = generateCalendar();
 
     if (isLoading || loading) return <div>Loading Group...</div>;
@@ -210,6 +224,11 @@ export const Group = () => {
             <main className="dashboard-main">
                 <div className="group-header">
                     <h1>{groupData.name}</h1>
+                    <button
+                        type="button"
+                        onClick={leaveGroup}
+                        class="px-4 py-2 text-white bg-[#373737] hover:bg-[#444444] rounded-lg transition-colors"
+                    >Leave Group</button>
                 </div>
 
                 <div className="group-content">

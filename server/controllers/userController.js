@@ -26,7 +26,7 @@ export const createUser = async (req, res) => {
 
         const newUser = new User({
             auth0Id,
-            username,
+            uniqueUsername,
             email,
             profilePicture,
             favoriteMovie,

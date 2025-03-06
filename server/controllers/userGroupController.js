@@ -34,33 +34,6 @@ export const addUserToGroup = async (req, res) => {
     }
 };
 
-export const joinGroupByInvite = async (req, res) => {
-    try{
-        const { userId, inviteCode } = req.body;
-
-        const group = await Group.findOne({ inviteCode });
-        if(!group){
-            return res.status(404).json({ message: "Invalid invite code." });
-        }
-
-        const existingMembership = await UserGroup.findOne({ userId, groupId: group._id });
-        if(existingMembership){
-            return res.status(400).json({ message: "User is already a member of this group." });
-        }
-
-        const newMembership = new UserGroup({
-            userId,
-            groupId: group._id,
-            role: "member"
-        });
-
-        await newMembership.save();
-        res.status(201).json({ message: "Joined group successfully", group });
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-}
-
 export const getUserGroupById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -77,6 +50,23 @@ export const getUserGroupById = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const checkGroupJoinExists = async (req, res) => {
+    try{
+        const { userId, groupId } = req.params;
+        
+        const userGroup = await UserGroup.findOne({ userId, groupId });
+
+        if(userGroup){
+            return res.json({ isMember: true, joinId: userGroup._id, role: userGroup.role });
+        }
+
+        res.json({ isMember: false });
+    }
+    catch(error){
+        res.status(500).json({ message: "Server error", error: error.message});
+    }
+}
 
 export const updateUserRole = async (req, res) => {
     try {
@@ -117,3 +107,19 @@ export const removeUserFromGroup = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const removeUserByIds = async (req, res) => {
+    try{
+        const { userId, groupId } = req.params;
+
+        const deletedMembership = await UserGroup.findOneAndDelete({ userId, groupId });
+        if(!deletedMembership){
+            return res.status(404).json({ message: "User group entry not found." });
+        }
+
+        res.status(200).json({ message: "User removed from group successfully." });
+    }
+    catch(error){
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}

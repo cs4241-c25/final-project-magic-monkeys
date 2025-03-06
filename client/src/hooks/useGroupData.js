@@ -155,8 +155,10 @@ export const useGroupData = (groupId) => {
             const nights = await groupAPI.getGroupMovieNights(groupId);
             setMovieNights(nights || []);
 
-            const uniqueMovies = [...new Set(nights.map(night => night.movieId))]
-                .filter(movieId => movieId);
+            // const uniqueMovies = [...new Set(nights.map(night => night.movieId))]
+            //     .filter(movieId => movieId);
+
+            const uniqueMovies = [];
 
             // Fetch movie details and ratings
             if (uniqueMovies.length > 0) {

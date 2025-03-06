@@ -5,6 +5,7 @@ import { CgProfile } from 'react-icons/cg';
 import { FiLogOut } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useUser } from '../context/UserContext';
 import axios from 'axios';
 import {JoinGroupModal} from './JoinGroupModal';
 
@@ -12,15 +13,11 @@ import '../styles/SideNav.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-const mockGroups = [
-  { id: '1', name: 'Movie Buffs' },
-  { id: '2', name: 'Sci-Fi Lovers' }
-];
-
 export const SideNav = ({ isExpanded, setIsExpanded }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user, isAuthenticated  } = useAuth0();
+  const { logout, isAuthenticated  } = useAuth0();
+  const { dbUser } = useUser();
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,11 +27,11 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
 
   useEffect(() => {
     const fetchUserGroups = async () => {
-      if (!isAuthenticated || !user) return;
+      if (!isAuthenticated || !dbUser) return;
 
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/users/${user.sub}/groups`);
+        const response = await axios.get(`${API_URL}/api/users/${dbUser._id}/groups`);
         const groups = response.data;
 
         setUserGroups(groups.map(group => ({
@@ -44,14 +41,13 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
       } catch (err) {
         console.error('Error fetching user groups:', err);
         setError(err);
-        setUserGroups(mockGroups);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserGroups();
-  }, [user, isAuthenticated]);
+  }, [dbUser, isAuthenticated]);
 
   const handleMouseLeave = () => {
     if (!isGroupModalOpen) {
