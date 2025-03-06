@@ -11,7 +11,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
         startDate: "",
         endDate: "",
         startTime: "",
-        duration: 120,
+        duration: "",
     });
 
     const handleChange = (e) => {
@@ -49,6 +49,10 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
             startTime: formData.recurring ? convertTimeToISO(formData.startTime) : null,
         };
 
+        if(formData.duration === "") {
+            delete formattedFormData.duration;
+        }
+
         try {
             const response = await fetch(`${API_URL}/api/movie-night-schedules`, {
                 method: "POST",
@@ -78,13 +82,16 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                             onClick={() => setFormData((prev) => ({ ...prev, recurring: !prev.recurring }))}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition bg-gray-700 text-gray-300 hover:bg-gray-600`}
                         >
-                            {formData.recurring ? "Recurring Event" : "Non-Recurring Event"}
+                            {formData.recurring ? "Recurring Event" : "One-Time Event"}
                         </button>
                     </div>
 
+                    {/* One-Time Event Fields */}
                     {!formData.recurring ? (
                         <div>
-                            <label className="block mb-1 text-sm">Date & Time</label>
+                            <label className="block mb-1 text-sm">
+                                Date & Time<span className="text-red-500 text-lg font-bold ml-1">*</span>
+                            </label>
                             <input
                                 type="datetime-local"
                                 name="dateTime"
@@ -98,7 +105,9 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                         <>
                             {/* Recurring Days Selection */}
                             <div>
-                                <label className="block mb-1 text-sm text-center">Select Recurring Days</label>
+                                <label className="block mb-1 text-sm text-center">
+                                    Select Recurring Days<span className="text-red-500 text-lg font-bold ml-1">*</span>
+                                </label>
                                 <div className="flex justify-between gap-1">
                                     {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, index) => {
                                         const isSelected = formData.recurrenceDays.includes(day);
@@ -117,9 +126,12 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                     })}
                                 </div>
                             </div>
-
+                            
+                            {/* Start Date (Required) */}
                             <div>
-                                <label className="block mb-1 text-sm">Start Date</label>
+                                <label className="block mb-1 text-sm">
+                                    Start Date<span className="text-red-500 text-lg font-bold ml-1">*</span>
+                                </label>
                                 <input
                                     type="date"
                                     name="startDate"
@@ -129,8 +141,12 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                     required
                                 />
                             </div>
+
+                            {/* End Date (Optional) */}
                             <div>
-                                <label className="block mb-1 text-sm">End Date</label>
+                                <label className="block mb-1 text-sm">
+                                    End Date <span className="text-gray-400">(Optional)</span>
+                                </label>
                                 <input
                                     type="date"
                                     name="endDate"
@@ -139,8 +155,12 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                     className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
+
+                            {/* Start Time (Required) */}
                             <div>
-                                <label className="block mb-1 text-sm">Start Time</label>
+                                <label className="block mb-1 text-sm">
+                                    Start Time<span className="text-red-500 text-lg font-bold ml-1">*</span>
+                                </label>
                                 <input
                                     type="time"
                                     name="startTime"
@@ -153,7 +173,9 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                         </>
                     )}
                     <div>
-                        <label className="block mb-1 text-sm">Duration (minutes)</label>
+                        <label className="block mb-1 text-sm">
+                            Duration (minutes) <span className="text-gray-400">(Optional)</span>
+                        </label>
                         <input
                             type="number"
                             name="duration"
@@ -161,7 +183,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                             onChange={handleChange}
                             min="1"
                             className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
+                            placeholder="Leave blank for no duration"
                         />
                     </div>
                     <div className="flex justify-end gap-2 mt-4">
