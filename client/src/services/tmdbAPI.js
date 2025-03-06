@@ -66,4 +66,12 @@ export const tmdbAPI = {
     return data.results.find(video => video.type === 'Trailer' || video.type === 'Teaser');
   },
 
+  async getMovieBase(movieId) {
+    const res = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=en-US`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch base details for movieId=${movieId}`);
+    }
+    return res.json();
+  },
+
 }; 
