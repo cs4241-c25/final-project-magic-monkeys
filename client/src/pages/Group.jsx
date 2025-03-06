@@ -9,6 +9,7 @@ import '../styles/Group.css';
 import {useGroupData} from "../hooks/useGroupData";
 import { TicketRating } from '../components/TicketRating';
 import { useUser } from '../context/UserContext';
+import { MovieNightSchedulerModal } from '../components/MovieNightSchedulerModal';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -20,6 +21,7 @@ export const Group = () => {
     const navigate = useNavigate();
 
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isSchedulerOpen, setSchedulerOpen] = useState(false);
 
     const {
         groupData,
@@ -235,6 +237,14 @@ export const Group = () => {
                     {/* Top Section */}
                     <div className="group-top-section">
                         <div className="group-showtime">
+                            <div>
+                                <button 
+                                    onClick={() => setSchedulerOpen(true)}
+                                    className="bg-green-500 text-white px-4 py-2 rounded">
+                                    Schedule Movie Night
+                                </button>
+                                <MovieNightSchedulerModal isOpen={isSchedulerOpen} onClose={() => setSchedulerOpen(false)} groupId={groupId} />
+                            </div>
                             <div className="showtime-date">
                                 {showtime?.date || 'No showtime scheduled'}
                             </div>
