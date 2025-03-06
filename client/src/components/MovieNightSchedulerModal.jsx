@@ -119,6 +119,24 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/movie-night-schedules/${movieNightSchedule._id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(),
+            });
+
+            if(response.ok) {
+                refreshData();
+                onClose();
+            }
+        } catch (error) {
+            console.error('Error deleting group membership:', error);
+            throw error;
+        }
+    };
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <div className="text-white p-6 rounded-lg w-full max-w-md mx-auto">
@@ -244,6 +262,15 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                         >
                             Cancel
                         </button>
+                        {movieNightSchedule && (
+                            <button
+                                type="button"
+                                onClick={handleDelete}
+                                className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded transition"
+                            >
+                                Delete
+                            </button>
+                        )}
                         <button
                             type="submit"
                             className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white rounded transition"
