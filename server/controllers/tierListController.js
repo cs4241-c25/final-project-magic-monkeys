@@ -56,8 +56,9 @@ export const getTierListByUser = async (req, res) => {
         const tierList = await TierList.find({ userId }).sort({ order: 1 });
 
         if (!tierList.length) {
-            return res.status(404).json({ message: "No tier list entries found for this user." });
-        }
+            // Return an empty array with 200 OK
+            return res.status(200).json([]);
+        }        
 
         res.status(200).json(tierList);
     } catch (error) {
