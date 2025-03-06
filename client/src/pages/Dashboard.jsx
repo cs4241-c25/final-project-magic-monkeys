@@ -630,28 +630,34 @@ export const Dashboard = () => {
             ) : (
               <div className="mini-tier-container">
                 {Object.entries(tierListData)
-                  .filter(([tier, movies]) => movies.length > 0) // Only show tiers with movies
+                  // Remove the filter and just show all tiers, still limiting to 3
                   .slice(0, 3) // Show at most 3 tiers to fit in the card
                   .map(([tier, movies]) => (
                     <div key={tier} className="mini-tier-row">
                       <div className="mini-tier-label">{tier}</div>
                       <div className="mini-tier-movies">
-                        {movies.map((movie, i) => (
-                          <img 
-                            key={`${tier}-${i}`}
-                            src={movie.poster}
-                            alt={movie.title}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                        {movies.length > 0 ? (
+                          // If there are movies, show them
+                          movies.map((movie, i) => (
+                      <img 
+                        key={`${tier}-${i}`}
+                        src={movie.poster}
+                        alt={movie.title}
+                      />
+                          ))
+                        ) : (
+                          // If there are no movies, show an empty state for this row
+                          <span className="empty-tier-message">No movies in this tier</span>
+                        )}
+                  </div>
+                </div>
+              ))}
                 {Object.values(tierListData).every(movies => movies.length === 0) && !isTierListLoading && (
                   <div className="empty-state">
                     <p>Click to create your tier list!</p>
                   </div>
                 )}
-              </div>
+            </div>
             )}
           </div>
 
@@ -684,9 +690,9 @@ export const Dashboard = () => {
                           <h4>{movie.title || `Movie ID: ${movie.movieId}`}</h4>
                           <div className="movie-year">
                             {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
-                          </div>
-                        </div>
-                        
+            </div>
+          </div>
+
                         <p className="movie-overview">
                           {movie.overview || 'No description available.'}
                         </p>
@@ -717,7 +723,7 @@ export const Dashboard = () => {
                 )}
               </div>
             ) : (
-              <div className="reviews-list">
+            <div className="reviews-list">
                 {movieData.map((movie, i) => (
                   <div key={movie.id} className="review-card">
                     <img src={movie.poster} alt={movie.title} />
@@ -743,10 +749,10 @@ export const Dashboard = () => {
                       </p>
                       
                       <a href="#" className="review-link">Click to see full review</a>
-                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+            </div>
             )}
           </div>
         </div>
