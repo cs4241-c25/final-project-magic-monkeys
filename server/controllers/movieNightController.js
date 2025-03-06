@@ -42,13 +42,13 @@ export const getMovieNightsByUser = async (req, res) => {
 
         const userGroups = await UserGroup.find({ userId }).select("groupId");
         if (!userGroups.length) {
-            return res.status(404).json({ message: "User is not in any groups." });
+            return res.status(200).json([]);
         }
 
         const groupIds = userGroups.map(ug => ug.groupId);
 
         const movieNights = await MovieNight.find({ groupId: { $in: groupIds } });
-
+        
         res.status(200).json(movieNights);
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
@@ -60,10 +60,6 @@ export const getMovieNightsByGroup = async (req, res) => {
         const { groupId } = req.params;
 
         const movieNights = await MovieNight.find({ groupId });
-
-        if (!movieNights.length) {
-            return res.status(404).json({ message: "No movie nights found for this group." });
-        }
 
         res.status(200).json(movieNights);
     } catch (error) {

@@ -25,7 +25,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
-  const fetchUserGroups = useCallback(async () => {
+  const fetchUserGroups = async () => {
     if (!isAuthenticated || !dbUser) return;
 
     try {
@@ -43,11 +43,11 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
     } finally {
       setLoading(false);
     }
-  }, [dbUser, isAuthenticated]);
+  };
 
   useEffect(() => {
     fetchUserGroups();
-  }, [fetchUserGroups]);
+  }, [dbUser, isAuthenticated]);
 
   const handleMouseLeave = () => {
     if (!isGroupModalOpen) {
@@ -159,4 +159,4 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
       />
     </aside>
   );
-}; 
+};
