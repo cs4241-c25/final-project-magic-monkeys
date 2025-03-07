@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { SideNav } from '../components/SideNav';
 import { useAuth0 } from '@auth0/auth0-react';
 import { BiChevronDown, BiFilterAlt, BiPlus, BiCog } from 'react-icons/bi';
@@ -288,7 +288,7 @@ export const Group = () => {
                     <button
                         type="button"
                         onClick={leaveGroup}
-                        class="px-4 py-2 text-white bg-[#373737] hover:bg-[#444444] rounded-lg transition-colors"
+                        className="px-4 py-2 text-white bg-[#373737] hover:bg-[#444444] rounded-lg transition-colors"
                     >Leave Group</button>
                 </div>
 
@@ -377,7 +377,12 @@ export const Group = () => {
                                 {members.map(member => (
                                     <div key={member.id} className="member-card">
                                         <div className="member-avatar">{member.avatar}</div>
-                                        <div className="member-name">{member.name}</div>
+                                        <Link 
+                                            to={`/user/${member.name}`} 
+                                            className="member-name-link"
+                                        >
+                                            {member.name}
+                                        </Link>
                                     </div>
                                 ))}
                             </div>

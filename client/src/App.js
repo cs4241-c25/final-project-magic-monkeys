@@ -8,6 +8,7 @@ import { Tierlist } from './pages/Tierlist';
 import { Group } from './pages/Group';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Profile } from './pages/Profile';
+import { PublicProfile } from './pages/PublicProfile';
 import './App.css';
 import React from "react";
 // import { useAuth0 } from "@auth0/auth0-react";
@@ -36,7 +37,7 @@ const AppContent = () => {
     });
   };
 
-  const hideNavBar = ['/dashboard', '/group', '/groups', '/tierlist', '/profile'].some(path =>
+  const hideNavBar = ['/dashboard', '/group', '/groups', '/tierlist', '/profile', '/user'].some(path =>
       location.pathname.startsWith(path)
   );
 
@@ -96,6 +97,7 @@ const AppContent = () => {
               </ProtectedRoute>
             }
         />
+        <Route path="/user/:username" element={<PublicProfile />} />
       </Routes>
     </div>
   );
