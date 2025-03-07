@@ -1,112 +1,160 @@
 .tierlist-container {
-    padding-left: 70px;
-    min-height: 100vh;
-    background: #1a1a1a;
-    color: #ffffff;
-  }
+  padding-left: 70px;
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: #ffffff;
+}
 
-  .tierlist-main {
-    padding: 20px;
-    margin-left: 40px;
-    margin-right: 40px;
-  }
-  
-  .sidenav.expanded + .tierlist-main {
-    margin-left: 250px;
-  }
+.tierlist-main {
+  padding: 20px;
+  margin-left: 40px;
+  margin-right: 40px;
+}
 
-  .tierlist-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    height: 20px;
-  }
+.sidenav.expanded + .tierlist-main {
+  margin-left: 250px;
+}
 
-  .tier-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-    height: 100%;
-  }
-  
-  .tier-row {
-    display: flex;
-    align-items: center;
-    background: #333;
-    border-radius: 1px;
-    height: calc((100% - 24px) / 3);
-  }
-  
-  .tier-label {
-    width: 75px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 20px;
-    font-weight: bold;
-    font-size: 1.4rem;
-  }
-  
-  /* Tier-specific colors - gradient from darker to lighter salmon */
-  .tier-row:nth-child(1) .tier-label {
-    background: #ff4b4b; /* S Tier - Darkest salmon */
-  }
+.tierlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  height: 20px;
+}
 
-  .tier-row:nth-child(2) .tier-label {
-    background: #ff5c5c; /* A Tier */
-  }
+.tier-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  height: 100%;
+}
 
-  .tier-row:nth-child(3) .tier-label {
-    background: #ff6e6e; /* B Tier */
-  }
+.tier-row {
+  display: flex;
+  align-items: center;
+  background: #333;
+  border-radius: 1px;
+  height: calc((100% - 24px) / 3);
+}
 
-  .tier-row:nth-child(4) .tier-label {
-    background: #ff8080; /* C Tier */
-  }
+.tier-label {
+  width: 75px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
 
-  .tier-row:nth-child(5) .tier-label {
-    background: #ff9292; /* D Tier */
-  }
+/* Tier-specific colors - gradient from darker to lighter salmon */
+.tier-row:nth-child(1) .tier-label {
+  color: #ff4646; /* S Tier */
+  background-color: #232323;
+}
 
-  .tier-row:nth-child(6) .tier-label {
-    background: #ffa4a4; /* F Tier - Lightest salmon */
-  }
-  
-  .tier-movies {
-    display: flex;
-    gap: 10px;
-    padding: 4px;
-    flex: 1;
-    overflow-x: auto;
-  }
+.tier-row:nth-child(2) .tier-label {
+  color: #ff5c5c; /* A Tier */
+  background-color: #232323;
+}
 
-  .content-section h2 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-right: 4px;
-  }
-  
-  .tier-movies img {
-    width: 60x;
-    height: 90px;
-    border-radius: 4px;
-    transition: transform 0.2s;
-    flex-shrink: 0;
-  }
-  
-  .tier-movies.dragging-over {
-    background-color: #444; /* Visual feedback when dragging over */
-  }
-  
-  .draggable-item {
-    position: relative;
-    transition: opacity 0.2s;
-  }
-  
-  .draggable-item.dragging {
-    opacity: 0.8;
-  }
+.tier-row:nth-child(3) .tier-label {
+  color: #ff6e6e; /* B Tier */
+  background-color: #232323;
+}
+
+.tier-row:nth-child(4) .tier-label {
+  color: #ff8080; /* C Tier */
+  background-color: #232323;
+}
+
+.tier-row:nth-child(5) .tier-label {
+  color: #ff9292; /* D Tier */
+  background-color: #232323;
+}
+
+.tier-row:nth-child(6) .tier-label {
+  color: #ffa4a4; /* F Tier */
+  background-color: #232323;
+}
+
+.tier-movies {
+  display: flex;
+  gap: 10px;
+  padding: 4px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.tier-movies img {
+  width: 60px;
+  height: 90px;
+  border-radius: 4px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.tier-movies.dragging-over {
+  background-color: #444;
+}
+
+.draggable-item {
+  position: relative;
+  transition: opacity 0.2s;
+}
+
+.draggable-item.dragging {
+  opacity: 0.8;
+}
+
+/* Unranked Section Styles */
+.unranked-section {
+  border: 1px solid #919191;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.unranked-title-section {
+  background-color: #232323;
+  padding: 10px;
+}
+
+.unranked-movies {
+  background-color: #2d2d2d;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+/* Constrain images in unranked section to the same size */
+.unranked-movies img {
+  width: 60px;
+  height: 90px;
+  border-radius: 4px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.save-button {
+  background-color: #ff4646;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 15px;
+  align-self: center;
+}
+
+.save-button:hover {
+  border: 1px solid #ff4646;
+  background-color: #1a1a1a;
+  color: #ff4646;
+}

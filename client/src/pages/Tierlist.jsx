@@ -17,7 +17,7 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-// The "unranked" tier is now keyed as "U" instead of "pool"
+// Tiers structure (no dummy items)
 const initialTiers = {
   S: { items: [], label: 'S Tier' },
   A: { items: [], label: 'A Tier' },
@@ -31,26 +31,24 @@ const initialTiers = {
 export const Tierlist = () => {
   const { dbUser } = useUser();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isLocked, setIsLocked] = useState(true);
   const [tiers, setTiers] = useState(initialTiers);
 
-  // Fetch user's TierList from the backend
+  // 1) Fetch user's TierList from the backend and 2) fetch TMDB title/poster
   useEffect(() => {
     if (!dbUser) return;
 
     const fetchTierList = async () => {
       try {
-        // GET the user's tier list: /api/users/:userId/tier-lists
+        // GET the user's tier list from /api/users/:userId/tier-lists
         const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/tier-lists`);
         if (!response.ok) {
-          console.warn('No existing tier list or error fetching it. Possibly empty.');
+          console.warn("No existing tier list or error fetching it. Possibly empty.");
           return;
         }
-
-        // e.g. [ { _id, userId, movieId, rank, order }, ... ]
+        // Example: [ { _id, userId, movieId, rank, order }, ... ]
         const savedData = await response.json();
 
-        // Enrich each doc with TMDB title/poster
+        // Augment each doc with TMDB info (title & poster)
         const withDetails = await Promise.all(
           savedData.map(async (doc) => {
             try {
@@ -61,7 +59,7 @@ export const Tierlist = () => {
                 poster_path: baseData.poster_path || null,
               };
             } catch (err) {
-              console.error('Failed to fetch TMDB data for doc:', doc, err);
+              console.error("Failed to get TMDB data for doc:", doc, err);
               return {
                 ...doc,
                 title: 'Unknown Movie',
@@ -74,18 +72,17 @@ export const Tierlist = () => {
         // Build a fresh copy of initialTiers
         const newTiers = structuredClone(initialTiers);
 
-        // Distribute movies into the correct tier, defaulting to "U" if rank missing
+        // Distribute movies into the correct tier or the unranked group (U)
         withDetails.forEach((doc) => {
-          const rank = doc.rank || 'U';  // fallback
+          const rank = doc.rank || 'U';
           const movieObj = {
-            id: String(doc.movieId),
+            id: String(doc.movieId), // used for Draggable key
             title: doc.title,
             poster: doc.poster_path
               ? `https://image.tmdb.org/t/p/w500${doc.poster_path}`
               : null,
           };
 
-          // If rank is "U", push to unranked items
           if (rank === 'U') {
             newTiers.U.items.push(movieObj);
           } else if (newTiers[rank]) {
@@ -93,7 +90,7 @@ export const Tierlist = () => {
           }
         });
 
-        // Sort each rank by "order" (S, A, B, C, D, F)
+        // Sort each ranked tier (S, A, B, C, D, F) by "order"
         for (const rank of ['S', 'A', 'B', 'C', 'D', 'F']) {
           newTiers[rank].items.sort((a, b) => {
             const docA = withDetails.find((d) => String(d.movieId) === a.id);
@@ -104,33 +101,35 @@ export const Tierlist = () => {
 
         setTiers(newTiers);
       } catch (error) {
-        console.error('Error fetching tier list:', error);
+        console.error("Error fetching tier list:", error);
       }
     };
 
     fetchTierList();
   }, [dbUser]);
 
-  // Drag & Drop event
+  // Called when a drag ends
   const onDragEnd = (result) => {
-    if (!result.destination || isLocked) return;
 
     const sourceKey = result.source.droppableId;
     const destKey = result.destination.droppableId;
 
-    // If dragging within the same tier
+    // Reordering within the same tier
     if (sourceKey === destKey) {
-      const reordered = reorder(
+      const reorderedItems = reorder(
         tiers[sourceKey].items,
         result.source.index,
         result.destination.index
       );
       setTiers((prev) => ({
         ...prev,
-        [sourceKey]: { ...prev[sourceKey], items: reordered },
+        [sourceKey]: {
+          ...prev[sourceKey],
+          items: reorderedItems,
+        },
       }));
     } else {
-      // Moving between different tiers
+      // Moving between tiers
       const sourceItems = Array.from(tiers[sourceKey].items);
       const [removed] = sourceItems.splice(result.source.index, 1);
       const destItems = Array.from(tiers[destKey].items);
@@ -144,65 +143,45 @@ export const Tierlist = () => {
     }
   };
 
-  // Save changes to the backend
+  // Save the updated tiers to your backend
   const handleSave = async () => {
     if (!dbUser) {
-      console.error('dbUser is null; cannot save tier list yet.');
-      alert('Please wait until your profile loads before saving your tier list.');
+      console.error("No dbUser found; can't save tier list yet.");
+      alert("Please wait until your profile loads before saving your tier list.");
       return;
     }
     try {
       const response = await fetch(`${BACKEND_URL}/api/tier-lists/bulk-save`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: dbUser._id,
           tiers,
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to save tier list.');
+        throw new Error("Failed to save tier list.");
       }
       const data = await response.json();
-      console.log('Tier list saved:', data);
-      alert('Tier list saved successfully!');
+      console.log("Tier list saved:", data);
+      alert("Tier list saved successfully!");
     } catch (error) {
-      console.error('Error saving tier list:', error);
-      alert('An error occurred while saving your tier list.');
+      console.error("Error saving tier list:", error);
+      alert("An error occurred while saving your tier list.");
     }
   };
 
   return (
     <div className="tierlist-container">
       <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-
       <div className={`tierlist-main ${isExpanded ? 'expanded' : ''}`}>
-        <div className="tierlist-header">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsLocked(!isLocked)}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg"
-            >
-              {isLocked ? <BiLock size={20} /> : <BiLockOpen size={20} />}
-              {isLocked ? 'Locked' : 'Unlocked'}
-            </button>
-
-            <button
-              onClick={handleSave}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="tier-container">
             {/* Tiers S, A, B, C, D, F */}
             {['S', 'A', 'B', 'C', 'D', 'F'].map((tierKey) => (
               <div className="tier-row" key={tierKey}>
                 <div className="tier-label">{tierKey}</div>
-                <Droppable droppableId={tierKey} direction="horizontal" isDropDisabled={isLocked}>
+                <Droppable droppableId={tierKey} direction="horizontal">
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
@@ -214,7 +193,6 @@ export const Tierlist = () => {
                           key={movie.id}
                           draggableId={movie.id}
                           index={index}
-                          isDragDisabled={isLocked}
                         >
                           {(provided) => (
                             <div
@@ -234,11 +212,6 @@ export const Tierlist = () => {
                                   {movie.title}
                                 </div>
                               )}
-                              {!isLocked && (
-                                <div className="absolute top-1 left-1 text-white/50">
-                                  <BsArrowsMove />
-                                </div>
-                              )}
                             </div>
                           )}
                         </Draggable>
@@ -250,22 +223,30 @@ export const Tierlist = () => {
               </div>
             ))}
 
+            <button
+              onClick={handleSave}
+              className="save-button"
+            >
+              Save
+            </button>
+
             {/* Unranked Movies (rank = "U") */}
-            <div className="content-section mt-4">
-              <h2 className="text-lg font-semibold mb-4">Unranked Movies</h2>
-              <Droppable droppableId="U" direction="horizontal" isDropDisabled={isLocked}>
+            <div className="unranked-section mt-4">
+              <div className="unranked-title-section">
+                <h2 className="text-lg font-semibold mb-0">Unranked Movies</h2>
+              </div>
+              <Droppable droppableId="U" direction="horizontal">
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className="tier-movies"
+                    className="unranked-movies"
                   >
                     {tiers.U.items.map((movie, index) => (
                       <Draggable
                         key={movie.id}
                         draggableId={movie.id}
                         index={index}
-                        isDragDisabled={isLocked}
                       >
                         {(provided) => (
                           <div
@@ -283,11 +264,6 @@ export const Tierlist = () => {
                             ) : (
                               <div className="missing-poster">
                                 {movie.title}
-                              </div>
-                            )}
-                            {!isLocked && (
-                              <div className="absolute top-1 left-1 text-white/50">
-                                <BsArrowsMove />
                               </div>
                             )}
                           </div>
