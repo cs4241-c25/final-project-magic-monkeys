@@ -6,10 +6,9 @@ import WatchList from "../models/WatchList.js";
 
 export const createUser = async (req, res) => {
     try {
-
-        console.log("Received request to create user: " + req.body);
-
         const { auth0Id, username, email, profilePicture, favoriteMovie } = req.body;
+
+        console.log("Received request to create user: { Auth0Id: ", auth0Id," }, { Email: ", email, " }, { Username: ", username, " }");
 
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
