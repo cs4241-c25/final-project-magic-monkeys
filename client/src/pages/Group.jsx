@@ -54,8 +54,8 @@ export const Group = () => {
     const toggleCalendarView = () => {
         setIsCalendarCondensed((prev) => {
             const newState = !prev;
-    
-            if (!newState) {
+            
+            if(newState){
                 const today = new Date();
                 setCurrentMonth(today.getMonth());
                 setCurrentYear(today.getFullYear());
@@ -74,7 +74,6 @@ export const Group = () => {
         const eventDate = new Date(event.dateTime);
         const eventYear = eventDate.getFullYear();
         const eventMonth = eventDate.getMonth();
-        const eventDay = eventDate.getDate();
 
         if(isCalendarCondensed){
             const startOfEventWeek = new Date(eventDate);
