@@ -6,6 +6,7 @@ import { tmdbAPI } from '../services/tmdbAPI';
 import { omdbAPI } from '../services/omdbAPI';
 import { useUser } from '../context/UserContext';
 import { useAuth0 } from '@auth0/auth0-react';
+import { SideNav } from '../components/SideNav';
 
 export const MovieDemo = () => {
   const { isLoading } = useAuth0();
@@ -19,6 +20,7 @@ export const MovieDemo = () => {
   const [cardRatings, setCardRatings] = useState({});
   const [scrollInterval, setScrollInterval] = useState(null);
   const [cast, setCast] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);   
 
   const { nowPlaying, upcoming, loading, error } = useMovieData();
 
@@ -281,7 +283,9 @@ export const MovieDemo = () => {
 
   return (
     <div className="movie-demo">
-      <header className="App-header">
+      {isAuthenticated && (
+        <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      )}      <header className="App-header">
         <form onSubmit={searchMovie} className="search-form">
           <input
             type="text"

@@ -124,9 +124,17 @@ export const PublicProfile = () => {
     tierMap[item.rank].push(item);
   });
 
+  // Determine what to display as the "favorite movie."
+  // If userData.favoriteMovie not set, use first S-tier movie title if it exists
+  let displayedFavoriteMovie = userData.favoriteMovie;
+  if (!displayedFavoriteMovie && tierMap.S.length > 0) {
+    displayedFavoriteMovie = tierMap.S[0].title;
+  }
+
   return (
     <div className="public-profile-container">
       <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+
       {/* Top Row */}
       <div className="profile-top-row">
         <div className="profile-avatar">
@@ -156,12 +164,8 @@ export const PublicProfile = () => {
         {/* Right half: Favorite Movie */}
         <div className="profile-favorite-movie">
           <h2>Favorite Movie</h2>
-          {userData.favoriteMovie ? (
-            <>
-              <p className="favorite-movie-title">{userData.favoriteMovie}</p>
-              {/* If you want to also show a poster for the favorite, fetch & display it similarly. 
-                  For now, we just do text. */}
-            </>
+          {displayedFavoriteMovie ? (
+            <p className="favorite-movie-title">{displayedFavoriteMovie}</p>
           ) : (
             <p>No favorite movie specified.</p>
           )}
@@ -171,16 +175,14 @@ export const PublicProfile = () => {
       {/* Mini Tier List */}
       <div className="profile-tierlist-section">
         <h2>User Tier List</h2>
-
         {tierList.length === 0 ? (
           <p>This user has no movies in their tier list yet.</p>
         ) : (
           <div className="mini-tier-container">
-            {/* Render up to e.g. 3 or 4 tiers for demonstration */}
             {RANK_ORDER.map((rank) => {
               const items = tierMap[rank];
               if (!items.length) return null; // Skip empty ranks
-              // We can show each rank row in a box (like your Dashboard mini-tierlist)
+
               return (
                 <div key={rank} className="mini-tier-row">
                   <div className="mini-tier-label">
