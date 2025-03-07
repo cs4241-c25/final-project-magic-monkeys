@@ -35,13 +35,12 @@ export const NavBar = ({ currentFont, toggleFont, isDarkTheme, toggleTheme }) =>
           >
             Dashboard
           </Link>
-          <Link
-            to="/groups" 
+          <button
+            onClick={() => loginWithRedirect()}
             className="nav-link"
-            onClick={handleProtectedClick}
           >
             Create/Join Group
-          </Link>
+          </button>
         </div>
         
         {!isAuthenticated ? (
