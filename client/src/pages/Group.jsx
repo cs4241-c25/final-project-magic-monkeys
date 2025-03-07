@@ -14,8 +14,8 @@ import { GroupMemberPermissionsModal } from '../components/GroupMemberPermission
 import axios from 'axios';
 import { useToast } from '../components/Toast';
 
-
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const TMDB_API_KEY = 'e7b225b138e7b083d203ad7bc2819fec';
 
 export const Group = () => {
     const { groupId } = useParams();
@@ -25,6 +25,14 @@ export const Group = () => {
     const menuRef = useRef(null);
 
     const [userRole, setUserRole] = useState(null);
+
+    const getMovieData = async (movieId) => {
+        const movieRes = await fetch(
+            `https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}&language=en-US`
+          );
+
+        return movieRes.json();
+    }
 
     useEffect(() => {
         const fetchUserRole = async () => {
@@ -687,34 +695,39 @@ export const Group = () => {
 
                             <div className="score-container">
                                 <div className="scores-list">
+                                    {scores.map(score => {
+                                        const movieData = getMovieData(score.movieId);
+                                        return (
+                                            <p>Coming Soon</p>
+                                        )
+                                        return (
+                                            <div key={score.id} className="review-card">
 
-                                    {scores.map(score => (
-                                        <div key={score.id} className="review-card">
-
-                                            {/*<div className="score-poster">*/}
-                                            {/*    <img src={score.poster} alt={score.movie}/>*/}
-                                            {/*    */}
-                                                <img
-                                                    src={score.poster}
-                                                    alt={score.movie}
-                                                />
-                                            {/*</div>*/}
-                                            <div className="review-content">
-                                                <h4>{score.movie}</h4>
-                                                {/*<div className="score-rating">{score.rating}</div>*/}
-                                                <div className="ticket-rating-container">
-                                                    <TicketRating
-                                                        rating={score.rating}
-                                                        size="lg"
-                                                        color="#ff4b4b"
+                                                {/*<div className="score-poster">*/}
+                                                {/*    <img src={score.poster} alt={score.movie}/>*/}
+                                                {/*    */}
+                                                    <img
+                                                        src={movieData.poster_path}
+                                                        alt={movieData.title}
                                                     />
-                                                    {/*  <TicketRating rating={i === 4 ? 5 : 4}/>*/}
+                                                {/*</div>*/}
+                                                <div className="review-content">
+                                                    <h4>{movieData.title}</h4>
+                                                    {/*<div className="score-rating">{score.rating}</div>*/}
+                                                    <div className="ticket-rating-container">
+                                                        <TicketRating
+                                                            rating={score.rating}
+                                                            size="lg"
+                                                            color="#ff4b4b"
+                                                        />
+                                                        {/*  <TicketRating rating={i === 4 ? 5 : 4}/>*/}
 
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                        </div>
-                                    ))}
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             </div>
                         </div>
