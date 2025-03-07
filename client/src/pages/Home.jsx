@@ -1,8 +1,9 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { HeroImage } from '../components/HeroImage';
 import { MdGroups, MdStarRate, MdChat, MdRecommend } from 'react-icons/md';
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { SideNav } from '../components/SideNav';
 
 import '../styles/Home.css';
 
@@ -10,6 +11,8 @@ export const Home = () => {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [isExpanded, setIsExpanded] = useState(false);
 
 
   useEffect(() => {
@@ -24,6 +27,7 @@ export const Home = () => {
 
   return (
     <div className="home-page">
+      {isAuthenticated && <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />}
       <section className="hero-section">
         <div className="hero-content">
           <h1>Welcome to Movie Mates</h1>
@@ -31,7 +35,7 @@ export const Home = () => {
             The social platform that brings friends together through movies. 
             Create groups, share ratings, and find the perfect movie for your next watch party.
           </p>
-          <div className="hero-buttons mb-5">
+          {/* <div className="hero-buttons mb-5">
             {!isAuthenticated ? (
                 <button onClick={() => loginWithRedirect()} className="cta-button">
                   Log In
@@ -44,6 +48,11 @@ export const Home = () => {
             <Link to="/movies" className="cta-button">
               Movies
             </Link>
+          </div> */}
+          <div className="hero-buttons mb-5">
+            <button onClick={() => loginWithRedirect()} className="cta-button">
+              Sign up today
+            </button>
           </div>
           <p className="hero-subtitle">
             ***THIS IS A WPI STUDENT PROJECT***
@@ -130,14 +139,11 @@ export const Home = () => {
       <section className="cta-section">
         <h2>Ready to watch together?</h2>
         <p>Join Movie Mates and make movie nights better with friends</p>
-        <div className="hero-buttons">
-          <Link to="/dashboard" className="cta-button">
-            Dashboard
-          </Link>
-          <Link to="/movies" className="cta-button">
-            Movies
-          </Link>
-        </div>
+        <div className="hero-buttons mb-5">
+            <button onClick={() => loginWithRedirect()} className="cta-button">
+              Sign up today
+            </button>
+          </div>
       </section>
     </div>
   );
