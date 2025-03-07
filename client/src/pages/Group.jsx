@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { SideNav } from '../components/SideNav';
 import { useAuth0 } from '@auth0/auth0-react';
 import { BiChevronDown, BiFilterAlt, BiPlus, BiCog, BiMenu } from 'react-icons/bi';
@@ -332,11 +332,11 @@ export const Group = () => {
                 </div>
 
                 <div className="group-content">
-                {/* Top Section */}
+                    {/* Top Section */}
                     <div className="group-top-section">
                         <div className="group-showtime">
                             <div>
-                                <button
+                                <button 
                                     onClick={() => setSchedulerOpen(true)}
                                     className="bg-green-500 text-white px-4 py-2 rounded">
                                     Schedule Movie Night
@@ -346,10 +346,10 @@ export const Group = () => {
                                     onClose={() => {
                                         setSchedulerOpen(false)
                                         setSelectedMovieNight(null);
-                                    }}
+                                    }} 
                                     groupId={groupId} 
                                     refreshData={refreshData}
-                                    movieNightSchedule={selectedMovieNight}
+                                    movieNightSchedule={selectedMovieNight} 
                                 />
                             </div>
                             <div className="showtime-date">
@@ -390,7 +390,7 @@ export const Group = () => {
                                             ${date.events.length > 0 ? 'has-event' : ''}`}
                                     >
                                         <span className="calendar-day-number font-bold text-lg">{date.day}</span>
-
+                                        
                                         <div className="calendar-events-container flex flex-col items-center w-full">
                                             {date.events.map((event, eventIndex) => (
                                                 <button
@@ -416,7 +416,12 @@ export const Group = () => {
                                 {members.map(member => (
                                     <div key={member.id} className="member-card">
                                         <div className="member-avatar">{member.avatar}</div>
-                                        <div className="member-name">{member.name}</div>
+                                        <Link
+                                            to={`/user/${member.name}`}
+                                            className="member-name-link"
+                                        >
+                                            {member.name}
+                                        </Link>
                                     </div>
                                 ))}
                             </div>

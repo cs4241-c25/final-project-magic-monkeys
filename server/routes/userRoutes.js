@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser, getUsers, getUserById, getUserByAuth0Id, getUserGroups, updateUser, deleteUser } from "../controllers/userController.js";
+import { createUser, getUsers, getUserById, getUserByAuth0Id, getUserGroups, updateUser, deleteUser, getUserByUsername } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -10,5 +10,6 @@ router.get("/users/auth0/:auth0Id", getUserByAuth0Id)
 router.get("/users/:id/groups", getUserGroups);
 router.put("/users/:id", updateUser);
 router.delete("/users/:id", deleteUser);
+router.get("/users/username/:username", getUserByUsername);
 
 export default router;
