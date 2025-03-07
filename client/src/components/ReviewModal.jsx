@@ -90,6 +90,14 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
                 throw new Error('Failed to submit review');
             }
 
+            const happening = `${dbUser.username} ${existingReview ? 'updated their review of' : 'gave'} ${movieTitle} ${existingReview ? 'to' : ''} ${rating} ${rating === 1 ? 'ticket' : 'tickets'}`;
+            await fetch(`${API_URL}/api/user-happenings`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId: dbUser._id, happening })
+                }
+            )
+
             const data = await response.json();
             onReviewSubmitted?.(data);
             addToast(existingReview ? 'Review updated successfully!' : 'Review submitted successfully!', 'success');
@@ -114,11 +122,8 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
-            {/*<div className="review-modal">*/}
                 <div className="review-modal-header">
-
                     <h2>{existingReview ? 'Edit Review' : 'Rate & Review'} {movieTitle}</h2>
-
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -146,7 +151,6 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
                                 {reviewText.length}/500 characters
                             </div>
                         </div>
-
                         {error && (
                             <p className="text-red-500 text-sm mt-2">{error}</p>
                         )}
@@ -169,7 +173,6 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
                         </button>
                     </div>
                 </form>
-            {/*</div>*/}
         </Modal>
     );
 };

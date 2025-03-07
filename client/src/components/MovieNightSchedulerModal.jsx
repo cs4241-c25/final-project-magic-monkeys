@@ -122,7 +122,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
             const response = await fetch(url, requestOptions);
 
             if (response.ok) {
-                const happening = `${dbUser.username} ${movieNightSchedule ? 'editted a' : 'created a new'} movie night.`
+                const happening = `${dbUser.username} ${movieNightSchedule ? 'edited a' : 'created a new'} movie night.`
 
                 await fetch(`${API_URL}/api/user-happenings`, {
                         method: "POST",
