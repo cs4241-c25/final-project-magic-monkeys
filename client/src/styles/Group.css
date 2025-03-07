@@ -309,6 +309,13 @@
     transition: all 0.2s ease-in-out;
 }
 
+.current-day{
+    background: var(--dark-card);
+    border-right: 2px solid var(--dark-bg);
+    border-bottom: 2px solid var(--dark-bg);
+    border-radius: 5px;
+}
+
 .calendar-more-events,
 .calendar-less-events {
     cursor: pointer;

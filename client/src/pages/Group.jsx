@@ -424,13 +424,20 @@ export const Group = () => {
                                         const isRowExpanded = expandedRow === rowIndex;
                                         const maxVisibleEvents = 2;
 
+                                        const today = new Date();
+                                        const isToday = 
+                                            date.day === today.getDate() &&
+                                            date.month === today.getMonth() + 1 &&
+                                            date.year === today.getFullYear();
+
                                         return (
                                             <div
                                                 key={index}
                                                 className={`calendar-date flex flex-col items-center justify-start p-2
                                                     ${date.isCurrentMonth ? 'current-month' : 'other-month'}
                                                     ${date.events.length > 0 ? 'has-event' : ''}
-                                                    ${isRowExpanded ? 'expanded' : ''}`}
+                                                    ${isRowExpanded ? 'expanded' : ''}
+                                                    ${isToday ? 'current-day' : ''}`}
                                             >
                                                 <span className="calendar-day-number font-bold text-lg">{date.day}</span>
 
