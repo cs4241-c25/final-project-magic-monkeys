@@ -106,7 +106,7 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
                     if (response.ok) {
                         const data = await response.json();
                         console.log("Tier list entry created:", data);
-                        setIsInTierList(true);
+                        // setIsInTierList(true);
                         // setTierListEntryId(data._id);
                         // await checkMovieStatus();
                         alert('Added to tier list successfully!');
