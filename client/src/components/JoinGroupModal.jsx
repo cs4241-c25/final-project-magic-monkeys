@@ -43,7 +43,9 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             });
             resetForm();
             onClose();
-            navigate(`/group/${groupData._id}`);
+            setTimeout(() => {
+                navigate(`/group/${groupData._id}`);
+            }, 500);
         } catch (err) {
             setError('Failed to create group. Please try again.');
             console.error('Group creation error:', err);
