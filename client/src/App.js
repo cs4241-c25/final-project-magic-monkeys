@@ -64,6 +64,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<MovieDemo />} />
+        <Route path="/movies/:movieId" element={<MovieDemo />} />
         <Route
             path="/dashboard"
             element={

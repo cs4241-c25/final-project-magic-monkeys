@@ -74,4 +74,26 @@ export const tmdbAPI = {
     return res.json();
   },
 
+  async getMovie(movieId) {
+    try {
+      const movieData = await this.getMovieBase(movieId);
+      return {
+        id: movieData.id,
+        title: movieData.title,
+        overview: movieData.overview,
+        poster_path: movieData.poster_path,
+        backdrop_path: movieData.backdrop_path,
+        release_date: movieData.release_date,
+        vote_average: movieData.vote_average,
+        genres: movieData.genres,
+        runtime: movieData.runtime,
+        poster: `https://image.tmdb.org/t/p/w500${movieData.poster_path}`,
+        backdrop: `https://image.tmdb.org/t/p/original${movieData.backdrop_path}`
+      };
+    } catch (error) {
+      console.error(`Error fetching movie with ID ${movieId}:`, error);
+      throw error;
+    }
+  },
+
 }; 
