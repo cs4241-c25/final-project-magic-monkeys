@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { SideNav } from '../components/SideNav';
 import { useAuth0 } from '@auth0/auth0-react';
-import { BiChevronDown, BiFilterAlt, BiPlus, BiCog, BiMenu } from 'react-icons/bi';
-import { BsTicketFill, BsTicket } from "react-icons/bs";
+import { BiChevronDown, BiChevronUp, BiFilterAlt, BiChevronRight, BiTransfer, BiMenu } from 'react-icons/bi';
 import '../styles/Dashboard.css';
 import '../styles/Group.css';
 import {useGroupData} from "../hooks/useGroupData";
@@ -438,7 +437,7 @@ export const Group = () => {
             <main className="dashboard-main">
                 <div className="group-header">
                     <h1>{groupData.name}</h1>
-                    <p className="group-invite-code"><b>Invite Code:</b> {groupData.inviteCode}</p>
+                    <p className="group-invite-code">Invite Code: {groupData.inviteCode}</p>
                     <div className="group-menu" ref={menuRef}>
                         <button
                             className="menu-button"
@@ -641,13 +640,8 @@ export const Group = () => {
                                     {activity.map(item => (
                                         <div key={item.id} className="activity-item">
                                             <span className="bullet">•</span>
-                                            <span className="activity-user">{item.user}</span>
-                                            <span className="activity-action">{item.action}</span>
-                                            <span className="activity-movie">{item.movie}</span>
-                                            {item.rating && (
-                                                <span className="activity-text">a {item.rating} out of 5 tickets</span>
-                                            )}
-                                            <span className="activity-timestamp">{item.timestamp}</span>
+                                            <span className="activity-happening">{item.happening}</span>
+                                            <span className="activity-timestamp">{item.createdAt}</span>
                                         </div>
                                     ))}
                                 </div>
