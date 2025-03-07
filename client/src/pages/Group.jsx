@@ -641,7 +641,7 @@ export const Group = () => {
                                         <div key={item.id} className="activity-item">
                                             <span className="bullet">•</span>
                                             <span className="activity-happening">{item.happening}</span>
-                                            <span className="activity-timestamp">{item.createdAt}</span>
+                                            {/*<span className="activity-timestamp">{item.createdAt}</span>*/}
                                         </div>
                                     ))}
                                 </div>
