@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal } from './Modal';
+import { useUser } from '../context/UserContext';
 import "../styles/MovieNightSchedulerModal.css";
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -14,6 +15,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
         startTime: "",
         duration: "",
     });
+    const { dbUser } = useUser();
 
     useEffect(() => {
         if(movieNightSchedule){
@@ -120,6 +122,15 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
             const response = await fetch(url, requestOptions);
 
             if (response.ok) {
+                const happening = `${dbUser.username} ${movieNightSchedule ? 'editted a' : 'created a new'} movie night.`
+
+                await fetch(`${API_URL}/api/user-happenings`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ userId: dbUser._id, happening })
+                    }
+                )
+
                 refreshData();
                 onClose();
             }
@@ -137,6 +148,15 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
             });
 
             if(response.ok) {
+                const happening = `${dbUser.username} deleted a movie night.`
+
+                await fetch(`${API_URL}/api/user-happenings`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ userId: dbUser._id, happening })
+                    }
+                )
+
                 refreshData();
                 onClose();
             }

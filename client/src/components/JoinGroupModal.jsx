@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { BiPlus, BiUserPlus } from 'react-icons/bi';
 import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from './Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -14,6 +15,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     const [loading, setLoading] = useState(false);
     const [groupToJoin, setGroupToJoin] = useState(null);
     const { dbUser } = useUser();
+    const navigate = useNavigate();
     const { addToast } = useToast();
 
     const handleCreateGroup = async (e) => {
@@ -41,6 +43,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             });
             resetForm();
             onClose();
+            navigate(`/group/${groupData._id}`);
         } catch (err) {
             setError('Failed to create group. Please try again.');
             console.error('Group creation error:', err);
@@ -58,7 +61,8 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             // Fetch group details first
             const groupResponse = await fetch(`${API_URL}/api/groups/invite/${groupCode}`);
             if (!groupResponse.ok) {
-                throw new Error('Group not found');
+                setError('Group not found. Please check the code and try again.');
+                throw new Error('Group not found. Please check the code and try again.');
             }
 
             const groupData = await groupResponse.json();
@@ -67,7 +71,8 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             const joinData = await joinResponse.json();
 
             if(joinData.isMember){
-                throw new Error('Already a member');
+                setError('You are already a member of this group.');
+                throw new Error('You are already a member of this group.');
             }
 
             // // Get member count (you'll need to implement this endpoint)
@@ -83,7 +88,6 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             });
             setMode('confirm');
         } catch (err) {
-            setError('Group not found. Please check the code and try again.');
             console.error('Group check error:', err);
         } finally {
             setLoading(false);
@@ -119,6 +123,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             });
             resetForm();
             onClose();
+            navigate(`/group/${groupToJoin._id}`);
         } catch (err) {
             setError('Failed to join group. Please try again.');
             console.error('Group join error:', err);
