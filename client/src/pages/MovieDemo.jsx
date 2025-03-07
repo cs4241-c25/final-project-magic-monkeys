@@ -6,7 +6,6 @@ import { tmdbAPI } from '../services/tmdbAPI';
 import { omdbAPI } from '../services/omdbAPI';
 import { useUser } from '../context/UserContext';
 import { useAuth0 } from '@auth0/auth0-react';
-import { NavBar } from '../components/NavBar';
 import { SideNav } from '../components/SideNav';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -25,7 +24,6 @@ export const MovieDemo = () => {
   const { movieId } = useParams();
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
-
 
   const { nowPlaying, upcoming, loading, error } = useMovieData();
 
@@ -122,22 +120,10 @@ export const MovieDemo = () => {
   };
 
   const scrollToTop = () => {
-    // Get the content container based on authentication status
-    const contentContainer = isAuthenticated ?
-        document.querySelector('.dashboard-main') :
-        window;
-
-    if (isAuthenticated) {
-      contentContainer.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    } else {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   const startScrolling = (direction, containerId) => {

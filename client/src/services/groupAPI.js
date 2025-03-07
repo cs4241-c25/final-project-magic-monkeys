@@ -45,6 +45,15 @@ export const groupAPI = {
         }
     },
 
+    async getGroupHappenings(groupId){
+        try{
+            const res = await axios.get(`${API_URL}/api/groups/${groupId}/user-happenings`)
+            return res.data;
+        } catch(error) {
+            console.error('Error fetching group happenings');
+        }
+    },
+
     // Get movie nights for a group
     async getGroupMovieNights(groupId) {
         try {
