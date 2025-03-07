@@ -220,7 +220,7 @@ export const Group = () => {
                 }
             });
 
-            date.events.sort((a, b) => b.startTimestamp - a.startTimestamp);
+            date.events.sort((a, b) => a.startTimestamp - b.startTimestamp);
         });
 
         return { days, dates };
