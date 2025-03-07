@@ -27,7 +27,7 @@ const AppContent = () => {
 
   const toggleFont = () => {
     setCurrentFont(current => {
-      switch(current) {
+      switch (current) {
         case 'Raleway':
           return 'Poppins';
         case 'Poppins':
@@ -38,25 +38,15 @@ const AppContent = () => {
     });
   };
 
-  // 1) Pages where we hide the NavBar unconditionally
-  const hideNavPaths = ['/dashboard', '/group', '/groups', '/tierlist', '/profile', '/user'];
-  const shouldHideForPaths = hideNavPaths.some(path =>
-    location.pathname.startsWith(path)
-  );
-
-  // 2) Hide the NavBar on home page if user is logged in
-  const isHomePage = location.pathname === '/';
-  const hideOnHomeIfLoggedIn = isHomePage && isAuthenticated;
-
-  // 3) Combine both conditions
-  const hideNavBar = shouldHideForPaths || hideOnHomeIfLoggedIn;
+  // If the user is logged in, always hide the NavBar
+  const hideNavBar = isAuthenticated;
 
   return (
     <div
       className={`App ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}
       style={{ fontFamily: `${currentFont}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif` }}
     >
-      {/* Only show NavBar if hideNavBar is false */}
+      {/* Only show NavBar if user is NOT authenticated */}
       {!hideNavBar && (
         <NavBar
           currentFont={currentFont}
