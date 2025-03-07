@@ -111,12 +111,11 @@ export const MovieDemo = () => {
   };
 
   const handleCloseMovie = () => {
-    setMovie(null);
-    setSelectedTrailer(null);
-    // If we're on a movie details URL, navigate back to the main movies page
-    if (movieId) {
-      navigate('/movies');
-    }
+    navigate('/movies', { replace: true });
+    setTimeout(() => {
+      setMovie(null);
+      setSelectedTrailer(null);
+    }, 0);
   };
 
   const scrollToTop = () => {
