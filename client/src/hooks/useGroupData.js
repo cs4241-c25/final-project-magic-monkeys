@@ -162,18 +162,8 @@ export const useGroupData = (groupId) => {
             // const uniqueMovies = [...new Set(nights.map(night => night.movieId))]
             //     .filter(movieId => movieId);
 
-            const uniqueMovies = [];
-
-            // Fetch movie details and ratings
-            if (uniqueMovies.length > 0) {
-                const movieDetails = await Promise.all(
-                    uniqueMovies.map(movieId => tmdbAPI.getMovieDetails(movieId))
-                );
-                const movieRatings = await fetchGroupMovieRatings(movieDetails);
-                setScores(movieRatings);
-            } else {
-                setScores(mockScores);
-            }
+            const groupReviews = await groupAPI.getGroupReviews(groupId);
+            setScores(groupReviews);
 
             const happenings = await groupAPI.getGroupHappenings(groupId);
             setActivity(happenings);

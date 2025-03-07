@@ -1,3 +1,4 @@
+import Group from "../models/Group.js";
 import Review from "../models/Review.js";
 import User from "../models/User.js";
 import UserGroup from "../models/UserGroups.js";
@@ -76,6 +77,21 @@ export const getReviewByUserMovie = async (req, res) => {
         }
 
         res.status(200).json(review);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
+
+export const getReviewsByGroup = async (req, res) => {
+    try {
+        const { groupId } = req.params;
+
+        const users = await UserGroup.find({ groupId });
+        const userIds = users.map(user => user.userId);
+
+        const reviews = await Review.find({ userId: { $in: userIds } });
+
+        res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }

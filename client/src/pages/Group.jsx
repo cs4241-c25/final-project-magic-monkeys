@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { BiMenu } from 'react-icons/bi';
 import '../styles/Dashboard.css';
 import '../styles/Group.css';
+import '../styles/HappeningsCard.css';
 import {useGroupData} from "../hooks/useGroupData";
 import { TicketRating } from '../components/TicketRating';
 import { useUser } from '../context/UserContext';
@@ -401,6 +402,14 @@ export const Group = () => {
     const upcomingMovieNights = getUpcomingMovieNights();
     const displayedMovieNights = isCalendarCondensed ? upcomingMovieNights.slice(0, 1) : upcomingMovieNights.slice(0, 10);
 
+    const copyInviteCode = () => {
+        if(groupData?.inviteCode){
+            navigator.clipboard.writeText(groupData.inviteCode)
+                .then(() => addToast("Invite code copied to clipboard.", "Success"))
+                .catch(() => addToast("Failed to copy invite code.", "error"));
+        }
+    };
+
     useEffect(() => {
         if(calendarRef.current) {
             setCalendarHeight(calendarRef.current.scrollHeight);
@@ -437,7 +446,11 @@ export const Group = () => {
             <main className="dashboard-main">
                 <div className="group-header">
                     <h1>{groupData.name}</h1>
-                    <p className="group-invite-code">Invite Code: {groupData.inviteCode}</p>
+                    <button
+                        className="group-invite-code-btn"
+                        onClick={copyInviteCode}>
+                            Invite Code: {groupData.inviteCode}
+                    </button>
                     <div className="group-menu" ref={menuRef}>
                         <button
                             className="menu-button"
@@ -639,13 +652,24 @@ export const Group = () => {
                                 <div className="activity-list">
                                     {activity
                                         .filter(item => item.userId._id !== dbUser._id)
-                                        .map((item, index) => (
-                                        <div key={item.id} className={`activity-item ${index % 2 === 0 ? 'activity-even' : 'activity-odd'}`}>
-                                            <span className="bullet">•</span>
-                                            <span className="activity-happening">{item.happening}</span>
-                                            {/*<span className="activity-timestamp">{item.createdAt}</span>*/}
-                                        </div>
-                                    ))}
+                                        .map((item, index) => {
+                                            const formatHappeningText = (text) => {
+                                                const words = text.split(' ');
+                                                return (
+                                                  <span className="happening-text">
+                                                    <span className="first-word">{words[0]}</span>
+                                                    {' ' + words.slice(1).join(' ')}
+                                                  </span>
+                                                );
+                                            };
+                                            return (
+                                                <div key={item.id} className={`activity-item ${index % 2 === 0 ? 'activity-even' : 'activity-odd'}`}>
+                                                    <span className="bullet">•</span>
+                                                    <span className="activity-happening">{formatHappeningText(item.happening)}</span>
+                                                    {/*<span className="activity-timestamp">{item.createdAt}</span>*/}
+                                                </div>
+                                            )
+                                        })}
                                 </div>
                             </div>
                         </div>

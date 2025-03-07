@@ -16,13 +16,21 @@
     text-align: center;
 }
 
-.group-invite-code{
+.group-invite-code-btn{
     font-size: 1.1rem;
     color: #ffffff;
     padding: 8px 14px;
     border-radius: 4px;
     background-color: var(--color-bg-dark);
+    cursor: pointer;
     font-family: 'Cabin';
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s;
+}
+
+.group-invite-code-btn:hover{
+    background-color: #393838;
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .group-menu {
@@ -191,9 +199,11 @@
     flex-direction: column;
     align-items: center;
     padding: 10px;
-    background: #444;
+    background: var(--color-bg-dark);
     border-radius: 5px;
-    margin-bottom: 5px;
+    margin-top: 3px;
+    margin-left: 4px;
+    margin-bottom: 2px;
     transition: transform 0.2s ease-in-out, height 0.3s ease-in-out;
     height: 144px;
     overflow: hidden;

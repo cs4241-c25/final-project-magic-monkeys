@@ -75,6 +75,15 @@ export const groupAPI = {
         }
     },
 
+    async getGroupReviews(groupId){
+        try{
+            const res = await axios.get(`${API_URL}/api/groups/${groupId}/all-reviews`)
+            return res.data;
+        } catch(error) {
+            console.error('Error fetching group reviews');
+        }
+    },
+
     async getUserReviews(userId) {
         try {
             // const res = await axios.get(`${API_URL}/api/users/${userId}/reviews`);

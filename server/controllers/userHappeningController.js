@@ -2,7 +2,6 @@ import UserHappening from "../models/UserHappening.js";
 import User from "../models/User.js";
 import Group from "../models/Group.js"
 import UserGroup from "../models/UserGroups.js"
-import UserGroups from "../models/UserGroups.js";
 
 const MAX_HAPPENINGS = 10;
 
@@ -104,14 +103,14 @@ export const getAllUsersGroupHappenings = async (req, res) => {
     try{
         const { userId } = req.params;
 
-        const userGroups = await UserGroups.find({ userId }).select("groupId");
+        const userGroups = await UserGroup.find({ userId }).select("groupId");
         const groupIds = userGroups.map(group => group.groupId);
 
         if(groupIds.length === 0){
             return res.json([]);
         }
 
-        const groupUsers = await UserGroups.find({ groupId: { $in: groupIds }, userId: { $ne: userId } })
+        const groupUsers = await UserGroup.find({ groupId: { $in: groupIds }, userId: { $ne: userId } })
             .select("userId");
         const userIdsInGroups = groupUsers.map(groupUser => groupUser.userId);
 
