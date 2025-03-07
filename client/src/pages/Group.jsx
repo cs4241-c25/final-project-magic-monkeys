@@ -22,6 +22,23 @@ export const Group = () => {
     const navigate = useNavigate();
     const menuRef = useRef(null);
 
+    const [userRole, setUserRole] = useState(null);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            if(!dbUser || !dbUser._id) return;
+            try{
+                const response = await axios.get(`${API_URL}/api/user-groups/check/${dbUser._id}/${groupId}`);
+                setUserRole(response.data.role);
+            } catch(error){
+                console.error("Error fetchinguser role:", error);
+                setUserRole(null);
+            }
+        };
+
+        fetchUserRole();
+    }, [groupId, dbUser]);
+
     const [showMenu, setShowMenu] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSchedulerOpen, setSchedulerOpen] = useState(false);
@@ -426,22 +443,26 @@ export const Group = () => {
                         </button>
                         {showMenu && (
                             <div className="menu-dropdown">
-                                <button 
-                                    className="menu-item"
-                                    onClick={() => {
-                                        setPermissionModalOpen(true);
-                                        setShowMenu(false);
-                                    }}>
-                                    Member Permissions
-                                </button>
-                                <button 
-                                    className="menu-item"
-                                    onClick={() => {
-                                        setSchedulerOpen(true);
-                                        setShowMenu(false);
-                                    }}>
-                                    Schedule Movie Night
-                                </button>
+                                {userRole === "owner" && (
+                                    <button 
+                                        className="menu-item"
+                                        onClick={() => {
+                                            setPermissionModalOpen(true);
+                                            setShowMenu(false);
+                                        }}>
+                                        Member Permissions
+                                    </button>
+                                )}
+                                {(userRole === "admin" || userRole === "owner") && (
+                                    <button 
+                                        className="menu-item"
+                                        onClick={() => {
+                                            setSchedulerOpen(true);
+                                            setShowMenu(false);
+                                        }}>
+                                        Schedule Movie Night
+                                    </button>
+                                )}
                                 <button
                                     className="menu-item"
                                     onClick={leaveGroup}
