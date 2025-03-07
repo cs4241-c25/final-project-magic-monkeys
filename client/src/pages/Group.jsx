@@ -25,6 +25,17 @@ export const Group = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSchedulerOpen, setSchedulerOpen] = useState(false);
     const [selectedMovieNight, setSelectedMovieNight] = useState(null);
+
+    const today = new Date();
+    const initStartOfThisWeek = new Date(today.setDate(today.getDate() - today.getDay() - 1));
+    const [displayedWeekStart, setDisplayedWeekStart] = useState(initStartOfThisWeek);
+
+    const resetDisplayWeekStart = () => {
+        const today = new Date();
+        const startOfThisWeek = new Date(today.setDate(today.getDate() - today.getDay() - 1));
+        setDisplayedWeekStart(startOfThisWeek);
+    }
+
     const [expandedDay, setExpandedDay] = useState(null);
 
     const toggleExpandDay = (index) => {
@@ -41,17 +52,87 @@ export const Group = () => {
     const [isCalendarCondensed, setIsCalendarCondensed] = useState(true);
 
     const toggleCalendarView = () => {
-        setIsCalendarCondensed((prev) => !prev);
-
-        if(!isCalendarCondensed) {
-            const today = new Date();
-            setCurrentMonth(today.getMonth());
-            setCurrentYear(today.getFullYear());
-        }
+        setIsCalendarCondensed((prev) => {
+            const newState = !prev;
+    
+            if (!newState) {
+                const today = new Date();
+                setCurrentMonth(today.getMonth());
+                setCurrentYear(today.getFullYear());
+                resetDisplayWeekStart();
+            }
+    
+            return newState;
+        });
     };
 
     const calendarRef = useRef(null);
     const [calendarHeight, setCalendarHeight] = useState(0);
+    const dateRefs = useRef({});
+
+    const scrollToMovieNight = (event) => {
+        const eventDate = new Date(event.dateTime);
+        const eventYear = eventDate.getFullYear();
+        const eventMonth = eventDate.getMonth();
+        const eventDay = eventDate.getDate();
+
+        if(isCalendarCondensed){
+            const startOfEventWeek = new Date(eventDate);
+            startOfEventWeek.setDate(eventDate.getDate() - eventDate.getDay() - 1);
+
+            const endOfEventWeek = new Date(startOfEventWeek);
+            endOfEventWeek.setDate(startOfEventWeek.getDate() + 7);
+
+            const today = new Date();
+            const startOfCurrentWeek = new Date(today.setDate(today.getDate() - today.getDay() - 1));
+            const endOfCurrentWeek = new Date(startOfCurrentWeek);
+            endOfCurrentWeek.setDate(startOfCurrentWeek.getDate() + 7);
+
+            const isInCurrentWeek = eventDate >= startOfCurrentWeek && eventDate <=endOfCurrentWeek;
+
+            if(!isInCurrentWeek){
+                setCurrentYear(eventYear);
+                setCurrentMonth(eventMonth);
+                setDisplayedWeekStart(startOfEventWeek);
+
+                setTimeout(() => {
+                    scrollToDate(eventDate);
+                }, 300);
+            } else{
+                scrollToDate(eventDate);
+            }   
+        } else{
+            if(eventYear !== currentYear || eventMonth !== currentMonth){
+                setCurrentYear(eventYear);
+                setCurrentMonth(eventMonth);
+    
+                setTimeout(() => {
+                    scrollToDate(eventDate);
+                }, 300);
+            } else{
+                scrollToDate(eventDate);
+            }
+        }
+    };
+
+    const scrollToDate = (eventDate) => {
+        const key = `${eventDate.getFullYear()}-${eventDate.getMonth() + 1}-${eventDate.getDate()}`;
+
+        if(dateRefs.current[key]){
+            dateRefs.current[key].scrollIntoView({ behavior: "smooth", block: "center" });
+
+            const element = dateRefs.current[key];
+            element.classList.add("flash-highlight");
+
+            setTimeout(() => {
+                element.classList.add("fade-out");
+            }, 500);
+
+            setTimeout(() => {
+                element.classList.remove("flash-highlight", "fade-out");
+            }, 1500);
+        }
+    }
 
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -81,15 +162,17 @@ export const Group = () => {
     };
 
     const getCurrentWeek = (dates) => {
-        const today = new Date();
+        if(!displayedWeekStart) return dates;
+
         return dates.filter(date => {
-            const thisWeekStart = new Date(today.setDate(today.getDate() - today.getDay() - 1));
-            const thisWeekEnd = new Date(today.setDate(thisWeekStart.getDate() + 7));
+            const weekStart = new Date(displayedWeekStart);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 7);
 
             const dateObj = new Date(date.year, date.month - 1, date.day);
-            return dateObj >= thisWeekStart && dateObj <= thisWeekEnd;
+            return dateObj >= weekStart && dateObj <= weekEnd;
         })
-    }
+    };
 
     const {
         groupData,
@@ -292,7 +375,7 @@ export const Group = () => {
     };
 
     const calendar = generateCalendar();
-    const displayedDates = isCalendarCondensed ? getCurrentWeek(calendar.dates) : calendar.dates;
+    const displayedDates = isCalendarCondensed ? getCurrentWeek(generateCalendar().dates) : calendar.dates;
     const upcomingMovieNights = getUpcomingMovieNights();
     const displayedMovieNights = isCalendarCondensed ? upcomingMovieNights.slice(0, 1) : upcomingMovieNights.slice(0, 10);
 
@@ -374,7 +457,7 @@ export const Group = () => {
                                 <div className="group-showtime-content">
                                     {displayedMovieNights.length > 0 ? (
                                         displayedMovieNights.map((event, index) => (
-                                            <div key={index} className="showtime-card">
+                                            <div key={index} className="showtime-card" onClick={() => scrollToMovieNight(event)}>
                                                 <h3 className="showtime-date">
                                                     {new Date(event.dateTime).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric'})}
                                                 </h3>
@@ -419,6 +502,8 @@ export const Group = () => {
                                 </div>
                                 <div className="calendar-grid">
                                     {displayedDates.map((date, index) => {
+                                        const key = `${date.year}-${date.month}-${date.day}`;
+
                                         const isExpanded = expandedDay === index;
                                         const rowIndex = Math.floor(index / 7);
                                         const isRowExpanded = expandedRow === rowIndex;
@@ -433,6 +518,7 @@ export const Group = () => {
                                         return (
                                             <div
                                                 key={index}
+                                                ref={(el) => (dateRefs.current[key] = el)}
                                                 className={`calendar-date flex flex-col items-center justify-start p-2
                                                     ${date.isCurrentMonth ? 'current-month' : 'other-month'}
                                                     ${date.events.length > 0 ? 'has-event' : ''}

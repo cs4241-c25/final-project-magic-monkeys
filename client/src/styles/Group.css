@@ -177,6 +177,7 @@
 }
 
 .showtime-card {
+    cursor: pointer !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -187,6 +188,10 @@
     transition: transform 0.2s ease-in-out, height 0.3s ease-in-out;
     height: 144px;
     overflow: hidden;
+}
+
+.showtime-card * {
+    cursor: pointer !important;
 }
 
 .showtime-card:hover {
@@ -314,6 +319,20 @@
     border-right: 2px solid var(--dark-bg);
     border-bottom: 2px solid var(--dark-bg);
     border-radius: 5px;
+}
+
+.flash-highlight{
+    background-color: var(--secondary);
+    transition: background-color 0.5s ease-in-out;
+}
+
+@keyframes fadeOutHighlight{
+    0% { background-color: var(--secondary); }
+    100% { background-color: transparent; }
+}
+
+.flash-highlight.fade-out{
+    animation: fadeOutHighlight 1s ease-in-out forwards;
 }
 
 .calendar-more-events,
