@@ -122,7 +122,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
             const response = await fetch(url, requestOptions);
 
             if (response.ok) {
-                const happening = `${dbUser.username} ${movieNightSchedule ? 'editted' : 'created'} a new movie night.`
+                const happening = `${dbUser.username} ${movieNightSchedule ? 'editted a' : 'created a new'} movie night.`
 
                 await fetch(`${API_URL}/api/user-happenings`, {
                         method: "POST",
@@ -148,6 +148,15 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
             });
 
             if(response.ok) {
+                const happening = `${dbUser.username} deleted a movie night.`
+
+                await fetch(`${API_URL}/api/user-happenings`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ userId: dbUser._id, happening })
+                    }
+                )
+
                 refreshData();
                 onClose();
             }
