@@ -3,6 +3,7 @@ import { BiMoviePlay, BiGroup, BiHome, BiChevronDown, BiChevronRight, BiPlus } f
 import { MdDashboard, MdFormatListBulleted } from 'react-icons/md';
 import { CgProfile } from 'react-icons/cg';
 import { FiLogOut } from 'react-icons/fi';
+import { BiAward } from "react-icons/bi";
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useUser } from '../context/UserContext';
@@ -138,6 +139,11 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
         <Link to="/movies" className={`nav-item ${location.pathname === '/movies' ? 'active' : ''}`}>
           <span className="icon"><BiMoviePlay /></span>
           <span className="text">Movies</span>
+        </Link>
+
+        <Link to={`/user/${dbUser.username}`} className="nav-item">
+          <span className="icon"><BiAward /></span>
+          <span className="text">My Public Profile</span>
         </Link>
 
         <Link to="/profile" className="nav-item">

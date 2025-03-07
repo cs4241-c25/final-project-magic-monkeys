@@ -1,203 +1,216 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { tmdbAPI } from '../services/tmdbAPI';
+import { tmdbAPI } from '../services/tmdbAPI'; // Adjust path as needed
+import '../styles/PublicProfile.css'; // Our new stylesheet
+import { SideNav } from '../components/SideNav';
 
-// Adjust this to match your actual API URL
+// Same background color from your existing theme
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-
-// The possible ranks, in a display order
-const RANK_ORDER = ['S', 'A', 'B', 'C', 'D', 'F', 'U']; 
-// We'll treat "U" as "unranked" and display it last (or you can put it first if you prefer)
+// Tier rank order
+const RANK_ORDER = ['S', 'A', 'B', 'C', 'D', 'F', 'U'];
 
 export const PublicProfile = () => {
-    const { username } = useParams();
-    const [userData, setUserData] = useState(null);
-    const [tierListData, setTierListData] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
-  
-    // Fetch the user by username
-    useEffect(() => {
-      const fetchUser = async () => {
-        try {
-          const res = await fetch(`${BACKEND_URL}/api/users/username/${username}`);
-          if (!res.ok) {
-            throw new Error(`Error fetching user: ${res.statusText}`);
-          }
-          const user = await res.json();
-          setUserData(user);
-  
-          // Next, fetch this user's TierList
-          const tierRes = await fetch(`${BACKEND_URL}/api/users/${user._id}/tier-lists`);
-          // If no tier list entries, you might get 404 per your controller logic – handle that:
-          if (tierRes.status === 404) {
-            // Means user has no tier list entries, so just set an empty array
-            setTierListData([]);
-          } else if (!tierRes.ok) {
-            throw new Error(`Error fetching tier list: ${tierRes.statusText}`);
-          } else {
-            const rawTierList = await tierRes.json();
-            
-            // We'll fetch each movie's title/poster from TMDB
-            const enriched = await Promise.all(
-              rawTierList.map(async (doc) => {
-                // doc: { _id, userId, movieId, rank, order }
-                try {
-                  const baseData = await tmdbAPI.getMovieBase(doc.movieId);
-                  return {
-                    ...doc,
-                    title: baseData.title,
-                    posterPath: baseData.poster_path,
-                  };
-                } catch (err) {
-                  console.error(`Could not fetch TMDB data for movieId=${doc.movieId}:`, err);
-                  return {
-                    ...doc,
-                    title: 'Unknown Title',
-                    posterPath: null,
-                  };
-                }
-              })
-            );
-  
-            // Sort by rank + order. 
-            // We’ll group them, but let’s keep a single list for now and 
-            // group them when displaying.
-            enriched.sort((a, b) => {
-              // First by RANK_ORDER, then by 'order'
-              const rankA = RANK_ORDER.indexOf(a.rank);
-              const rankB = RANK_ORDER.indexOf(b.rank);
-              if (rankA !== rankB) return rankA - rankB;
-              return (a.order ?? 0) - (b.order ?? 0);
-            });
-  
-            setTierListData(enriched);
-          }
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
+  const { username } = useParams();
+
+  // Basic user data & error/loading states
+  const [userData, setUserData] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);   
+
+  // TierList data
+  const [tierList, setTierList] = useState([]);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        // 1) Fetch the user by username
+        const userRes = await fetch(`${BACKEND_URL}/api/users/username/${username}`);
+        if (!userRes.ok) {
+          throw new Error(`Error fetching user: ${userRes.statusText}`);
         }
-      };
-  
-      fetchUser();
-    }, [username]);
-  
-    if (loading) {
-      return (
-        <div style={{ padding: '20px' }}>
-          <h1>Public Profile</h1>
-          <p>Loading user data...</p>
-        </div>
-      );
-    }
-  
-    if (error) {
-      return (
-        <div style={{ padding: '20px' }}>
-          <h1>Public Profile</h1>
-          <p>Error: {error}</p>
-        </div>
-      );
-    }
-  
-    if (!userData) {
-      return (
-        <div style={{ padding: '20px' }}>
-          <h1>Public Profile</h1>
-          <p>No user data found.</p>
-        </div>
-      );
-    }
-  
-    // Group tier-list items by rank
-    const tierMap = {};
-    for (const rank of RANK_ORDER) {
-      tierMap[rank] = [];
-    }
-    tierListData.forEach((item) => {
-      tierMap[item.rank].push(item);
-    });
-  
-    return (
-      <div style={{ padding: '20px' }}>
-        <h1>Public Profile</h1>
-        <p>
-          <strong>Username:</strong> {userData.username}
-        </p>
-        <p>
-          <strong>Favorite Movie:</strong>{' '}
-          {userData.favoriteMovie || 'No favorite movie yet'}
-        </p>
-  
-        {/* TIERLIST SECTION */}
-        <h2>User’s Tier List</h2>
-        
-        {/* If the user has no tier list entries: */}
-        {tierListData.length === 0 && (
-          <p>This user has no movies in their tier list yet.</p>
-        )}
-  
-        {/* Otherwise, show them grouped by rank */}
-        {RANK_ORDER.map((rank) => {
-          const items = tierMap[rank];
-          if (!items.length) return null; // skip empty ranks
-  
-          // We'll display a rank heading, plus each movie
-          return (
-            <div key={rank} style={{ margin: '1em 0' }}>
-              <h3>
-                {rank === 'U' ? 'Unranked' : `${rank} Tier`}
-              </h3>
-              <div style={{ display: 'flex', gap: '1em', flexWrap: 'wrap' }}>
-                {items.map((movieItem) => {
-                  const posterUrl = movieItem.posterPath
-                    ? `https://image.tmdb.org/t/p/w200${movieItem.posterPath}`
-                    : null;
-  
-                  return (
-                    <div
-                      key={movieItem._id}
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        width: '100px',
-                      }}
-                    >
-                      {posterUrl ? (
-                        <img
-                          src={posterUrl}
-                          alt={movieItem.title}
-                          style={{ width: '100px', marginBottom: '0.5em' }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: '100px',
-                            height: '150px',
-                            backgroundColor: '#444',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#fff',
-                            marginBottom: '0.5em'
-                          }}
-                        >
-                          No Poster
-                        </div>
-                      )}
-                      <span style={{ fontSize: '0.9rem', textAlign: 'center' }}>
-                        {movieItem.title}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+        const user = await userRes.json();
+        setUserData(user);
+
+        // 2) Fetch user’s tier list using user._id
+        const tierRes = await fetch(`${BACKEND_URL}/api/users/${user._id}/tier-lists`);
+        if (tierRes.status === 404) {
+          // This user has no tier list entries
+          setTierList([]);
+        } else if (!tierRes.ok) {
+          throw new Error(`Error fetching tier list: ${tierRes.statusText}`);
+        } else {
+          const rawTierList = await tierRes.json();
+
+          // 3) For each entry, fetch title/poster from TMDB
+          const enriched = await Promise.all(
+            rawTierList.map(async (doc) => {
+              try {
+                // doc has { movieId, rank, order, ... }
+                const baseData = await tmdbAPI.getMovieBase(doc.movieId);
+                return {
+                  ...doc,
+                  title: baseData.title || 'Unknown Title',
+                  posterPath: baseData.poster_path,
+                };
+              } catch (tmdbError) {
+                console.error(`Failed to fetch TMDB for movieId=${doc.movieId}`, tmdbError);
+                return {
+                  ...doc,
+                  title: 'Unknown Title',
+                  posterPath: null
+                };
+              }
+            })
           );
-        })}
+
+          // 4) Sort them by rank + order
+          enriched.sort((a, b) => {
+            const rankA = RANK_ORDER.indexOf(a.rank);
+            const rankB = RANK_ORDER.indexOf(b.rank);
+            if (rankA !== rankB) return rankA - rankB;
+            return (a.order ?? 0) - (b.order ?? 0);
+          });
+
+          setTierList(enriched);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [username]);
+
+  if (loading) {
+    return (
+      <div className="public-profile-container">
+        <h1>Loading Profile...</h1>
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="public-profile-container">
+        <h1>Error</h1>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="public-profile-container">
+        <h1>No user data found.</h1>
+      </div>
+    );
+  }
+
+  // Build a map of rank -> [movies...]
+  const tierMap = {
+    S: [],
+    A: [],
+    B: [],
+    C: [],
+    D: [],
+    F: [],
+    U: []
   };
+  tierList.forEach(item => {
+    tierMap[item.rank].push(item);
+  });
+
+  return (
+    <div className="public-profile-container">
+      <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      {/* Top Row */}
+      <div className="profile-top-row">
+        <div className="profile-avatar">
+          {/* Show first letter if no profile pic */}
+          {userData.username?.charAt(0).toUpperCase()}
+        </div>
+        <div className="profile-info">
+          <h1 className="profile-username">{userData.username}</h1>
+          {/* Dummy data for “Joined” date */}
+          <p className="profile-joined">Joined: Jan 1, 2023</p>
+        </div>
+      </div>
+
+      {/* Second Row */}
+      <div className="profile-second-row">
+        {/* Left half: Bio */}
+        <div className="profile-bio-section">
+          <h2>Bio</h2>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+            Quisque fermentum felis in lectus gravida, nec pulvinar 
+            lacus convallis. Pellentesque habitant morbi tristique 
+            senectus et netus et malesuada fames ac turpis egestas.
+          </p>
+        </div>
+
+        {/* Right half: Favorite Movie */}
+        <div className="profile-favorite-movie">
+          <h2>Favorite Movie</h2>
+          {userData.favoriteMovie ? (
+            <>
+              <p className="favorite-movie-title">{userData.favoriteMovie}</p>
+              {/* If you want to also show a poster for the favorite, fetch & display it similarly. 
+                  For now, we just do text. */}
+            </>
+          ) : (
+            <p>No favorite movie specified.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Mini Tier List */}
+      <div className="profile-tierlist-section">
+        <h2>User Tier List</h2>
+
+        {tierList.length === 0 ? (
+          <p>This user has no movies in their tier list yet.</p>
+        ) : (
+          <div className="mini-tier-container">
+            {/* Render up to e.g. 3 or 4 tiers for demonstration */}
+            {RANK_ORDER.map((rank) => {
+              const items = tierMap[rank];
+              if (!items.length) return null; // Skip empty ranks
+              // We can show each rank row in a box (like your Dashboard mini-tierlist)
+              return (
+                <div key={rank} className="mini-tier-row">
+                  <div className="mini-tier-label">
+                    {rank === 'U' ? 'U' : rank}
+                  </div>
+                  <div className="mini-tier-movies">
+                    {items.map((movie, i) => {
+                      const posterUrl = movie.posterPath
+                        ? `https://image.tmdb.org/t/p/w200${movie.posterPath}`
+                        : null;
+
+                      return posterUrl ? (
+                        <img
+                          key={`${rank}-${i}`}
+                          src={posterUrl}
+                          alt={movie.title}
+                        />
+                      ) : (
+                        <div key={`${rank}-${i}`} className="no-poster">
+                          {movie.title}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
