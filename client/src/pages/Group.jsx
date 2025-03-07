@@ -11,6 +11,8 @@ import { TicketRating } from '../components/TicketRating';
 import { useUser } from '../context/UserContext';
 import { MovieNightSchedulerModal } from '../components/MovieNightSchedulerModal';
 import axios from 'axios';
+import { useToast } from '../components/Toast';
+
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -21,11 +23,12 @@ export const Group = () => {
     const navigate = useNavigate();
     const menuRef = useRef(null);
 
-
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSchedulerOpen, setSchedulerOpen] = useState(false);
     const [selectedMovieNight, setSelectedMovieNight] = useState(null);
     const [showMenu, setShowMenu] = useState(false);
+
+    const { addToast } = useToast();
 
     const {
         groupData,
@@ -258,6 +261,7 @@ export const Group = () => {
         try {
             await axios.delete(`${API_URL}/api/user-groups/${dbUser._id}/${groupId}`);
             navigate('/dashboard');
+            addToast('Left the group', 'success');
         } catch (error) {
             console.error('Error deleting group membership:', error);
             throw error;

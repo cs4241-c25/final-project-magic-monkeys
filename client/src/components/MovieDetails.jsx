@@ -282,6 +282,25 @@ export const MovieDetails = ({
     }
   };
 
+  const fetchUserReview = async () => {
+    try {
+      if (!dbUser) return;
+
+      const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/movie/${movie.id}`);
+      if (response.ok) {
+        const review = await response.json();
+        setUserReview(review);
+      }
+    } catch (error) {
+      console.error('Error fetching user review:', error);
+    }
+  };
+
+  // Add useEffect to fetch review when movie changes
+  useEffect(() => {
+    fetchUserReview();
+  }, [movie.id, dbUser]);
+
   const toggleWatchlist = async () => {
     try {
       if (isInWatchlist) {
@@ -434,90 +453,121 @@ export const MovieDetails = ({
           <div className="flex items-center justify-between">
 
             <h1>{movie.title}</h1>
-            <button
-                onClick={() => setShowReviewModal(true)}
-                className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
-            >
-              <BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>
-              <span className="text-white font-medium">Rate & Review</span>
+            {/*<button*/}
+            {/*    onClick={() => setShowReviewModal(true)}*/}
+            {/*    className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"*/}
+            {/*>*/}
+            {/*  <BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>*/}
+            {/*  <span className="text-white font-medium">Rate & Review</span>*/}
+            {/*</button>*/}
+            <div className="flex items-center gap-4">
+
+              {userReview ? (
+                <>
+                  <div className="flex items-center mb-3">
+                    <TicketRating
+                        rating={userReview.rating}
+                        size="md"
+                        color="#ff4b4b"
+                        interactive={false}
+                        variant={'condensed'}
+                    />
+                  </div>
+                  <button
+                      onClick={() => setShowReviewModal(true)}
+                      className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
+                  >
+                    {/*<BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>*/}
+                    <span className="text-white font-medium">Edit</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                    onClick={() => setShowReviewModal(true)}
+                    className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
+                >
+                  <BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>
+                  <span className="text-white font-medium">Rate & Review</span>
+                </button>
+              )}
+            </div>
+          </div>
+            <button onClick={fetchApiDetails} className="api-details-button">
+              API Details
             </button>
-          </div>
-          <button onClick={fetchApiDetails} className="api-details-button">
-            API Details
-          </button>
 
-          <button
-            onClick={isInWatchlist ? removeFromWatchlist : addToWatchlist}
-            className="api-details-button mx-2"
-          >
-            {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-          </button>
-
-          <button
-            onClick={isInTierList ? removeFromTierList : addToTierList}
-            className="api-details-button mx-2"
-          >
-            {isInTierList ? "Haven't Watched" : 'Have Watched'}
-          </button>
-          <p className="overview">{movie.overview}</p>
-          {director && (
-            <p className="director">
-              <span>🎬 Director:</span> {director.name}
-            </p>
-          )}
-          <div className="ratings">
-            {ratings.rt && (
-              <a
-                href={`https://www.rottentomatoes.com/m/${movie.title.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rating rt-rating"
-              >
-                <img 
-                  src={parseInt(ratings.rt) >= 60 ? 
-                    'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg' : 
-                    'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/tomatometer-rotten.f1ef4f02ce3.svg'
-                  } 
-                  alt="Tomato Score"
-                  className="tomato-icon"
-                />
-                <span>Score:</span> {ratings.rt}
-              </a>
-            )}
-            {ratings.imdb && ratings.imdbId && (
-              <a
-                href={`https://www.imdb.com/title/${ratings.imdbId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rating imdb-rating"
-              >
-                <img 
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
-                  alt="IMDb"
-                  className="imdb-icon"
-                />
-                <span>Rating:</span> {ratings.imdb}/10
-              </a>
-            )}
-            <a 
-              href={`https://www.themoviedb.org/movie/${movie.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rating tmdb-rating"
+            <button
+                onClick={isInWatchlist ? removeFromWatchlist : addToWatchlist}
+                className="api-details-button mx-2"
             >
-              <span>⭐ TMDB Rating:</span> {movie.vote_average.toFixed(1)}/10
-            </a>
-          </div>
-          <p className="release-date">
-            <span>🗓 Release Date:</span> {new Date(movie.release_date).toLocaleDateString('en-US', {
+              {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+            </button>
+
+            <button
+                onClick={isInTierList ? removeFromTierList : addToTierList}
+                className="api-details-button mx-2"
+            >
+              {isInTierList ? "Haven't Watched" : 'Have Watched'}
+            </button>
+            <p className="overview">{movie.overview}</p>
+            {director && (
+                <p className="director">
+                  <span>🎬 Director:</span> {director.name}
+                </p>
+            )}
+            <div className="ratings">
+              {ratings.rt && (
+                  <a
+                      href={`https://www.rottentomatoes.com/m/${movie.title.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rating rt-rating"
+                  >
+                    <img
+                        src={parseInt(ratings.rt) >= 60 ?
+                            'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg' :
+                            'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/tomatometer-rotten.f1ef4f02ce3.svg'
+                        }
+                        alt="Tomato Score"
+                        className="tomato-icon"
+                    />
+                    <span>Score:</span> {ratings.rt}
+                  </a>
+              )}
+              {ratings.imdb && ratings.imdbId && (
+                  <a
+                      href={`https://www.imdb.com/title/${ratings.imdbId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rating imdb-rating"
+                  >
+                    <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
+                        alt="IMDb"
+                        className="imdb-icon"
+                    />
+                    <span>Rating:</span> {ratings.imdb}/10
+                  </a>
+              )}
+              <a
+                  href={`https://www.themoviedb.org/movie/${movie.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rating tmdb-rating"
+              >
+                <span>⭐ TMDB Rating:</span> {movie.vote_average.toFixed(1)}/10
+              </a>
+            </div>
+            <p className="release-date">
+              <span>🗓 Release Date:</span> {new Date(movie.release_date).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
             })}
-          </p>
-        </div>
-        {selectedTrailer && (
-          <div className="trailer-container">
+            </p>
+          </div>
+          {selectedTrailer && (
+              <div className="trailer-container">
             <iframe
               title="Movie Trailer"
               width="560"
@@ -647,7 +697,11 @@ export const MovieDetails = ({
           onClose={() => setShowReviewModal(false)}
           movieId={movie.id}
           movieTitle={movie.title}
-          onReviewSubmitted={handleReviewSubmitted}
+          existingReview={userReview}
+          onReviewSubmitted={(review) => {
+            setUserReview(review);
+            handleReviewSubmitted();
+          }}
       />
     </div>
   );

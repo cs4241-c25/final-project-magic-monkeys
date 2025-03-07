@@ -13,6 +13,8 @@ import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserProvider } from './context/UserContext';
 import "./App.css";
+import {ToastProvider} from "./components/Toast";
+import './styles/Toast.css';
 
 const AppContent = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
@@ -105,9 +107,11 @@ const AppContent = () => {
 function App() {
   return (
     <UserProvider>
-      <Router>
-        <AppContent />
-      </Router>
+        <ToastProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </ToastProvider>
     </UserProvider>
   );
 

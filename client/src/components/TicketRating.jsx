@@ -11,7 +11,8 @@ export const TicketRating = ({
                                  interactive = false,
                                  onChange = () => {},
                                  size = 'md',
-                                 color = '#ff4b4b'
+                                 color = '#ff4b4b',
+                                 variant = 'default' // variant prop: 'default', 'simple', or 'condensed'
                              }) => {
     const [hoverRating, setHoverRating] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
@@ -45,7 +46,7 @@ export const TicketRating = ({
     };
 
     const handleValueClick = () => {
-        if (!interactive) return;
+        if (!interactive ) return;
 
         setIsEditing(true);
         setEditValue((hoverRating || rating || 0).toFixed(2));
@@ -117,31 +118,39 @@ export const TicketRating = ({
     };
 
     return (
-        <div className={`ticket-rating-wrapper ${interactive ? 'interactive' : ''}`}>
+        <div className={`ticket-rating-wrapper ${interactive ? 'interactive' : ''} ${variant === 'condensed' ? 'condensed' : ''}`}>
             <div
-                className={`ticket-rating ${getSizeClass()}`}
+                className={`ticket-rating ${getSizeClass()} ${variant}`}
                 onMouseLeave={handleMouseLeave}
             >
                 {renderTickets()}
 
-                {isEditing ? (
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        className="ticket-value-input"
-                        value={editValue}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        onKeyDown={handleInputKeyDown}
-                        maxLength={4}
-                    />
-                ) : (
-                    <div
-                        className={`ticket-value ${interactive ? 'editable' : ''}`}
-                        onClick={interactive ? handleValueClick : undefined}
-                    >
-                        {(hoverRating || rating || 0).toFixed(2)} / {maxRating.toFixed(0)}
-                    </div>
+                {/*{condensed && (*/}
+                {/*    <div className="ticket-value">*/}
+                {/*        {(hoverRating || rating || 0).toFixed(0)} / {maxRating.toFixed(0)}*/}
+                {/*    </div>*/}
+                {/*)}*/}
+                {variant !== 'condensed' && (
+
+                    isEditing ? (
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            className="ticket-value-input"
+                            value={editValue}
+                            onChange={handleInputChange}
+                            onBlur={handleInputBlur}
+                            onKeyDown={handleInputKeyDown}
+                            maxLength={4}
+                        />
+                    ) : (
+                        <div
+                            className={`ticket-value ${interactive ? 'editable' : ''}`}
+                            onClick={interactive ? handleValueClick : undefined}
+                        >
+                            {(hoverRating || rating || 0).toFixed(2)} / {maxRating.toFixed(0)}
+                        </div>
+                    )
                 )}
             </div>
         </div>

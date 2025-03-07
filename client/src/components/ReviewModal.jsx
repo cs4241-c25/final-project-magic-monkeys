@@ -1,24 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { TicketRating } from './TicketRating';
 import { useUser } from '../context/UserContext';
+import '../styles/ReviewModal.css';
+import { useToast } from './Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubmitted }) => {
+export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubmitted, existingReview }) => {
     const [rating, setRating] = useState(0);
     const [reviewText, setReviewText] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { dbUser } = useUser();
+    const { addToast } = useToast();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+    useEffect(() => {
+        if (existingReview) {
+            setRating(existingReview.rating);
+            setReviewText(existingReview.reviewText || '');
+        } else {
+            setRating(0);
+            setReviewText('');
+        }
+    }, [existingReview, isOpen]);
 
+    const addToTierList = async () => {
         try {
-            const response = await fetch(`${API_URL}/api/reviews`, {
+            const response = await fetch(`${API_URL}/api/tier-lists`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,10 +35,56 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
                 body: JSON.stringify({
                     userId: dbUser._id,
                     movieId,
-                    rating,
-                    reviewText
-                }),
+                    rank: "U",
+                    order: 1
+                })
             });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add to tier list');
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error adding to tier list:', error);
+            throw error;
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+            try {
+                let response;
+                if (existingReview) {
+                    response = await fetch(`${API_URL}/api/reviews/${existingReview._id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            rating,
+                            reviewText
+                        }),
+                    });
+            } else {
+                response = await fetch(`${API_URL}/api/reviews`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: dbUser._id,
+                        movieId,
+                        rating,
+                        reviewText
+                    }),
+                });
+            }
 
             if (!response.ok) {
                 throw new Error('Failed to submit review');
@@ -37,9 +92,11 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
 
             const data = await response.json();
             onReviewSubmitted?.(data);
+            addToast(existingReview ? 'Review updated successfully!' : 'Review submitted successfully!', 'success');
             handleClose();
         } catch (err) {
             setError(err.message || 'Failed to submit review');
+            addToast(err.message || 'Failed to submit review', 'error');
             console.error('Review submission error:', err);
         } finally {
             setLoading(false);
@@ -47,70 +104,72 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
     };
 
     const handleClose = () => {
-        setRating(0);
-        setReviewText('');
+        if (!existingReview) {
+            setRating(0);
+            setReviewText('');
+        }
         setError('');
         onClose();
     };
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
-            <div className="p-6 max-w-lg w-full">
-                <h2 className="text-2xl font-bold text-white mb-4 text-center">
-                    Rate & Review {movieTitle}
-                </h2>
+            {/*<div className="review-modal">*/}
+                <div className="review-modal-header">
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="flex justify-center mb-6">
-                        <TicketRating
-                            rating={rating}
-                            onChange={setRating}
-                            interactive={true}
-                            size="lg"
-                            color="#ff4b4b"
-                            precision={2}
-                        />
+                    <h2>{existingReview ? 'Edit Review' : 'Rate & Review'} {movieTitle}</h2>
+
+                </div>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="review-modal-body">
+
+                        <div className="flex justify-center mb-6">
+                            <TicketRating
+                                rating={rating}
+                                onChange={setRating}
+                                interactive={true}
+                                size="lg"
+                                color="#ff4b4b"
+                            />
+                        </div>
+
+                        <div>
+                            <textarea
+                                value={reviewText}
+                                onChange={(e) => setReviewText(e.target.value)}
+                                className="review-textarea"
+                                placeholder="Share your thoughts about the movie..."
+                                maxLength={500}
+                            />
+                            <div className="review-char-count">
+                                {reviewText.length}/500 characters
+                            </div>
+                        </div>
+
+                        {error && (
+                            <p className="text-red-500 text-sm mt-2">{error}</p>
+                        )}
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Your Review
-                        </label>
-                        <textarea
-                            value={reviewText}
-                            onChange={(e) => setReviewText(e.target.value)}
-                            className="w-full h-32 p-3 bg-gray-700 rounded-lg border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ff4b4b]"
-                            placeholder="Share your thoughts about the movie..."
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                            500 Chars
-                        </label>
-                    </div>
-
-                    {error && (
-                        <p className="text-red-500 text-sm mt-2">{error}</p>
-                    )}
-
-                    <div className="flex justify-end gap-4">
+                    <div className="review-modal-footer">
                         <button
                             type="button"
                             onClick={handleClose}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                            className="review-modal-button cancel"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading || rating === 0}
-                            className="px-4 py-2 bg-[#ff4b4b] text-white rounded-lg hover:bg-[#ff716d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="review-modal-button submit"
                         >
-                            {loading ? 'Submitting...' : 'Submit Review'}
+                            {loading ? 'Submitting...' : existingReview ? 'Update Review' : 'Submit Review'}
                         </button>
                     </div>
                 </form>
-            </div>
+            {/*</div>*/}
         </Modal>
     );
 };
