@@ -3,6 +3,7 @@ import { Modal } from './Modal';
 import { BiPlus, BiUserPlus } from 'react-icons/bi';
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from './Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -15,6 +16,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     const [groupToJoin, setGroupToJoin] = useState(null);
     const { dbUser } = useUser();
     const navigate = useNavigate();
+    const { addToast } = useToast();
 
     const handleCreateGroup = async (e) => {
         e.preventDefault();
@@ -34,6 +36,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
                 throw new Error('Failed to create group');
             }
             const groupData = await response.json();
+            addToast('Group created successfully!', 'success');
 
             onGroupCreated({
                 ...groupData
@@ -112,6 +115,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             }
 
             const memberData = await response.json();
+            addToast('Successfully joined group!', 'success');
             onGroupCreated({
                 ...groupToJoin,
                 membership: memberData

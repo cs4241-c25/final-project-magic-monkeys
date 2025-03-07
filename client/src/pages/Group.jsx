@@ -12,6 +12,8 @@ import { useUser } from '../context/UserContext';
 import { MovieNightSchedulerModal } from '../components/MovieNightSchedulerModal';
 import { GroupMemberPermissionsModal } from '../components/GroupMemberPermissionsModal';
 import axios from 'axios';
+import { useToast } from '../components/Toast';
+
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -192,6 +194,8 @@ export const Group = () => {
         })
     };
 
+    const { addToast } = useToast();
+
     const {
         groupData,
         members,
@@ -331,6 +335,7 @@ export const Group = () => {
         try {
             await axios.delete(`${API_URL}/api/user-groups/${dbUser._id}/${groupId}`);
             navigate('/dashboard');
+            addToast('Left the group', 'success');
         } catch (error) {
             console.error('Error deleting group membership:', error);
             throw error;

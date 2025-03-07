@@ -42,14 +42,37 @@
   .tier-label {
     width: 75px;
     height: 100px;
-    background: #ff5c5c;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 20px;
-    /* border-radius: 4px 0px 0px 4px; */
     font-weight: bold;
     font-size: 1.4rem;
+  }
+  
+  /* Tier-specific colors - gradient from darker to lighter salmon */
+  .tier-row:nth-child(1) .tier-label {
+    background: #ff4b4b; /* S Tier - Darkest salmon */
+  }
+
+  .tier-row:nth-child(2) .tier-label {
+    background: #ff5c5c; /* A Tier */
+  }
+
+  .tier-row:nth-child(3) .tier-label {
+    background: #ff6e6e; /* B Tier */
+  }
+
+  .tier-row:nth-child(4) .tier-label {
+    background: #ff8080; /* C Tier */
+  }
+
+  .tier-row:nth-child(5) .tier-label {
+    background: #ff9292; /* D Tier */
+  }
+
+  .tier-row:nth-child(6) .tier-label {
+    background: #ffa4a4; /* F Tier - Lightest salmon */
   }
   
   .tier-movies {

@@ -71,7 +71,7 @@ export const getReviewByUserMovie = async (req, res) => {
         const { userId, movieId } = req.params;
 
         const review = await Review.findOne({ userId, movieId });
-        if (!review.ok) {
+        if (!review) {
             return res.status(404).json({ message: "Review not found." });
         }
 

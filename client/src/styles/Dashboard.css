@@ -1,12 +1,15 @@
 .dashboard-container {
   padding-left: 70px;
-  min-height: 100vh;
+  height: 100vh;
   background: #1a1a1a;
   color: #ffffff;
+  overflow: hidden;
 }
 
 .dashboard-main {
-  padding: 20px;
+  padding: 20px 20px 0 20px;
+  height: 100%;
+  overflow: hidden;
 }
 
 .sidenav.expanded + .dashboard-main {
@@ -54,7 +57,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   height: 20px;
 }
 
@@ -66,20 +69,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid white;
+  color: white;
+  font-family: 'Cabin', sans-serif;
+  font-weight: 600;
 }
 
 .dashboard-content {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 12px;
-  height: calc(100vh - 65px);
+  gap: 16px;
+  height: calc(100vh - 60px);
 }
 
 .content-section {
   background: #2a2a2a;
   border-radius: 8px;
-  padding: 10px;
+  padding: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -136,12 +143,12 @@
 }
 
 .content-section h2 {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: #fff;
   opacity: 0.9;
   font-weight: 500;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
   margin-top: 4px;
   border-bottom: 1px solid #333;
   position: sticky;
@@ -151,7 +158,7 @@
   text-align: left;
   display: flex;
   align-items: center;
-  height: 10px;
+  height: 14px;
   padding-right: 8px;
 }
 

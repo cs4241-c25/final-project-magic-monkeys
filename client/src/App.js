@@ -14,6 +14,8 @@ import React from "react";
 import { UserProvider } from './context/UserContext';
 import "./App.css";
 import { useAuth0 } from "@auth0/auth0-react";
+import {ToastProvider} from "./components/Toast";
+import './styles/Toast.css';
 
 const AppContent = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
@@ -41,7 +43,6 @@ const AppContent = () => {
   // If the user is logged in, always hide the NavBar
   const hideNavBar = isAuthenticated;
 
-
   return (
     <div
       className={`App ${isDarkTheme ? 'dark-theme' : 'light-theme'}`}
@@ -60,6 +61,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<MovieDemo />} />
+        <Route path="/movies/:movieId" element={<MovieDemo />} />
         <Route
           path="/dashboard"
           element={
@@ -101,9 +103,11 @@ const AppContent = () => {
 function App() {
   return (
     <UserProvider>
-      <Router>
-        <AppContent />
-      </Router>
+        <ToastProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </ToastProvider>
     </UserProvider>
   );
 }

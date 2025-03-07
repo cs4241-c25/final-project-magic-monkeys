@@ -7,6 +7,7 @@ import { omdbAPI } from '../services/omdbAPI';
 import { useUser } from '../context/UserContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { SideNav } from '../components/SideNav';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export const MovieDemo = () => {
   const { isLoading } = useAuth0();
@@ -20,7 +21,9 @@ export const MovieDemo = () => {
   const [cardRatings, setCardRatings] = useState({});
   const [scrollInterval, setScrollInterval] = useState(null);
   const [cast, setCast] = useState([]);
-  const [isExpanded, setIsExpanded] = useState(false);   
+  const { movieId } = useParams();
+  const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const { nowPlaying, upcoming, loading, error } = useMovieData();
 
@@ -41,6 +44,26 @@ export const MovieDemo = () => {
     }
   }, []);
 
+  // Load movie from URL parameter if present
+  useEffect(() => {
+    const loadMovieFromUrl = async () => {
+      if (movieId && !movie) {
+        try {
+          const movieData = await tmdbAPI.getMovie(movieId);
+          if (movieData) {
+            setMovie(movieData);
+            fetchMovieDetails(movieData.id, movieData.title);
+            scrollToTop();
+          }
+        } catch (err) {
+          console.error("Error loading movie from URL:", err);
+        }
+      }
+    };
+
+    loadMovieFromUrl();
+  }, [movieId, fetchMovieDetails, movie]);
+
   const fetchCardRatings = useCallback(async (movie) => {
     try {
       const ratings = await omdbAPI.getMovieRatings(movie.title);
@@ -50,7 +73,6 @@ export const MovieDemo = () => {
         [movie.id]: {
           imdb: ratings.imdb,
           rt: ratings.rt,
-          tmdb: movie.vote_average
         }
       }));
     } catch (err) {
@@ -85,15 +107,16 @@ export const MovieDemo = () => {
     setMovie(movie);
     fetchMovieDetails(movie.id, movie.title);
     scrollToTop();
+    navigate(`/movies/${movie.id}`, { replace: true });
   };
 
   const handleCloseMovie = () => {
     setMovie(null);
     setSelectedTrailer(null);
-    setWatchProviders(null);
-    setReviews([]);
-    setRatings({ rt: null, imdb: null, imdbId: null });
-    setCast([]);
+    // If we're on a movie details URL, navigate back to the main movies page
+    if (movieId) {
+      navigate('/movies');
+    }
   };
 
   const scrollToTop = () => {
@@ -284,8 +307,9 @@ export const MovieDemo = () => {
   return (
     <div className="movie-demo">
       {isAuthenticated && (
-        <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
-      )}      <header className="App-header">
+          <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      )}
+      <header className="App-header">
         <form onSubmit={searchMovie} className="search-form">
           <input
             type="text"
