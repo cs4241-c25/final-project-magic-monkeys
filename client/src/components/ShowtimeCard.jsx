@@ -54,64 +54,93 @@ export const ShowtimeCard = ({
     </div>
   );
 
+  // Safely format the time
+  const safeFormatTime = (timeData) => {
+    try {
+      if (!timeData) return "No time available";
+      return formatMovieNightTime(timeData);
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return "Time unavailable";
+    }
+  };
+
+  // Safely format the date
+  const safeFormatDate = (dateData) => {
+    try {
+      if (!dateData) return "No date available";
+      return formatMovieNightDate(dateData);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Date unavailable";
+    }
+  };
+
   return (
-    <div className="bg-[#333] p-4 rounded-md relative h-[calc(100%)] flex flex-col justify-between">
-    {/* <div className="bg-[#333] p-4 rounded-md border border-[#444] relative h-[calc(100%-45px)] flex flex-col justify-center"> */}
-      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex flex-col gap-1 z-10">
-        <BiChevronUp 
-          className={`text-4xl text-[#888] hover:text-[#ff4b4b] transition-colors ${userMovieNights.length <= 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (userMovieNights.length > 1) handlePrevMovieNight(e);
-          }}
-        />
-        <BiChevronDown 
-          className={`text-4xl text-[#888] hover:text-[#ff4b4b] transition-colors ${userMovieNights.length <= 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (userMovieNights.length > 1) handleNextMovieNight(e);
-          }}
-        />
-      </div>
-      
-      <div className="flex-grow flex items-center justify-center w-full">
-        {isLoading ? (
-          renderLoadingPlaceholder()
-        ) : (
-          <AnimatePresence mode="wait" custom={movieNightAnimationDirection}>
-            <motion.div 
-              key={currentMovieNightIndex}
-              className="flex flex-col items-center justify-center font-['Cabin'] w-full"
-              custom={movieNightAnimationDirection}
-              variants={contentVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
-              {currentMovieNight ? (
-                <>
-                  <h3 
-                    onClick={userMovieNights.length > 0 ? handleMovieNightClick : undefined}
-                    className="text-[#ff4b4b] text-[2.5rem] m-0 hover:underline transition-all cursor-pointer max-w-[calc(100%-60px)] text-center font-['Cabin'] font-semibold"
-                  >
-                    {formatMovieNightDate(currentMovieNight.displayDate)}
-                  </h3>
-                  <div className="text-[#ff8a80] -mt-2 mb-1 text-[1.6rem] font-['Cabin']">{formatMovieNightTime(currentMovieNight)}</div>
-                  <div className="text-white text-md font-['Cabin']">{currentMovieNight.groupName}</div>
-                </>
-              ) : (
-                <h3 className="text-[#ff4b4b] text-[2.5rem] m-0 text-center font-['Cabin'] font-semibold">No Showtimes</h3>
-              )}
-            </motion.div>
-          </AnimatePresence>
+    <div className="content-section showtime">
+      <h2>
+        Showtimes
+        <div className="chevron-controls">
+          <BiChevronUp 
+            className={`chevron-arrow ${userMovieNights.length <= 1 ? 'disabled' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (userMovieNights.length > 1) handlePrevMovieNight(e);
+            }}
+          />
+          <BiChevronDown 
+            className={`chevron-arrow ${userMovieNights.length <= 1 ? 'disabled' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (userMovieNights.length > 1) handleNextMovieNight(e);
+            }}
+          />
+        </div>
+      </h2>
+      <div className="showtime-card-container">
+        <div className="flex-grow flex items-center justify-center w-full">
+          {isLoading ? (
+            renderLoadingPlaceholder()
+          ) : (
+            <AnimatePresence mode="wait" custom={movieNightAnimationDirection}>
+              <motion.div
+                key={currentMovieNightIndex}
+                className="flex flex-col items-center justify-center font-['Cabin'] w-full"
+                custom={movieNightAnimationDirection}
+                variants={contentVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+              >
+                {currentMovieNight ? (
+                  <>
+                    <h3 
+                      onClick={userMovieNights.length > 0 ? handleMovieNightClick : undefined}
+                      className="text-[#ff4b4b] text-[2.5rem] m-0 hover:underline transition-all cursor-pointer max-w-[calc(100%-60px)] text-center font-['Cabin'] font-semibold"
+                    >
+                      {safeFormatDate(currentMovieNight.displayDate || currentMovieNight.date)}
+                    </h3>
+                    <div className="text-[#ff8a80] -mt-2 mb-1 text-[1.6rem] font-['Cabin']">
+                      {safeFormatTime(currentMovieNight)}
+                    </div>
+                    <div className="text-white text-md font-['Cabin']">
+                      {currentMovieNight.groupName || currentMovieNight.group}
+                    </div>
+                  </>
+                ) : (
+                  <h3 className="text-[#ff4b4b] text-[2.5rem] m-0 text-center font-['Cabin'] font-semibold">No Showtimes</h3>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
+        
+        {userMovieNights.length > 0 && !isLoading && (
+          <div className="text-center mt-auto text-sm text-[#888] font-['Cabin']">
+            {currentMovieNightIndex + 1} / {userMovieNights.length}
+          </div>
         )}
       </div>
-      
-      {userMovieNights.length > 0 && !isLoading && (
-        <div className="text-center mt-auto text-sm text-[#888] font-['Cabin']">
-          {currentMovieNightIndex + 1} / {userMovieNights.length}
-        </div>
-      )}
     </div>
   );
 }; 

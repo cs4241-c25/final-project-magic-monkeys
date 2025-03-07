@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/TierListCard.css';
 import '../styles/LoadingAnimations.css';
 import { useNavigate } from 'react-router-dom';
+import { FiEdit } from 'react-icons/fi';
 
 export const TierListCard = ({ 
   tierListData, 
@@ -53,65 +54,82 @@ export const TierListCard = ({
     [];
 
   return (
-    <div className="flex-1 overflow-hidden h-full">
-      {isTierListLoading ? (
-        renderLoadingPlaceholder()
-      ) : (
-        <div className="flex flex-col gap-0 flex-1 h-full">
-          {availableTiers.length > 0 ? (
-            availableTiers.map((tier, index) => (
-              <div 
-                key={tier} 
-                className={`flex items-center ${index % 2 === 0 ? 'tier-row-even' : 'tier-row-odd'}`} 
-                style={{ 
-                  height: `calc(100% / ${availableTiers.length})`, 
-                  paddingLeft: '20px',
-                  paddingTop: '5px',
-                  paddingBottom: '5px'
-                }}
-              >
+    <div className="content-section mini-tierlist">
+      <h2>
+        Tier List
+        <FiEdit 
+          className="ml-auto text-gray-400 text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors" 
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate('/tierlist');
+          }}
+        />
+      </h2>
+      <div className="flex-1 overflow-hidden h-full">
+        {isTierListLoading ? (
+          renderLoadingPlaceholder()
+        ) : (
+          <div className="flex flex-col gap-0 flex-1 h-full">
+            {availableTiers.length > 0 ? (
+              availableTiers.map((tier, index) => (
                 <div 
-                  className="w-[70px] flex items-center justify-center mr-6 font-bold text-[2.5rem]"
-                  style={{ height: '100%' }}
+                  key={tier} 
+                  className={`flex items-center ${index % 2 === 0 ? 'tier-row-even' : 'tier-row-odd'}`} 
+                  style={{ 
+                    height: `calc(100% / ${availableTiers.length})`, 
+                    paddingLeft: '20px',
+                    paddingTop: '5px',
+                    paddingBottom: '5px'
+                  }}
                 >
-                  <span className={`tier-text-${tier}`}>{tier}</span>
+                  <div 
+                    className="w-[70px] flex items-center justify-center mr-4 font-light text-[3.5rem]"
+                    style={{ height: '100%' }}
+                    onClick={() => navigate('/tierlist')}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <span className={`tier-text-${tier}`}>{tier}</span>
+                  </div>
+                  <div className="tier-movies flex gap-2 p-1 flex-1 overflow-x-auto items-center">
+                    {tierListData[tier].length > 0 ? (
+                      tierListData[tier].map((movie, i) => (
+                        <div 
+                          key={`${tier}-${i}`}
+                          style={{ 
+                            width: '90px',
+                            height: '135px',
+                            backgroundImage: `url(${movie.poster})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                            borderRadius: '4px',
+                            flexShrink: 0,
+                            transition: 'transform 0.2s'
+                          }}
+                          className="hover:scale-105 cursor-pointer"
+                          title={movie.title}
+                          onClick={() => handleMovieClick(movie.movieId)}
+                          onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                          onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        ></div>
+                      ))
+                    ) : (
+                      <span className="flex items-center justify-center text-[#888] italic w-full h-[135px] rounded-md text-[0.9rem]">
+                        No movies in this tier
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="tier-movies flex gap-3 p-2 flex-1 overflow-x-auto items-center">
-                  {tierListData[tier].length > 0 ? (
-                    tierListData[tier].map((movie, i) => (
-                      <div 
-                        key={`${tier}-${i}`}
-                        style={{ 
-                          width: '90px',
-                          height: '135px',
-                          backgroundImage: `url(${movie.poster})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat',
-                          borderRadius: '4px',
-                          flexShrink: 0,
-                          transition: 'transform 0.2s'
-                        }}
-                        className="hover:scale-105 cursor-pointer"
-                        title={movie.title}
-                        onClick={() => handleMovieClick(movie.movieId)}
-                      ></div>
-                    ))
-                  ) : (
-                    <span className="flex items-center justify-center text-[#888] italic w-full h-[135px] rounded-md text-[0.9rem]">
-                      No movies in this tier
-                    </span>
-                  )}
-                </div>
+              ))
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-center p-4">
+                <p className="text-[#888] text-base">Your tier list is empty. Add movies to your tier list to see them here.</p>
               </div>
-            ))
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-center p-4">
-              <p className="text-[#888] text-base">Your tier list is empty. Add movies to your tier list to see them here.</p>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

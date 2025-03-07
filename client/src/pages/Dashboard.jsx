@@ -56,6 +56,7 @@ export const Dashboard = () => {
   const [isTierListLoading, setIsTierListLoading] = useState(false);
   const [isGroupsLoading, setIsGroupsLoading] = useState(false);
   const [isHappeningsLoading, setIsHappeningsLoading] = useState(false);
+  const [happenings, setHappenings] = useState([]);
 
   // Fetch user groups
   useEffect(() => {
@@ -225,17 +226,36 @@ export const Dashboard = () => {
     fetchUserMovieNights();
   }, [dbUser]);
 
-  // Simulate happenings loading
+  // Fetch user happenings
   useEffect(() => {
     if (!dbUser) return;
     
-    setIsHappeningsLoading(true);
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setIsHappeningsLoading(false);
-    }, 1500);
-    
-    return () => clearTimeout(timer);
+    const fetchHappenings = async () => {
+      setIsHappeningsLoading(true);
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/users/67c8c90e4255e8e3812db203/user-happenings`);
+        if (response.ok) {
+          const happeningsData = await response.json();
+          
+          // Just use the happening string directly
+          const formattedHappenings = happeningsData.map(item => ({
+            happening: item.happening
+          }));
+          
+          setHappenings(formattedHappenings);
+        } else {
+          console.error('Failed to fetch happenings:', await response.text());
+          setHappenings([]);
+        }
+      } catch (error) {
+        console.error('Error fetching happenings:', error);
+        setHappenings([]);
+      } finally {
+        setIsHappeningsLoading(false);
+      }
+    };
+
+    fetchHappenings();
   }, [dbUser]);
 
   // Add this temporary test function
@@ -340,68 +360,123 @@ export const Dashboard = () => {
   const formatMovieNightDate = (dateString) => {
     if (!dateString) return "TBD";
     
-    // Create date object
-    const date = new Date(dateString);
-    
-    // Get the day number
-    const day = date.getDate();
-    
-    // Determine the ordinal suffix
-    let suffix = "th";
-    if (day % 10 === 1 && day !== 11) {
-      suffix = "st";
-    } else if (day % 10 === 2 && day !== 12) {
-      suffix = "nd";
-    } else if (day % 10 === 3 && day !== 13) {
-      suffix = "rd";
+    try {
+      // Create date object
+      const date = new Date(dateString);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn("Invalid date string:", dateString);
+        return dateString; // Return the original string if it's not a valid date
+      }
+      
+      // Get the day number
+      const day = date.getDate();
+      
+      // Determine the ordinal suffix
+      let suffix = "th";
+      if (day % 10 === 1 && day !== 11) {
+        suffix = "st";
+      } else if (day % 10 === 2 && day !== 12) {
+        suffix = "nd";
+      } else if (day % 10 === 3 && day !== 13) {
+        suffix = "rd";
+      }
+      
+      // Format the month
+      const options = { 
+        timeZone: 'America/New_York',
+        month: 'short'
+      };
+      
+      const month = date.toLocaleDateString('en-US', options);
+      
+      // Return formatted date with ordinal suffix
+      return `${month} ${day}${suffix}`;
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString || "TBD";
     }
-    
-    // Format the month
-    const options = { 
-      timeZone: 'America/New_York',
-      month: 'short'
-    };
-    
-    const month = date.toLocaleDateString('en-US', options);
-    
-    // Return formatted date with ordinal suffix
-    return `${month} ${day}${suffix}`;
   };
 
   // Format time for display in EST
   const formatMovieNightTime = (schedule) => {
-    if (schedule.recurring) {
-      // For recurring schedules, parse and format the startTime
+    if (!schedule) return "No time available";
+    
+    try {
+      // If schedule is a string, it might be a time string or a full date string
+      if (typeof schedule === 'string') {
+        return schedule;
+      }
+      
+      // If schedule has a displayTime property, use that
+      if (schedule.displayTime) {
+        return schedule.displayTime;
+      }
+      
+      // If schedule has a time property, use that
+      if (schedule.time) {
+        return schedule.time;
+      }
+      
+      // If schedule is an object with recurring property
+      if (schedule.recurring) {
+        // For recurring schedules, parse and format the startTime
+        if (schedule.startTime) {
+          // Check if startTime is a full ISO date string
+          if (typeof schedule.startTime === 'string' && schedule.startTime.includes('T')) {
+            const timeDate = new Date(schedule.startTime);
+            const options = {
+              timeZone: 'America/New_York',
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true
+            };
+            return timeDate.toLocaleTimeString('en-US', options);
+          } 
+          // If it's just a time string like "19:30"
+          else {
+            return schedule.startTime;
+          }
+        }
+      }
+      
+      // If schedule has a startTime property
       if (schedule.startTime) {
-        // Check if startTime is a full ISO date string
-        if (schedule.startTime.includes('T')) {
-          const timeDate = new Date(schedule.startTime);
+        return schedule.startTime;
+      }
+      
+      // If schedule has a dateTime property
+      if (schedule.dateTime) {
+        const options = {
+          timeZone: 'America/New_York',
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true
+        };
+        
+        return new Date(schedule.dateTime).toLocaleTimeString('en-US', options);
+      }
+      
+      // If we have a date property, try to extract time from it
+      if (schedule.date) {
+        const dateObj = new Date(schedule.date);
+        if (!isNaN(dateObj.getTime())) {
           const options = {
             timeZone: 'America/New_York',
             hour: 'numeric', 
             minute: '2-digit',
             hour12: true
           };
-          return timeDate.toLocaleTimeString('en-US', options);
-        } 
-        // If it's just a time string like "19:30"
-        else {
-          return schedule.startTime;
+          return dateObj.toLocaleTimeString('en-US', options);
         }
       }
-      return "TBD";
-    } else if (schedule.dateTime) {
-      // For specific schedules, convert to EST
-      const options = {
-        timeZone: 'America/New_York',
-        hour: 'numeric', 
-        minute: '2-digit',
-        hour12: true
-      };
       
-      return new Date(schedule.dateTime).toLocaleTimeString('en-US', options);
+      return "Time unavailable";
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return "Time unavailable";
     }
-    return "TBD";
   };
 
   // Get current movie night details
@@ -524,15 +599,6 @@ export const Dashboard = () => {
 
   const dummyMovies = Array(12).fill(null).map((_, i) => movieData[i % 4]);
 
-  const dummyHappenings = [
-    { user: 'John', movie: 'Oppenheimer', rating: 4.5, tickets: 5 },
-    { user: 'Sarah', movie: 'Interstellar', rating: 5, tickets: 5 },
-    { user: 'Mike', movie: 'Arrival', rating: 4.5, tickets: 5 },
-    { user: 'Emma', movie: 'Midsommar', rating: 5, tickets: 5 },
-    { user: 'Alex', movie: 'Arrival', rating: 5, tickets: 5 },
-    { user: 'Rachel', movie: 'Interstellar', rating: 4.5, tickets: 5 }
-  ];
-
   return (
     <div className="dashboard-container">
       <SideNav 
@@ -547,89 +613,55 @@ export const Dashboard = () => {
 
         <div className="dashboard-content">
           {/* Showtime Card - col 1, row 1 */}
-          <div className="content-section showtime">
-            <h2>Showtimes</h2>
-            <ShowtimeCard
-              userMovieNights={userMovieNights}
-              currentMovieNight={currentMovieNight}
-              currentMovieNightIndex={currentMovieNightIndex}
-              isMovieNightAnimating={isMovieNightAnimating}
-              movieNightAnimationDirection={movieNightAnimationDirection}
-              handlePrevMovieNight={handlePrevMovieNight}
-              handleNextMovieNight={handleNextMovieNight}
-              handleMovieNightClick={handleMovieNightClick}
-              formatMovieNightDate={formatMovieNightDate}
-              formatMovieNightTime={formatMovieNightTime}
-              isLoading={isMovieNightsLoading}
-            />
-          </div>
+          <ShowtimeCard
+            userMovieNights={userMovieNights}
+            currentMovieNight={currentMovieNight}
+            currentMovieNightIndex={currentMovieNightIndex}
+            isMovieNightAnimating={isMovieNightAnimating}
+            movieNightAnimationDirection={movieNightAnimationDirection}
+            handlePrevMovieNight={handlePrevMovieNight}
+            handleNextMovieNight={handleNextMovieNight}
+            handleMovieNightClick={handleMovieNightClick}
+            formatMovieNightDate={formatMovieNightDate}
+            formatMovieNightTime={formatMovieNightTime}
+            isLoading={isMovieNightsLoading}
+          />
 
           {/* Group Card - col 2, row 1 */}
-          <div className="content-section groups">
-            <h2>Groups</h2>
-            <GroupCard
-              userGroups={userGroups}
-              currentGroupName={currentGroupName}
-              currentGroupIndex={currentGroupIndex}
-              isAnimating={isAnimating}
-              animationDirection={animationDirection}
-              handlePrevGroup={handlePrevGroup}
-              handleNextGroup={handleNextGroup}
-              handleGroupCardClick={handleGroupCardClick}
-              isLoading={isGroupsLoading}
-            />
-          </div>
+          <GroupCard
+            userGroups={userGroups}
+            currentGroupName={currentGroupName}
+            currentGroupIndex={currentGroupIndex}
+            isAnimating={isAnimating}
+            animationDirection={animationDirection}
+            handlePrevGroup={handlePrevGroup}
+            handleNextGroup={handleNextGroup}
+            handleGroupCardClick={handleGroupCardClick}
+            isLoading={isGroupsLoading}
+          />
 
           {/* Happenings Card - col 3-4, row 1 */}
-          <div className="content-section happenings">
-            <h2>Happenings</h2>
-            <HappeningsCard 
-              happenings={dummyHappenings} 
-              isLoading={isHappeningsLoading}
-            />
-          </div>
-
-          {/* Tier List Card - col 1-2, row 2-3 */}
-          <div className="content-section mini-tierlist">
-            <h2>
-              Tier List
-              <FiEdit 
-                className="ml-auto text-white text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate('/tierlist');
-                }}
-              />
-            </h2>
-            <TierListCard
-              tierListData={tierListData}
-              isTierListLoading={isTierListLoading}
-            />
-          </div>
+          <HappeningsCard 
+            happenings={happenings} 
+            isLoading={isHappeningsLoading}
+          />
 
           {/* Watchlist/Reviews Card - col 3-4, row 2-3 */}
-          <div className="content-section combined-card">
-            <h2 className="flex items-center">
-              <span className="w-[5.2rem]">{activeView === 'watchlist' ? 'Watchlist' : 'Reviews'}</span>
-              <BiTransfer 
-                className="text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors -ml-1 -mt-0.5" 
-                onClick={toggleView}
-              />
-              <BiMenu 
-                className="ml-auto text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors filter-menu-icon" 
-                onClick={handleFilterClick}
-              />
-            </h2>
-            <WatchlistReviewsCard
-              activeView={activeView}
-              toggleView={toggleView}
-              watchlist={watchlist}
-              isWatchlistLoading={isWatchlistLoading}
-              setIsWatchlistLoading={setIsWatchlistLoading}
-              showFilterMenu={showFilterMenu}
-              setShowFilterMenu={setShowFilterMenu}
-            />
-          </div>
+          <WatchlistReviewsCard
+            activeView={activeView}
+            toggleView={toggleView}
+            watchlist={watchlist}
+            isWatchlistLoading={isWatchlistLoading}
+            setIsWatchlistLoading={setIsWatchlistLoading}
+            showFilterMenu={showFilterMenu}
+            setShowFilterMenu={setShowFilterMenu}
+          />
+
+          {/* Tier List Card - col 1-2, row 2-3 */}
+                    <TierListCard
+            tierListData={tierListData}
+            isTierListLoading={isTierListLoading}
+          />
         </div>
       </main>
     </div>

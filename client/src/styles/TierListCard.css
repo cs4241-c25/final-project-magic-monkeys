@@ -2,6 +2,11 @@
 .tier-movies {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  flex: 1;
+  overflow-x: auto;
 }
 
 .tier-movies::-webkit-scrollbar {
@@ -9,28 +14,39 @@
 }
 
 /* Tier text colors - gradient from darker to lighter salmon with greater difference */
+.tier-text-S, 
+.tier-text-A, 
+.tier-text-B, 
+.tier-text-C, 
+.tier-text-D, 
+.tier-text-F {
+  font-weight: 300; /* Light font weight */
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(255, 75, 75, 0.2); /* Subtle text shadow for better visibility */
+}
+
 .tier-text-S {
-  color: #ff4b4b; /* S Tier - Darkest salmon */
+  color: var(--color-accent-primary); /* S Tier - Darkest salmon */
 }
 
 .tier-text-A {
-  color: #ff7676; /* A Tier */
+  color: var(--color-accent-primary); /* A Tier */
 }
 
 .tier-text-B {
-  color: #ff9999; /* B Tier */
+  color: var(--color-accent-primary); /* B Tier */
 }
 
 .tier-text-C {
-  color: #ff9999; /* C Tier */
+  color: var(--color-accent-primary); /* C Tier */
 }
 
 .tier-text-D {
-  color: #ffbdbd; /* D Tier */
+  color: var(--color-accent-primary); /* D Tier */
 }
 
 .tier-text-F {
-  color: #ffe0e0; /* F Tier - Lightest salmon */
+  color: var(--color-accent-primary); /* F Tier - Lightest salmon */
 }
 
 /* Enhance empty tier message */
@@ -45,9 +61,44 @@
 
 /* Alternating row colors */
 .tier-row-even {
-  background-color: #333;
+  background-color: var(--color-bg-dark);
 }
 
 .tier-row-odd {
-  background-color: #3a3a3a;
+  background-color: var(--color-bg-medium);
+}
+
+/* Container for the tierlist card that fills the entire space */
+.tierlist-card-container {
+  background-color: var(--color-bg-dark);
+  position: relative;
+  flex: 1; /* Take up all available space */
+  display: flex;
+  flex-direction: column;
+  margin-top: 0px;
+  padding: 0;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  overflow: hidden;
+}
+
+/* Ensure the content section has no padding and fills the available height */
+.content-section.mini-tierlist {
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Style the title to be at the top */
+.content-section.mini-tierlist h2 {
+  margin: 0;
+  padding: 20px 20px; /* Increased padding for top/bottom and left/right */
+  background-color: var(--color-bg-darker);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  flex-shrink: 0; /* Prevent the title from shrinking */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 } 

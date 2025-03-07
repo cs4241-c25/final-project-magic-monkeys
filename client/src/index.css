@@ -8,6 +8,35 @@
   --dark-bg: #222222;
   --dark-card: #373737;
   --white: #ffffff;
+  
+  /* Dashboard theme colors - Main backgrounds (darker version) */
+  --color-bg-darkest: #121212;      /* Darkest background (scrollbar tracks) */
+  --color-bg-darker: #181818;       /* Darker background (title bars) */
+  --color-bg-dark: #1e1e1e;         /* Dark background (card backgrounds, even rows) */
+  --color-bg-medium: #252525;       /* Medium background (odd rows) */
+  
+  /* Border colors */
+  --color-border-dark: #2a2a2a;     /* Dark borders */
+  
+  /* Text and icon colors */
+  --color-text-muted: #555;         /* Muted text (secondary text, icons) */
+  --color-text-medium: #777;        /* Medium text (headings, hover states) */
+  --color-text-light: #999;         /* Light text (primary text) */
+  --color-text-bright: #fff;        /* Bright text (important text) */
+  
+  /* Loading element colors */
+  --color-loading: #2a2a2a;         /* Loading element backgrounds */
+  
+  /* Scrollbar colors */
+  --color-scrollbar-track: #121212; /* Scrollbar track */
+  --color-scrollbar-thumb: #2a2a2a; /* Scrollbar thumb */
+  
+  /* Accent colors */
+  --color-accent-primary: #ff6b6b;  /* Primary accent (salmon) */
+  --color-accent-secondary: #4ecdc4; /* Secondary accent (teal) */
+  
+  /* Overlay colors */
+  --color-overlay: rgba(0, 0, 0, 0.4); /* Shadow overlay */
 }
 
 body {
