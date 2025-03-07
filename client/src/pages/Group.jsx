@@ -10,7 +10,7 @@ import {useGroupData} from "../hooks/useGroupData";
 import { TicketRating } from '../components/TicketRating';
 import { useUser } from '../context/UserContext';
 import { MovieNightSchedulerModal } from '../components/MovieNightSchedulerModal';
-import { GroupMemberPermissionModal } from '../components/GroupMemberPermissionsModal';
+import { GroupMemberPermissionsModal } from '../components/GroupMemberPermissionsModal';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -451,7 +451,7 @@ export const Group = () => {
                             </div>
                         )}
                     </div>
-                    <GroupMemberPermissionModal 
+                    <GroupMemberPermissionsModal 
                         isOpen={isPermissionModalOpen} 
                         onClose={() => setPermissionModalOpen(false)} 
                         groupId={groupId} 

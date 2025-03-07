@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal } from './Modal';
+import "../styles/GroupMemberPermissionsModal.css";
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-export const GroupMemberPermissionModal = ({ isOpen, onClose, groupId }) => {
+export const GroupMemberPermissionsModal = ({ isOpen, onClose, groupId }) => {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -30,7 +31,7 @@ export const GroupMemberPermissionModal = ({ isOpen, onClose, groupId }) => {
 
     const updateMemberRole = async (userId, newRole) => {
         try {
-            await axios.put(`${API_URL}/user-groups/${userId}`, { role: newRole });
+            await axios.put(`${API_URL}/api/user-groups/${userId}/${groupId}`, { role: newRole });
             setMembers((prev) =>
                 prev.map((member) =>
                     member.userId === userId ? { ...member, role: newRole } : member
@@ -45,42 +46,48 @@ export const GroupMemberPermissionModal = ({ isOpen, onClose, groupId }) => {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <h2>Manage Group Permissions</h2>
-            {loading ? (
-                <p>Loading members...</p>
-            ) : error ? (
-                <p>{error}</p>
-            ) : (
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {members.map((member) => (
-                            <tr key={member.userId}>
-                                <td>{member.username}</td>
-                                <td>{member.role}</td>
-                                {member.role !== "owner" && (
-                                    <td>
-                                        <select
-                                            value={member.role}
-                                            onChange={(e) => updateMemberRole(member.userId, e.target.value)}
-                                        >
-                                            <option value="admin">Admin</option>
-                                            <option value="member">Member</option>
-                                        </select>
-                                    </td>
-                                )}
-                                {member.role === "owner" && <td>Cannot modify</td>}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+            <div className="permissions-content">
+                <h2 className="modal-title">Manage Group Permissions</h2>
+                {loading ? (
+                    <p>Loading members...</p>
+                ) : error ? (
+                    <p>{error}</p>
+                ) : (
+                    <div className="table-container">
+                        <table className="permissions-table">
+                            <thead>
+                                <tr>
+                                    <th className="table-line">Username</th>
+                                    <th className="table-line">Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {members.map((member) => (
+                                    <tr key={member.userId}>
+                                        <td className="table-line">{member.username}</td>
+                                        <td className="table-line">{member.role}</td>
+                                        {member.role !== "owner" ? (
+                                            <td>
+                                                <select
+                                                    className="role-select"
+                                                    value={member.role || "member"}
+                                                    onChange={(e) => updateMemberRole(member.userId, e.target.value)}
+                                                >
+                                                    <option value="admin">Admin</option>
+                                                    <option value="member">Member</option>
+                                                </select>
+                                            </td>
+                                        ) : (
+                                            <td className="disabled-cell">Cannot modify</td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </Modal>
     );
 };
