@@ -17,6 +17,10 @@ export const createUser = async (req, res) => {
             return res.status(400).json({ message: "Username or email already in use." });
         }
 
+        if(!username){
+            username = email.split("@")[0];
+        }
+
         let uniqueUsername = username;
         let counter = 1;
         while(await User.findOne({ username: uniqueUsername })){
