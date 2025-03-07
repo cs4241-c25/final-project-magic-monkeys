@@ -54,9 +54,7 @@ export const getTierListByUser = async (req, res) => {
         }
 
         const tierList = await TierList.find({ userId }).sort({ order: 1 });
-
         if (!tierList.length) {
-            // Return an empty array with 200 OK
             return res.status(200).json([]);
         }
 
@@ -105,16 +103,17 @@ export const deleteTierList = async (req, res) => {
 export const bulkSaveTierList = async (req, res) => {
     try {
         /*
-          The request body should look like:
+          Request body shape:
           {
-            userId: "someObjectIdForUser",
-            tiers: {
-              S: { items: [...] },
-              A: { items: [...] },
-              B: { items: [...] },
-              C: { items: [...] },
-              D: { items: [...] },
-              F: { items: [...] },
+            "userId": "someUserId",
+            "tiers": {
+              "S": { "items": [...] },
+              "A": { "items": [...] },
+              "B": { "items": [...] },
+              "C": { "items": [...] },
+              "D": { "items": [...] },
+              "F": { "items": [...] },
+              "U": { "items": [...] }
             }
           }
         */
@@ -126,28 +125,27 @@ export const bulkSaveTierList = async (req, res) => {
             return res.status(404).json({ message: "User not found." });
         }
 
-        // Remove existing tier list for this user
+        // Delete old tier list entries for this user
         await TierList.deleteMany({ userId });
 
-        const validRanks = ["S", "A", "B", "C", "D", "F"];
-        
+        // Now we include "U" in validRanks
+        const validRanks = ["S", "A", "B", "C", "D", "F", "U"];
+
         let results = [];
 
         for (const rank of validRanks) {
-            if (!tiers[rank]) continue;
+            if (!tiers[rank]) continue; // If no items for that rank, skip
 
-            // Insert each movie in the tier, preserving index as 'order'
             const items = tiers[rank].items || [];
             for (let i = 0; i < items.length; i++) {
                 const movie = items[i];
-                
                 const movieId = Number(movie.id);
 
-                // Create a new TierList document
+                // Create a new TierList doc
                 const newEntry = await TierList.create({
                     userId: user._id,
-                    movieId: movieId,
-                    rank: rank,
+                    movieId,
+                    rank, // "S", "A", ..., or "U"
                     order: i
                 });
                 results.push(newEntry);
@@ -159,7 +157,7 @@ export const bulkSaveTierList = async (req, res) => {
             data: results
         });
     } catch (error) {
+        console.error("bulkSaveTierList error:", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
-
