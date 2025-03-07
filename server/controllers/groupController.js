@@ -86,7 +86,13 @@ export const getGroupMembers = async (req, res) => {
             return res.status(404).json({ message: "No members found in this group." });
         }
 
-        res.status(200).json(userGroups.map(ug => ug.userId));
+        res.status(200).json(userGroups.map(ug => ({
+            userId: ug.userId._id,
+            username: ug.userId.username,
+            email: ug.userId.email,
+            profilePicture: ug.userId.profilePicture,
+            role: ug.role
+        })));
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }

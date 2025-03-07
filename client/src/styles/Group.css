@@ -16,6 +16,12 @@
     text-align: center;
 }
 
+.group-invite-code{
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: 500;
+}
+
 .group-menu {
     position: relative;
 }

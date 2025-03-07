@@ -10,6 +10,7 @@ import {useGroupData} from "../hooks/useGroupData";
 import { TicketRating } from '../components/TicketRating';
 import { useUser } from '../context/UserContext';
 import { MovieNightSchedulerModal } from '../components/MovieNightSchedulerModal';
+import { GroupMemberPermissionModal } from '../components/GroupMemberPermissionsModal';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -24,6 +25,7 @@ export const Group = () => {
     const [showMenu, setShowMenu] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [isSchedulerOpen, setSchedulerOpen] = useState(false);
+    const [isPermissionModalOpen, setPermissionModalOpen] = useState(false);
     const [selectedMovieNight, setSelectedMovieNight] = useState(null);
 
     const today = new Date();
@@ -413,8 +415,8 @@ export const Group = () => {
             />
             <main className="dashboard-main">
                 <div className="group-header">
-                    <div></div>
                     <h1>{groupData.name}</h1>
+                    <p className="group-invite-code">Invite Code: {groupData.inviteCode}</p>
                     <div className="group-menu" ref={menuRef}>
                         <button
                             className="menu-button"
@@ -424,11 +426,13 @@ export const Group = () => {
                         </button>
                         {showMenu && (
                             <div className="menu-dropdown">
-                                <button
+                                <button 
                                     className="menu-item"
-                                    onClick={leaveGroup}
-                                >
-                                    Leave Group
+                                    onClick={() => {
+                                        setPermissionModalOpen(true);
+                                        setShowMenu(false);
+                                    }}>
+                                    Member Permissions
                                 </button>
                                 <button 
                                     className="menu-item"
@@ -438,9 +442,20 @@ export const Group = () => {
                                     }}>
                                     Schedule Movie Night
                                 </button>
+                                <button
+                                    className="menu-item"
+                                    onClick={leaveGroup}
+                                >
+                                    Leave Group
+                                </button>
                             </div>
                         )}
                     </div>
+                    <GroupMemberPermissionModal 
+                        isOpen={isPermissionModalOpen} 
+                        onClose={() => setPermissionModalOpen(false)} 
+                        groupId={groupId} 
+                    />
                 </div>
 
                 <div className="group-content">
