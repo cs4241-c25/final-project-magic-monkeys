@@ -21,7 +21,7 @@ Contributions:
 
 Parker: I designed the project’s database, set up the MongoDB cluster, and implemented all of the backend schemas, routes, and controllers. I also connected the group page to the backend to display all of the group's data and created the group calendar which allows users to schedule, edit, and display movie nights.
 
-Christian: I designed and implemented the tier list page to allow users to rank and order the movies they’ve watched. I also made the profile page and settings page and helped with the landing and movies pages.
+Christian: I designed and implemented the tier list, profile, and settings pages. The tier list page pulls from the user's Have Watched list to populate the pool of available movies and saves the user's tierlist in the database. The profile page pulls other data from the user to populate a public page which other group members can view to see their bio, favorite movie, tierlist, etc. And the settings page is a limited proof of concept for where the user would navigate to alter account settings. I also restructured/restyled the landing page, created the finalized top nav bar, and designed half of the dashboard page.
 
 Matthew: I connected our project to two free online movie database APIs to populate our app with movie data.  I also designed and implemented the landing page, the dashboard where users can easily see details about all their groups and movie nights, as well as their tier list, watchlist, and reviews, and the movie page where users can search for movies, see all the details about a move and do things like add them to their watchlist or review them.
 
