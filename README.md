@@ -1,46 +1,29 @@
-# Final Project
-*Due at noon on the day of your team's assigned class presentation. Teams will be presenting
-during the last week of class on Tuesday, Thursday, and Friday (March 4, 6, 7)*
+Our project is a social movie app designed to make it easy for you and your friends to create movie-watching groups, schedule and plan out movie nights, and view each other’s reviews. The main page is the user’s Dashboard, allowing them to see their upcoming movie nights for all groups, a list of their groups, and a list of ‘Happenings’, those being notifications of actions related to users who are members of the user’s groups. The event and group cards link to the respective groups as well. Beneath that, a preview of that user’s full tier list, comprised of three tiers, is available to view, along with a button linking them to the full Tierlist page where they can edit the Tierlist itself. Beside that is the card containing either the user’s intended watchlist or a listing of reviews they have left for different movies. Swapping between either function in this card can let a user sort their watchlist or reviews.
 
-For your final project, you'll implement a web application that exhibits understanding of the course materials.
-This project should provide an opportunity to both be creative and to pursue individual research and learning goals.
+We have a sidebar that allows users to easily navigate the site, from the dashboard, their groups, the tier list page, and their profile. The group dropdown not only shows all the user’s groups but allows them to either create or join new groups. Joining a group requires a group invite code, which can be found on that group’s page in the top left.
 
-## Final Project Description
-- Your project should consist of a complete Web application, exhibiting facets of the three main sections of the course material:
-- Static web page content and design. You should have a project with a well-designed user interface that is responsive, accessible, easily navigable, and features significant content.
-- Dynamic behavior implemented with JavaScript or Typescript.
-- Server-side programming using Node.js – either JavaScript or Typescript. Typically, this will take the form of some sort of persistent data (database), authentication, and possibly server-side computation.
-- A video (less than five minutes) where each group member explains some aspect of the project. An easy way to produce this video is for you all the group members to join a Zoom call that is recorded; each member can share their screen when they discuss the project or one member can "drive" the interface while other members narrate (this second option will probably work better.) The video should be posted on YouTube or some other accessible video hosting service. Make sure your video is less than five minutes, but long enough to successfully explain your project and show it in action. There is no minimum video length.
+On each group’s page, users can see detailed information about that group, such as members, group happenings, and a full calendar displaying the scheduled movie nights. Admins or the group owner can schedule, edit, and delete movie nights for the group. We plan to continue growing this page with aggregated rating scores and an aggregated tier list.
 
-## Project ideation
-I encourage you to identify projects that will have impact, either artistically or in terms of productivity. A few possibilities are
-1.	AI/ML app. You may take an AI/ML that you have written in the past and create a full application out of it provided it satisfies all the project requirements. I will review the proposals to make sure the scope is significant enough for a final project.
-2.	Mass General Brigham – The hospital is interested in providing visitors with directions to parking lots, building entrances, and information desks for multiple buildings. Integrated with the Google Maps API, these directions would guide visitors from their homes to the information desks of hospital buildings, and would guide visitors to locations between hospital buildings. Contact me if you would like more information.
-3.	Boston Freedom Trail app for tourists.
-4.	A generalized sightseeing app that permits tourist organizations to enter information in creating their own city walking tours.
-5.	An application aimed at serving the WPI student body. For example, an app that would facilitate the formation and coordination of informal WPI student groups.
-6.	An idea of your own!
+See our project here: https://moviematesfrontend.onrender.com/
 
+Once you’re on the dashboard, you just need to sign up, and then you will have full access to the project.
 
-### Deliverables
+Technologies:
+App was built on a React.js (vite) framework, connecting a MongoDB database with Mongoose and Node.js (Express, Axios)
+Javascript, HTML, CSS, Tailwind
+Authentication with Auth0
+Deployed using Render
+TMDB and OMDB APIs
 
+Contributions:
 
-#### Turning in Your Project
-Push the final version of your term project to the GitHub repo you accepted for the assignment. 
+Parker: I designed the project’s database, set up the MongoDB cluster, and implemented all of the backend schemas, routes, and controllers. I also connected the group page to the backend to display all of the group's data and created the group calendar which allows users to schedule, edit, and display movie nights.
 
-Deploy your app, in the form of a webpage, to Glitch, Vercel, AWS, Heroku or some other service; it is critical that the application functions correctly wherever you post it.
+Christian: I designed and implemented the tier list page to allow users to rank and order the movies they’ve watched. I also made the profile page and settings page and helped with the landing and movies pages.
 
-The README for your submitted repo should include
+Matthew: I connected our project to two free online movie database APIs to populate our app with movie data.  I also designed and implemented the landing page, the dashboard where users can easily see details about all their groups and movie nights, as well as their tier list, watchlist, and reviews, and the movie page where users can search for movies, see all the details about a move and do things like add them to their watchlist or review them.
 
-1. A brief description of what you created, and a link to the project itself (two paragraphs of text)
-2. Any additional instructions that might be needed to fully use your project (login information etc.)
-3. An outline of the technologies you used and how you used them.
-4. What challenges you faced in completing the project.
-5. What each group member was responsible for designing / developing.
-6. A link to your project video.
+Francesco: I designed and created the Group page as well as components including modals such as the Review Modal, Create/Join Group Modal, the Ticket Rating bar, toasts, and Group menu, full stack. I also set up and integrated authentication with Auth0, and made sure pages and components worked with our intended authentication designs.
 
-Think of 1,3, and 4 in particular in a similar vein to the design / tech achievements for A1—A4… make a case for why what you did was challenging and why your implementation deserves a grade of 100%.
+Our Project Demo: https://youtu.be/jb0y7h1P2KM
 
-## FAQs
-
-- **Can I use XYZ framework?** You can use any web-based frameworks or tools available, but for your server programming you need to use Node.js. Your client-side scripting language should be either JavaScript or TypeScript. While the course staff is happy to help with frameworks used in the class, we can't guarantee we'll be able to assist you with other frameworks / databases; choose carefully!
