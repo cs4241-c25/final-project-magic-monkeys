@@ -19,10 +19,10 @@
 .group-invite-code{
     font-size: 1.1rem;
     color: #ffffff;
-    font-weight: 500;
     padding: 8px 14px;
     border-radius: 4px;
     background-color: #373737;
+    font-family: 'Cabin';
 }
 
 .group-menu {
@@ -113,7 +113,7 @@
 .group-top-section {
     display: flex;
     flex-direction: column;
-    background: #373737;
+    background: #2A2A2A;
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 20px;
@@ -143,7 +143,7 @@
     display: flex;
     flex-direction: column;
     max-height: auto;
-    background: #373737;
+    background: #2A2A2A;
     overflow: hidden;
     transition: height 0.3s ease-in-out;
 }
@@ -225,11 +225,15 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    background: #4C4C4C;
+    background: #333333;
     min-height: auto;
     transition: height 0.3s ease-in-out;
     height: auto;
     overflow: hidden;
+}
+
+.calendar-toggle-btn {
+    background: #2A2A2A !important;
 }
 
 .status-icons {
@@ -322,7 +326,8 @@
 }
 
 .current-day{
-    background: var(--dark-card);
+    background: #2A2A2A;
+    color: var(--primary);
     border-radius: 0px;
 }
 
@@ -375,7 +380,7 @@
     height: 50px;
     gap: 10px;
     padding: 10px;
-    background-color: #3a3a3a;
+    background-color: #2A2A2A;
     border-radius: 5px;
     margin-bottom: 10px;
 }
@@ -433,7 +438,7 @@
 }
 
 .group-members-box {
-    background: #373737;
+    background: #2A2A2A;
     border-radius: 8px;
     padding: 20px;
     height: 320px;
@@ -492,7 +497,7 @@
 }
 
 .activity-header {
-    background: #373737;
+    background: #2A2A2A;
     padding: 20px;
 }
 
@@ -504,14 +509,7 @@
 
 .activity-list-container {
     flex: 1;
-    background: #4C4C4C;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.activity-list-container {
-    flex: 1;
-    background: #4C4C4C;
+    background: #333333;
     padding: 20px;
     overflow-y: auto;
 }
@@ -533,11 +531,13 @@
 .bullet {
     color: var(--primary);
     margin-right: 5px;
+    font-size: 1.4rem;
 }
 
-.activity-user {
+.activity-happening {
     color: var(--primary);
     font-weight: 500;
+    font-size: 1.2rem;
 }
 
 .activity-movie {
@@ -557,7 +557,7 @@
 }
 
 .group-scores-box {
-    background: #373737;
+    background: #2A2A2A;
     border-radius: 8px;
     height: 500px;
     display: flex;
@@ -569,7 +569,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background: #373737;
+    background: #2A2A2A;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     z-index: 1;
@@ -658,7 +658,7 @@
 }
 
 .group-tierlist-box {
-    background: #373737;
+    background: #2A2A2A;
     border-radius: 8px;
     padding: 20px;
     height: 500px;
