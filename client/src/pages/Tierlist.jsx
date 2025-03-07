@@ -7,7 +7,7 @@ import { useUser } from '../context/UserContext';
 import { tmdbAPI } from '../services/tmdbAPI';
 import '../styles/Tierlist.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // Helper function: reorder items in a list
 const reorder = (list, startIndex, endIndex) => {
