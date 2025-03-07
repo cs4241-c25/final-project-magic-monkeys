@@ -130,11 +130,80 @@
 
 .group-showtime {
     width: 350px;
-    padding: 30px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    max-height: auto;
     background: #373737;
+    overflow: hidden;
+    transition: height 0.3s ease-in-out;
+}
+
+.schedule-header-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.schedule-header {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    min-width: 180px;
+    display: inline-block;
+}
+
+.group-showtime-content{
+    flex-grow: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #666 #333;
+    padding-right: 5px;
+}
+
+.group-showtime-content::-webkit-scrollbar{
+    width: 8px;
+}
+
+.group-showtime-content::-webkit-scrollbar-thumb{
+    background-color: #666;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.showtime-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: #444;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: transform 0.2s ease-in-out, height 0.3s ease-in-out;
+    height: 144px;
+    overflow: hidden;
+}
+
+.showtime-card:hover {
+    transform: scale(1.02);
+}
+
+.showtime-time {
+    font-size: 1.2rem;
+    margin: 6px 0;
+    color: #fff;
+    opacity: 0.9;
+}
+
+.showtime-placeholder {
+    text-align: center;
+    color: #bbb;
+    font-size: 14px;
 }
 
 .group-calendar {
@@ -144,25 +213,9 @@
     flex-direction: column;
     background: #4C4C4C;
     min-height: auto;
-}
-
-.showtime-date {
-    color: var(--primary);
-    font-size: 2.5rem;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.showtime-time {
-    color: #ffffff;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-}
-
-.showtime-status {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    transition: height 0.3s ease-in-out;
+    height: auto;
+    overflow: hidden;
 }
 
 .status-icons {

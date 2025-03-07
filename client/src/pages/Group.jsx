@@ -48,7 +48,10 @@ export const Group = () => {
             setCurrentMonth(today.getMonth());
             setCurrentYear(today.getFullYear());
         }
-    }
+    };
+
+    const calendarRef = useRef(null);
+    const [calendarHeight, setCalendarHeight] = useState(0);
 
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -95,7 +98,6 @@ export const Group = () => {
         scores,
         movieNightSchedules,
         movieNights,
-        showtime,
         loading,
         error,
         refreshData
@@ -239,8 +241,66 @@ export const Group = () => {
         setSchedulerOpen(true);
     }
 
+    const getUpcomingMovieNights = () => {
+        if (!movieNightSchedules || movieNightSchedules.length === 0) return [];
+
+        const now = new Date();
+
+        const generateRecurringInstances = (event) => {
+            if(!event.recurring || !event.recurrenceDays) return [];
+
+            const instances = [];
+            const startDate = new Date(event.startDate);
+            const endDate = event.endDate ? new Date(event.endDate) : null;
+            const limitDate = new Date();
+            limitDate.setMonth(limitDate.getMonth() + 1);
+
+            let currentDate = new Date(startDate);
+
+            while(currentDate <= limitDate && (!endDate || currentDate <= endDate)) {
+                const weekday = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+
+                if(event.recurrenceDays.includes(weekday) && currentDate >= now) {
+                    const eventStartTime = new Date(event.startTime);
+                    currentDate.setHours(eventStartTime.getHours(), eventStartTime.getMinutes(), 0, 0);
+                    instances.push({
+                        ...event,
+                        dateTime: new Date(currentDate),
+                    });
+                }
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            return instances;
+        };
+
+        let allUpcomingEvents = movieNightSchedules
+            .filter(event => !event.recurring && new Date(event.dateTime) > now)
+            .map(event => ({
+                ...event,
+                dateTime: new Date(event.dateTime),
+            }));
+
+        movieNightSchedules.forEach(event => {
+            if(event.recurring){
+                allUpcomingEvents = allUpcomingEvents.concat(generateRecurringInstances(event));
+            }
+        });
+
+        return allUpcomingEvents.sort((a, b) => a.dateTime - b.dateTime);
+    };
+
     const calendar = generateCalendar();
     const displayedDates = isCalendarCondensed ? getCurrentWeek(calendar.dates) : calendar.dates;
+    const upcomingMovieNights = getUpcomingMovieNights();
+    const displayedMovieNights = isCalendarCondensed ? upcomingMovieNights.slice(0, 1) : upcomingMovieNights.slice(0, 10);
+
+    useEffect(() => {
+        if(calendarRef.current) {
+            setCalendarHeight(calendarRef.current.scrollHeight);
+        }
+    }, [isCalendarCondensed, displayedDates]);
 
     if (isLoading || loading) return <div>Loading Group...</div>;
     if (!isAuthenticated) {
@@ -290,7 +350,10 @@ export const Group = () => {
                                 </button>
                                 <button 
                                     className="menu-item"
-                                    onClick={() => setSchedulerOpen(true)}>
+                                    onClick={() => {
+                                        setSchedulerOpen(true);
+                                        setShowMenu(false);
+                                    }}>
                                     Schedule Movie Night
                                 </button>
                             </div>
@@ -302,7 +365,41 @@ export const Group = () => {
                     {/* Top Section */}
                     <div className={`group-top-section ${isCalendarCondensed ? 'condensed' : 'expanded'}`}>
                         <div className="group-top-content">
-                            <div className="group-showtime">
+                            <div className="group-showtime" style={{ maxHeight: `${calendarHeight}px`}}>
+                                <div className="schedule-header-zone">
+                                    <span className="schedule-header">
+                                        Upcoming Movie Nights
+                                    </span>
+                                </div>
+                                <div className="group-showtime-content">
+                                    {displayedMovieNights.length > 0 ? (
+                                        displayedMovieNights.map((event, index) => (
+                                            <div key={index} className="showtime-card">
+                                                <h3 className="showtime-date">
+                                                    {new Date(event.dateTime).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric'})}
+                                                </h3>
+                                                <div className="showtime-time">
+                                                    {new Date(event.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="showtime-placeholder">No upcoming movie nights</div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="group-calendar" ref={calendarRef}>
+                                <div className="calendar-navigation">
+                                    {!isCalendarCondensed && (
+                                        <button onClick={() => changeMonth(-1)} className="calendar-nav-btn">{"<"}</button>
+                                    )}
+                                    <span className="calendar-month">
+                                        {new Date(currentYear, currentMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                                    </span>
+                                    {!isCalendarCondensed && (
+                                        <button onClick={() => changeMonth(1)} className="calendar-nav-btn">{">"}</button>
+                                    )}
+                                </div>
                                 <div>
                                     <MovieNightSchedulerModal 
                                         isOpen={isSchedulerOpen} 
@@ -314,40 +411,6 @@ export const Group = () => {
                                         refreshData={refreshData}
                                         movieNightSchedule={selectedMovieNight} 
                                     />
-                                </div>
-                                <div className="showtime-date">
-                                    {showtime?.date || 'No showtime scheduled'}
-                                </div>
-                                {showtime?.time && (
-                                    <div className="showtime-time">{showtime.time}</div>
-                                )}
-                                {showtime?.movieDetails && (
-                                    <div className="showtime-movie">
-                                        {showtime.movieDetails.title}
-                                    </div>
-                                )}
-                                <div className="showtime-status">
-                                    <div className="status-icons">
-                                        <div className="status-icon no">
-                                        {showtime?.attending.map(attendee => (
-                                            <span key={attendee.id}>{attendee.profilePicture}</span>
-                                        ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="group-calendar">
-                                <div className="calendar-navigation">
-                                    {!isCalendarCondensed && (
-                                        <button onClick={() => changeMonth(-1)} className="calendar-nav-btn">{"<"}</button>
-                                    )}
-                                    <span className="calendar-month">
-                                        {new Date(currentYear, currentMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-                                    </span>
-                                    {!isCalendarCondensed && (
-                                        <button onClick={() => changeMonth(1)} className="calendar-nav-btn">{">"}</button>
-                                    )}
                                 </div>
                                 <div className="calendar-header">
                                     {calendar.days.map(day => (

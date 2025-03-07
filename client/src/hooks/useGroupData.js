@@ -255,8 +255,6 @@ export const useGroupData = (groupId) => {
         scores,
         movieNightSchedules,
         movieNights,
-        // showtime: getNextShowtime(),
-        showtime,
         loading,
         error,
         refreshData
