@@ -34,7 +34,10 @@ export const MovieDetails = ({
   const [tierListEntryId, setTierListEntryId] = useState(null);
 
   const checkMovieStatus = async () => {
+
     try {
+      if (!dbUser) return;
+
       // Get user's watchlist
       console.log(`Checking movie status for movie ID: ${movie.id}`);
       const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/watch-lists`);
@@ -103,8 +106,11 @@ export const MovieDetails = ({
   };
 
   useEffect(() => {
-    checkMovieStatus();
-  }, [movie.id, dbUser._id]);
+    if (dbUser && movie.id) {
+      checkMovieStatus();
+    }
+  }, [movie.id, dbUser]);
+
 
   // Simple function to add to watchlist with seenMovie=false
   const addToWatchlist = async () => {
