@@ -12,7 +12,6 @@ import { PublicProfile } from './pages/PublicProfile';
 import './App.css';
 import React from "react";
 import { UserProvider } from './context/UserContext';
-import "./App.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import {ToastProvider} from "./components/Toast";
 import './styles/Toast.css';

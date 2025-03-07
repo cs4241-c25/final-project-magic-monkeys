@@ -21,7 +21,7 @@
     color: #ffffff;
     padding: 8px 14px;
     border-radius: 4px;
-    background-color: #373737;
+    background-color: var(--color-bg-dark);
     font-family: 'Cabin';
 }
 
@@ -33,7 +33,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #373737;
+    background-color: var(--color-bg-dark);
     border: none;
     display: flex;
     align-items: center;
@@ -51,7 +51,7 @@
     position: absolute;
     top: 45px;
     right: 0;
-    background-color: #373737;
+    background-color: var(--color-bg-dark);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     overflow: hidden;
@@ -113,7 +113,7 @@
 .group-top-section {
     display: flex;
     flex-direction: column;
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 20px;
@@ -143,7 +143,7 @@
     display: flex;
     flex-direction: column;
     max-height: auto;
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     overflow: hidden;
     transition: height 0.3s ease-in-out;
 }
@@ -225,7 +225,7 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    background: #333333;
+    background: var(--color-bg-dark);
     min-height: auto;
     transition: height 0.3s ease-in-out;
     height: auto;
@@ -233,7 +233,7 @@
 }
 
 .calendar-toggle-btn {
-    background: #2A2A2A !important;
+    background: var(--color-bg-darker) !important;
 }
 
 .status-icons {
@@ -326,7 +326,7 @@
 }
 
 .current-day{
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     color: var(--primary);
     border-radius: 0px;
 }
@@ -380,7 +380,7 @@
     height: 50px;
     gap: 10px;
     padding: 10px;
-    background-color: #2A2A2A;
+    background-color: var(--color-bg-darker);
     border-radius: 5px;
     margin-bottom: 10px;
 }
@@ -438,7 +438,7 @@
 }
 
 .group-members-box {
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     border-radius: 8px;
     padding: 20px;
     height: 320px;
@@ -497,7 +497,7 @@
 }
 
 .activity-header {
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     padding: 20px;
 }
 
@@ -509,7 +509,7 @@
 
 .activity-list-container {
     flex: 1;
-    background: #333333;
+    background: var(--color-bg-dark);
     padding: 20px;
     overflow-y: auto;
 }
@@ -517,15 +517,22 @@
 .activity-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
 }
 
 .activity-item {
     display: flex;
     align-items: center;
-    gap: 5px;
     color: #aaaaaa;
-    padding: 5px 0;
+    padding: 7px 9px;
+    border-radius: 3px;
+}
+
+.activity-even{
+    background-color: var(--color-bg-dark);
+}
+
+.activity-odd{
+    background-color: var(--color-bg-medium);
 }
 
 .bullet {
@@ -557,7 +564,7 @@
 }
 
 .group-scores-box {
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     border-radius: 8px;
     height: 500px;
     display: flex;
@@ -569,7 +576,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     z-index: 1;
@@ -658,7 +665,7 @@
 }
 
 .group-tierlist-box {
-    background: #2A2A2A;
+    background: var(--color-bg-darker);
     border-radius: 8px;
     padding: 20px;
     height: 500px;

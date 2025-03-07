@@ -233,7 +233,7 @@ export const Dashboard = () => {
     const fetchHappenings = async () => {
       setIsHappeningsLoading(true);
       try {
-        const response = await fetch(`${BACKEND_URL}/api/users/67c8c90e4255e8e3812db203/user-happenings`);
+        const response = await fetch(`${BACKEND_URL}/api/users-groups/${dbUser._id}/user-happenings`);
         if (response.ok) {
           const happeningsData = await response.json();
           

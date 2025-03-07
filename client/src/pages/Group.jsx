@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { SideNav } from '../components/SideNav';
 import { useAuth0 } from '@auth0/auth0-react';
-import { BiChevronDown, BiChevronUp, BiFilterAlt, BiChevronRight, BiTransfer, BiMenu } from 'react-icons/bi';
+import { BiMenu } from 'react-icons/bi';
 import '../styles/Dashboard.css';
 import '../styles/Group.css';
 import {useGroupData} from "../hooks/useGroupData";
@@ -632,13 +632,15 @@ export const Group = () => {
                         </div>
 
                         <div className="group-activity-box">
-                            <div className="activity-header">
+                        <div className="activity-header">
                                 <h2>The Happenings</h2>
                             </div>
                             <div className="activity-list-container">
                                 <div className="activity-list">
-                                    {activity.map(item => (
-                                        <div key={item.id} className="activity-item">
+                                    {activity
+                                        .filter(item => item.userId._id !== dbUser._id)
+                                        .map((item, index) => (
+                                        <div key={item.id} className={`activity-item ${index % 2 === 0 ? 'activity-even' : 'activity-odd'}`}>
                                             <span className="bullet">•</span>
                                             <span className="activity-happening">{item.happening}</span>
                                             {/*<span className="activity-timestamp">{item.createdAt}</span>*/}

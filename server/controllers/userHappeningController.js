@@ -2,6 +2,7 @@ import UserHappening from "../models/UserHappening.js";
 import User from "../models/User.js";
 import Group from "../models/Group.js"
 import UserGroup from "../models/UserGroups.js"
+import UserGroups from "../models/UserGroups.js";
 
 const MAX_HAPPENINGS = 10;
 
@@ -91,13 +92,48 @@ export const getUserHappeningsByGroup = async (req, res) => {
 
         const happenings = await UserHappening.find({ userId: { $in: userIds } })
             .sort({ createdAt: -1 })
-            .populate("userId","username profilePicture");
+            .populate("userId","userId username profilePicture");
 
         res.status(200).json(happenings);
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const getAllUsersGroupHappenings = async (req, res) => {
+    try{
+        const { userId } = req.params;
+
+        const userGroups = await UserGroups.find({ userId }).select("groupId");
+        const groupIds = userGroups.map(group => group.groupId);
+
+        if(groupIds.length === 0){
+            return res.json([]);
+        }
+
+        const groupUsers = await UserGroups.find({ groupId: { $in: groupIds }, userId: { $ne: userId } })
+            .select("userId");
+        const userIdsInGroups = groupUsers.map(groupUser => groupUser.userId);
+
+        if(userIdsInGroups.length === 0){
+            return res.json([]);
+        }
+
+        const allHappenings = await UserHappening.find({ 
+            userId: { $in: userIdsInGroups }
+        })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const uniqueHappenings = Array.from(new Map(
+            allHappenings.map(happening => [happening._id.toString(), happening])
+        ).values());
+
+        res.json(uniqueHappenings);
+    } catch (error){
+        res.status(500).json({ message: "Server error" });
+    }
+}
 
 export const deleteUserHappening = async (req, res) => {
     try {
