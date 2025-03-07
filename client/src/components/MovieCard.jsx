@@ -37,11 +37,11 @@ export const MovieCard = ({ movie, cardRatings, isUpcoming, onClick }) => (
       </div>
     </div>
     {isUpcoming && (
-      <p>Release Date: {new Date(movie.release_date).toLocaleDateString('en-US', {
+      <p>Release Date: <span className="release-date-date">{new Date(movie.release_date).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
-      })}</p>
+      })}</span></p>
     )}
   </div>
 ); 

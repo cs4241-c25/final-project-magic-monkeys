@@ -8,6 +8,7 @@ import { useUser } from '../context/UserContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { SideNav } from '../components/SideNav';
 import { useParams, useNavigate } from 'react-router-dom';
+import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 export const MovieDemo = () => {
   const { isLoading } = useAuth0();
@@ -340,7 +341,7 @@ export const MovieDemo = () => {
               onMouseDown={() => startScrolling('left', 'now-playing-grid')}
               onMouseUp={stopScrolling}
               onMouseLeave={stopScrolling}
-            >←</button>
+            ><FiArrowLeft /></button>
             <div className="movie-grid" id="now-playing-grid">
               {nowPlaying.map(movie => (
                 <MovieCard 
@@ -357,7 +358,7 @@ export const MovieDemo = () => {
               onMouseDown={() => startScrolling('right', 'now-playing-grid')}
               onMouseUp={stopScrolling}
               onMouseLeave={stopScrolling}
-            >→</button>
+            ><FiArrowRight /></button>
           </div>
         </div>
 
@@ -369,7 +370,7 @@ export const MovieDemo = () => {
               onMouseDown={() => startScrolling('left', 'upcoming-grid')}
               onMouseUp={stopScrolling}
               onMouseLeave={stopScrolling}
-            >←</button>
+            ><FiArrowLeft /></button>
             <div className="movie-grid" id="upcoming-grid">
               {upcoming.map(movie => (
                 <MovieCard 
@@ -386,7 +387,7 @@ export const MovieDemo = () => {
               onMouseDown={() => startScrolling('right', 'upcoming-grid')}
               onMouseUp={stopScrolling}
               onMouseLeave={stopScrolling}
-            >→</button>
+            ><FiArrowRight /></button>
           </div>
         </div>
       </header>

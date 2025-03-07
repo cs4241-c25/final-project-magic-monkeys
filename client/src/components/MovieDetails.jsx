@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
-// import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth0 } from "@auth0/auth0-react";
 import { useUser } from '../context/UserContext';
 import { ReviewModal } from './ReviewModal';
 import { BsTicket } from "react-icons/bs";
 import { TicketRating } from './TicketRating';
-
+import { FiX } from "react-icons/fi";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
@@ -19,12 +19,12 @@ export const MovieDetails = ({
   renderReviews 
 }) => {
   const [showApiDetails, setShowApiDetails] = useState(false);
-  // const { user } = useAuth0();
   const [apiData, setApiData] = useState(null);
   const [director, setDirector] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const { dbUser } = useUser();
+  const { loginWithRedirect } = useAuth0();
   const [userReview, setUserReview] = useState(null);
 
   const [isInWatchlist, setIsInWatchlist] = useState(false);
@@ -34,41 +34,29 @@ export const MovieDetails = ({
   const [tierListEntryId, setTierListEntryId] = useState(null);
 
   const checkMovieStatus = async () => {
-
     try {
       if (!dbUser) return;
-
       // Get user's watchlist
       console.log(`Checking movie status for movie ID: ${movie.id}`);
       const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/watch-lists`);
-
       console.log("Watchlist response status:", response.status);
-
       if (response.ok) {
         const watchlist = await response.json();
         console.log("Full watchlist data:", watchlist);
-
         const entry = watchlist.find(item => item.movieId === movie.id);
         console.log('Found entry for this movie:', entry);
-
         if (entry) {
-          console.log('Entry seenMovie value:', entry.seenMovie, 'Type:', typeof entry.seenMovie);
-          console.log('Boolean conversion:', Boolean(entry.seenMovie));
-
           setIsInWatchlist(true);
-          setIsWatched(Boolean(entry.seenMovie)); // Ensure it's a boolean
+          setIsWatched(Boolean(entry.seenMovie));
           setWatchlistEntryId(entry._id);
-          console.log('Updated state - isInWatchlist:', true, 'isWatched:', Boolean(entry.seenMovie), 'watchlistEntryId:', entry._id);
         } else {
           setIsInWatchlist(false);
           setIsWatched(false);
           setWatchlistEntryId(null);
-          console.log('Updated state - isInWatchlist:', false, 'isWatched:', false, 'watchlistEntryId:', null);
         }
       } else {
         console.error("Failed to fetch watchlist:", response.status);
       }
-
       // Also check if movie is in tier list
       await checkIsInTierList();
     } catch (error) {
@@ -80,22 +68,17 @@ export const MovieDetails = ({
     try {
       console.log(`Checking if movie ${movie.id} is in tier list`);
       const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/tier-lists`);
-
       if (response.ok) {
         const tierList = await response.json();
         console.log("Full tier list data:", tierList);
-
         const entry = tierList.find(item => item.movieId === movie.id);
         console.log('Found tier list entry:', entry);
-
         if (entry) {
           setIsInTierList(true);
           setTierListEntryId(entry._id);
-          console.log('Updated state - isInTierList:', true, 'tierListEntryId:', entry._id);
         } else {
           setIsInTierList(false);
           setTierListEntryId(null);
-          console.log('Updated state - isInTierList:', false, 'tierListEntryId:', null);
         }
       } else {
         console.error("Failed to fetch tier list:", response.status);
@@ -111,33 +94,38 @@ export const MovieDetails = ({
     }
   }, [movie.id, dbUser]);
 
+  // Rate & Review Button handler
+  const handleReviewButtonClick = () => {
+    if (!dbUser) {
+      loginWithRedirect();
+      return;
+    }
+    setShowReviewModal(true);
+  };
 
-  // Simple function to add to watchlist with seenMovie=false
+  // Add to Watchlist function with auth check
   const addToWatchlist = async () => {
+    if (!dbUser) {
+      loginWithRedirect();
+      return;
+    }
     try {
       console.log("Adding to watchlist with seenMovie=false");
-
       const response = await fetch(`${BACKEND_URL}/api/watch-lists`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: dbUser._id,
           movieId: movie.id,
-          seenMovie: false // Explicitly set to false
+          seenMovie: false
         })
       });
-      
       if (response.ok) {
         const data = await response.json();
         console.log("Watchlist entry created:", data);
-
-        // Update UI state
         setIsInWatchlist(true);
         setIsWatched(false);
         setWatchlistEntryId(data._id);
-
         alert('Added to watchlist successfully!');
       } else {
         const errorData = await response.json();
@@ -149,30 +137,26 @@ export const MovieDetails = ({
     }
   };
 
-  // Simple function to remove from watchlist
   const removeFromWatchlist = async () => {
+    if (!dbUser) {
+      loginWithRedirect();
+      return;
+    }
     try {
       if (!isInWatchlist || !watchlistEntryId) {
         throw new Error('Movie is not in your watchlist');
       }
-
       console.log("Removing from watchlist");
-
-      // Delete the watchlist entry
       const response = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
         method: 'DELETE',
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error('Failed to remove from watchlist: ' + (errorData.message || 'Unknown error'));
       }
-
-      // Update UI state
       setIsInWatchlist(false);
       setIsWatched(false);
       setWatchlistEntryId(null);
-
       await checkMovieStatus();
       alert('Removed from watchlist!');
     } catch (error) {
@@ -181,16 +165,17 @@ export const MovieDetails = ({
     }
   };
 
-  // Simple function to add to tier list with rank "U"
+  // Add to Tier List function with auth check
   const addToTierList = async () => {
+    if (!dbUser) {
+      loginWithRedirect();
+      return;
+    }
     try {
       console.log("Adding to tier list with rank U");
-
       const response = await fetch(`${BACKEND_URL}/api/tier-lists`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: dbUser._id,
           movieId: movie.id,
@@ -198,15 +183,11 @@ export const MovieDetails = ({
           order: 1
         })
       });
-
       if (response.ok) {
         const data = await response.json();
         console.log("Tier list entry created:", data);
-
-        // Update UI state
         setIsInTierList(true);
         setTierListEntryId(data._id);
-
         await checkMovieStatus();
         alert('Added to tier list successfully!');
       } else {
@@ -219,29 +200,25 @@ export const MovieDetails = ({
     }
   };
 
-  // Simple function to remove from tier list
   const removeFromTierList = async () => {
+    if (!dbUser) {
+      loginWithRedirect();
+      return;
+    }
     try {
       if (!isInTierList || !tierListEntryId) {
         throw new Error('Movie is not in your tier list');
       }
-
       console.log("Removing from tier list");
-
-      // Delete the tier list entry
       const response = await fetch(`${BACKEND_URL}/api/tier-lists/${tierListEntryId}`, {
         method: 'DELETE',
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error('Failed to remove from tier list: ' + (errorData.message || 'Unknown error'));
       }
-
-      // Update UI state
       setIsInTierList(false);
       setTierListEntryId(null);
-
       await checkMovieStatus();
       alert('Removed from tier list!');
     } catch (error) {
@@ -263,7 +240,6 @@ export const MovieDetails = ({
         console.error('Error fetching director:', err);
       }
     };
-
     fetchDirector();
   }, [movie.id]);
 
@@ -280,9 +256,7 @@ export const MovieDetails = ({
     }
   };
 
-
   const handleReviewSubmitted = async () => {
-    // Refresh the reviews section if it exists
     if (renderReviews) {
       renderReviews();
     }
@@ -291,7 +265,6 @@ export const MovieDetails = ({
   const fetchUserReview = async () => {
     try {
       if (!dbUser) return;
-
       const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/movie/${movie.id}`);
       if (response.ok) {
         const review = await response.json();
@@ -302,37 +275,34 @@ export const MovieDetails = ({
     }
   };
 
-  // Add useEffect to fetch review when movie changes
   useEffect(() => {
     fetchUserReview();
   }, [movie.id, dbUser]);
 
   const toggleWatchlist = async () => {
+    if (!dbUser) {
+      loginWithRedirect();
+      return;
+    }
     try {
       if (isInWatchlist) {
-        // Delete the watchlist entry
         const response = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
           method: 'DELETE',
         });
-
         if (response.ok) {
           await checkMovieStatus();
           alert('Removed from watchlist!');
         }
       } else {
-        // Add to watchlist
         const response = await fetch(`${BACKEND_URL}/api/watch-lists`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId: dbUser._id,
             movieId: movie.id,
             seenMovie: false
           })
         });
-
         if (response.ok) {
           await checkMovieStatus();
           alert('Added to watchlist successfully!');
@@ -345,85 +315,63 @@ export const MovieDetails = ({
   };
 
   const toggleWatched = async () => {
+    if (!dbUser) {
+      loginWithRedirect();
+      return;
+    }
     try {
       if (isWatched) {
-        // Update watchlist entry to unwatched
         const watchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            seenMovie: false
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ seenMovie: false })
         });
-
         if (watchlistResponse.ok) {
-          // Find and remove from tierlist using userId and movieId
           const tierlistResponse = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/tier-lists`);
           if (tierlistResponse.ok) {
             const tierlist = await tierlistResponse.json();
             const tierEntry = tierlist.find(item => item.movieId === movie.id);
-
             if (tierEntry) {
-              // Delete the tier list entry
               const deleteResponse = await fetch(`${BACKEND_URL}/api/tier-lists/${tierEntry._id}`, {
                 method: 'DELETE'
               });
-
               if (!deleteResponse.ok) {
                 console.error('Failed to remove from tier list');
               }
             }
           }
-
           setIsWatched(false);
           await checkMovieStatus();
           alert('Movie marked as unwatched!');
         }
       } else {
-        // If not in watchlist, create a watchlist entry first
         if (!isInWatchlist) {
           const createWatchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               userId: dbUser._id,
               movieId: movie.id,
               seenMovie: true
             })
           });
-
           if (!createWatchlistResponse.ok) {
             throw new Error('Failed to create watchlist entry');
           }
-
           await checkMovieStatus();
         } else {
-          // Update existing watchlist entry to watched
           const watchlistResponse = await fetch(`${BACKEND_URL}/api/watch-lists/${watchlistEntryId}`, {
             method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              seenMovie: true
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ seenMovie: true })
           });
-
           if (!watchlistResponse.ok) {
             throw new Error('Failed to update watchlist');
           }
         }
-
-        // Add to tierlist
         const tierlistResponse = await fetch(`${BACKEND_URL}/api/tier-lists`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId: dbUser._id,
             movieId: movie.id,
@@ -431,7 +379,6 @@ export const MovieDetails = ({
             order: 1
           })
         });
-
         if (tierlistResponse.ok) {
           setIsWatched(true);
           await checkMovieStatus();
@@ -446,7 +393,7 @@ export const MovieDetails = ({
 
   return (
     <div className="search-result">
-      <button onClick={handleCloseMovie} className="close-button">×</button>
+      <button onClick={handleCloseMovie} className="close-button"><FiX /></button>
       <div className="movie-details">
         {movie.poster_path && (
           <img 
@@ -457,17 +404,8 @@ export const MovieDetails = ({
         )}
         <div className="movie-info">
           <div className="flex items-center justify-between">
-
-            <h1>{movie.title}</h1>
-            {/*<button*/}
-            {/*    onClick={() => setShowReviewModal(true)}*/}
-            {/*    className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"*/}
-            {/*>*/}
-            {/*  <BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>*/}
-            {/*  <span className="text-white font-medium">Rate & Review</span>*/}
-            {/*</button>*/}
+            <h1 className="movie-title">{movie.title}</h1>
             <div className="flex items-center gap-4">
-
               {userReview ? (
                 <>
                   <div className="flex items-center mb-3">
@@ -480,17 +418,28 @@ export const MovieDetails = ({
                     />
                   </div>
                   <button
-                      onClick={() => setShowReviewModal(true)}
+                      onClick={() => {
+                        if (!dbUser) {
+                          loginWithRedirect();
+                          return;
+                        }
+                        setShowReviewModal(true);
+                      }}
                       className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
                   >
-                    {/*<BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>*/}
                     <span className="text-white font-medium">Edit</span>
                   </button>
                 </>
               ) : (
                 <button
-                    onClick={() => setShowReviewModal(true)}
-                    className="flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
+                    onClick={() => {
+                      if (!dbUser) {
+                        loginWithRedirect();
+                        return;
+                      }
+                      setShowReviewModal(true);
+                    }}
+                    className="rate-review-button flex items-center gap-2 px-2 py-2 mb-5 hover:bg-[#444444] rounded-lg transition-colors group"
                 >
                   <BsTicket className="text-2xl text-[#ff4b4b] group-hover:text-[#ff716d] transition-colors"/>
                   <span className="text-white font-medium">Rate & Review</span>
@@ -498,19 +447,26 @@ export const MovieDetails = ({
               )}
             </div>
           </div>
-            <button onClick={fetchApiDetails} className="api-details-button">
-              API Details
-            </button>
-
             <button
-                onClick={isInWatchlist ? removeFromWatchlist : addToWatchlist}
+                onClick={() => {
+                  if (!dbUser) {
+                    loginWithRedirect();
+                    return;
+                  }
+                  isInWatchlist ? removeFromWatchlist() : addToWatchlist();
+                }}
                 className="api-details-button mx-2"
             >
               {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
             </button>
-
             <button
-                onClick={isInTierList ? removeFromTierList : addToTierList}
+                onClick={() => {
+                  if (!dbUser) {
+                    loginWithRedirect();
+                    return;
+                  }
+                  isInTierList ? removeFromTierList() : addToTierList();
+                }}
                 className="api-details-button mx-2"
             >
               {isInTierList ? "Haven't Watched" : 'Have Watched'}
@@ -518,9 +474,16 @@ export const MovieDetails = ({
             <p className="overview">{movie.overview}</p>
             {director && (
                 <p className="director">
-                  <span>🎬 Director:</span> {director.name}
+                  <span>Director:</span> {director.name}
                 </p>
             )}
+            <p className="release-date">
+              <span>Release Date:</span> {new Date(movie.release_date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+            </p>
             <div className="ratings">
               {ratings.rt && (
                   <a
@@ -530,13 +493,13 @@ export const MovieDetails = ({
                       className="rating rt-rating"
                   >
                     <img
-                        src={parseInt(ratings.rt) >= 60 ?
-                            'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg' :
-                            'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/tomatometer-rotten.f1ef4f02ce3.svg'
-                        }
-                        alt="Tomato Score"
-                        className="tomato-icon"
-                    />
+                      src={parseInt(ratings.rt) >= 60 ? 
+                        'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg' : 
+                        'https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/tomatometer-rotten.f1ef4f02ce3.svg'
+                      } 
+                      alt="Tomato Score"
+                      className="tomato-icon"
+                  />
                     <span>Score:</span> {ratings.rt}
                   </a>
               )}
@@ -548,48 +511,32 @@ export const MovieDetails = ({
                       className="rating imdb-rating"
                   >
                     <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
-                        alt="IMDb"
-                        className="imdb-icon"
-                    />
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
+                      alt="IMDb"
+                      className="imdb-icon"
+                  />
                     <span>Rating:</span> {ratings.imdb}/10
                   </a>
               )}
-              <a
-                  href={`https://www.themoviedb.org/movie/${movie.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rating tmdb-rating"
-              >
-                <span>⭐ TMDB Rating:</span> {movie.vote_average.toFixed(1)}/10
-              </a>
             </div>
-            <p className="release-date">
-              <span>🗓 Release Date:</span> {new Date(movie.release_date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-            </p>
           </div>
           {selectedTrailer && (
-              <div className="trailer-container">
-            <iframe
-              title="Movie Trailer"
-              width="560"
-              height="315"
-              src={`https://www.youtube.com/embed/${selectedTrailer.key}`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        )}
+            <div className="trailer-container">
+              <iframe
+                title="Movie Trailer"
+                width="560"
+                height="315"
+                src={`https://www.youtube.com/embed/${selectedTrailer.key}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          )}
       </div>
       {renderWatchProviders()}
       {renderCast()}
       {renderReviews()}
-
       <Modal 
         isOpen={showApiDetails} 
         onClose={() => setShowApiDetails(false)}
@@ -697,7 +644,6 @@ export const MovieDetails = ({
           </div>
         )}
       </Modal>
-
       <ReviewModal
           isOpen={showReviewModal}
           onClose={() => setShowReviewModal(false)}
@@ -711,4 +657,4 @@ export const MovieDetails = ({
       />
     </div>
   );
-}; 
+};
