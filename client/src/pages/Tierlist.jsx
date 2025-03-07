@@ -17,7 +17,7 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-// Tiers structure (no dummy items)
+// The "unranked" tier is now keyed as "U" instead of "pool"
 const initialTiers = {
   S: { items: [], label: 'S Tier' },
   A: { items: [], label: 'A Tier' },
@@ -25,7 +25,7 @@ const initialTiers = {
   C: { items: [], label: 'C Tier' },
   D: { items: [], label: 'D Tier' },
   F: { items: [], label: 'F Tier' },
-  pool: { items: [], label: 'Unranked Movies' }, // for rank "U"
+  U: { items: [], label: 'Unranked Movies' }, // rank "U"
 };
 
 export const Tierlist = () => {
@@ -34,24 +34,23 @@ export const Tierlist = () => {
   const [isLocked, setIsLocked] = useState(true);
   const [tiers, setTiers] = useState(initialTiers);
 
-  // 1) Fetch user's TierList from the backend and 2) fetch TMDB title/poster
+  // Fetch user's TierList from the backend
   useEffect(() => {
     if (!dbUser) return;
 
     const fetchTierList = async () => {
       try {
-        // GET the user's tier list from your /api/users/:userId/tier-lists route
+        // GET the user's tier list: /api/users/:userId/tier-lists
         const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/tier-lists`);
         if (!response.ok) {
-          console.warn("No existing tier list or error fetching it. Possibly empty.");
+          console.warn('No existing tier list or error fetching it. Possibly empty.');
           return;
         }
-        // This should return an array of TierList docs:
-        // [ { _id, userId, movieId, rank, order }, ... ]
+
+        // e.g. [ { _id, userId, movieId, rank, order }, ... ]
         const savedData = await response.json();
 
-        // We'll augment each doc with TMDB info (title & poster)
-        // using the new getMovieBase method in tmdbAPI
+        // Enrich each doc with TMDB title/poster
         const withDetails = await Promise.all(
           savedData.map(async (doc) => {
             try {
@@ -62,7 +61,7 @@ export const Tierlist = () => {
                 poster_path: baseData.poster_path || null,
               };
             } catch (err) {
-              console.error("Failed to get TMDB data for doc:", doc, err);
+              console.error('Failed to fetch TMDB data for doc:', doc, err);
               return {
                 ...doc,
                 title: 'Unknown Movie',
@@ -72,28 +71,29 @@ export const Tierlist = () => {
           })
         );
 
-        // Build up a fresh tier object
+        // Build a fresh copy of initialTiers
         const newTiers = structuredClone(initialTiers);
 
-        // Place each doc in its correct tier or the unranked pool
+        // Distribute movies into the correct tier, defaulting to "U" if rank missing
         withDetails.forEach((doc) => {
-          const rank = doc.rank || 'U';
+          const rank = doc.rank || 'U';  // fallback
           const movieObj = {
-            id: String(doc.movieId), // used for Draggable key
+            id: String(doc.movieId),
             title: doc.title,
             poster: doc.poster_path
               ? `https://image.tmdb.org/t/p/w500${doc.poster_path}`
               : null,
           };
 
+          // If rank is "U", push to unranked items
           if (rank === 'U') {
-            newTiers.pool.items.push(movieObj);
+            newTiers.U.items.push(movieObj);
           } else if (newTiers[rank]) {
             newTiers[rank].items.push(movieObj);
           }
         });
 
-        // Sort each rank by "order"
+        // Sort each rank by "order" (S, A, B, C, D, F)
         for (const rank of ['S', 'A', 'B', 'C', 'D', 'F']) {
           newTiers[rank].items.sort((a, b) => {
             const docA = withDetails.find((d) => String(d.movieId) === a.id);
@@ -104,36 +104,33 @@ export const Tierlist = () => {
 
         setTiers(newTiers);
       } catch (error) {
-        console.error("Error fetching tier list:", error);
+        console.error('Error fetching tier list:', error);
       }
     };
 
     fetchTierList();
   }, [dbUser]);
 
-  // Called when a drag ends
+  // Drag & Drop event
   const onDragEnd = (result) => {
     if (!result.destination || isLocked) return;
 
     const sourceKey = result.source.droppableId;
     const destKey = result.destination.droppableId;
 
-    // Reordering within the same tier
+    // If dragging within the same tier
     if (sourceKey === destKey) {
-      const reorderedItems = reorder(
+      const reordered = reorder(
         tiers[sourceKey].items,
         result.source.index,
         result.destination.index
       );
       setTiers((prev) => ({
         ...prev,
-        [sourceKey]: {
-          ...prev[sourceKey],
-          items: reorderedItems,
-        },
+        [sourceKey]: { ...prev[sourceKey], items: reordered },
       }));
     } else {
-      // Moving between tiers
+      // Moving between different tiers
       const sourceItems = Array.from(tiers[sourceKey].items);
       const [removed] = sourceItems.splice(result.source.index, 1);
       const destItems = Array.from(tiers[destKey].items);
@@ -147,33 +144,31 @@ export const Tierlist = () => {
     }
   };
 
-  // Save the updated tiers to your backend
+  // Save changes to the backend
   const handleSave = async () => {
     if (!dbUser) {
-      console.error("No dbUser found; can't save tier list yet.");
-      alert("Please wait until your profile loads before saving your tier list.");
+      console.error('dbUser is null; cannot save tier list yet.');
+      alert('Please wait until your profile loads before saving your tier list.');
       return;
     }
     try {
       const response = await fetch(`${BACKEND_URL}/api/tier-lists/bulk-save`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: dbUser._id,
-          tiers
+          tiers,
         }),
       });
-
       if (!response.ok) {
-        throw new Error("Failed to save tier list.");
+        throw new Error('Failed to save tier list.');
       }
-
       const data = await response.json();
-      console.log("Tier list saved:", data);
-      alert("Tier list saved successfully!");
+      console.log('Tier list saved:', data);
+      alert('Tier list saved successfully!');
     } catch (error) {
-      console.error("Error saving tier list:", error);
-      alert("An error occurred while saving your tier list.");
+      console.error('Error saving tier list:', error);
+      alert('An error occurred while saving your tier list.');
     }
   };
 
@@ -203,7 +198,7 @@ export const Tierlist = () => {
 
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="tier-container">
-            {/* Ranks S, A, B, C, D, F */}
+            {/* Tiers S, A, B, C, D, F */}
             {['S', 'A', 'B', 'C', 'D', 'F'].map((tierKey) => (
               <div className="tier-row" key={tierKey}>
                 <div className="tier-label">{tierKey}</div>
@@ -258,14 +253,14 @@ export const Tierlist = () => {
             {/* Unranked Movies (rank = "U") */}
             <div className="content-section mt-4">
               <h2 className="text-lg font-semibold mb-4">Unranked Movies</h2>
-              <Droppable droppableId="pool" direction="horizontal" isDropDisabled={isLocked}>
+              <Droppable droppableId="U" direction="horizontal" isDropDisabled={isLocked}>
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className="tier-movies"
                   >
-                    {tiers.pool.items.map((movie, index) => (
+                    {tiers.U.items.map((movie, index) => (
                       <Draggable
                         key={movie.id}
                         draggableId={movie.id}

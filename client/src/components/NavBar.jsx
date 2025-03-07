@@ -1,28 +1,58 @@
 import { Link } from 'react-router-dom';
 import { useAuth0 } from "@auth0/auth0-react";
-
-
+import { BiMoviePlay } from 'react-icons/bi';
+import '../styles/NavBar.css';
 
 export const NavBar = ({ currentFont, toggleFont, isDarkTheme, toggleTheme }) => {
-    const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
-    const handleLogout = () => {
-        console.log("Logging out...");
-        logout({ logoutParams: { returnTo: window.location.origin } });
-    };
+  const { loginWithRedirect, logout, isAuthenticated } = useAuth0();
 
-    return (
-    <nav className="nav-bar flex items-center justify-between">
-      {/* <button 
-        onClick={toggleFont} 
-        className="font-toggle"
-        style={{ fontFamily: currentFont }}
-      >
-        {currentFont}
-      </button> */}
-            <h1 className="site-title flex-1 text-center">Movie Mates</h1>
-        {/* <button onClick={toggleTheme} className="theme-toggle">
-        {isDarkTheme ? '🌙' : '☀️'}
-      </button> */}
+  const handleLogout = () => {
+    logout({ logoutParams: { returnTo: window.location.origin } });
+  };
+
+  const handleProtectedClick = (e) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      loginWithRedirect();
+    }
+  };
+
+  return (
+    <nav className="nav-bar">
+      <h1 className="site-title">
+        <Link to="/">Movie Mates</Link>
+      </h1>
+
+      <div className="nav-items-right">
+        <div className="nav-links">
+          <Link to="/movies" className="nav-link">
+            Movies
+          </Link>
+          <Link 
+            to="/dashboard" 
+            className="nav-link"
+            onClick={handleProtectedClick}
+          >
+            Dashboard
+          </Link>
+          <button
+            onClick={() => loginWithRedirect()}
+            className="nav-link"
+          >
+            Create/Join Group
+          </button>
+        </div>
+        
+        {!isAuthenticated ? (
+          <button onClick={() => loginWithRedirect()} className="nav-link">
+            Log In
+          </button>
+        ) : (
+          <button onClick={handleLogout} className="nav-link">
+            Log Out
+          </button>
+        )}
+      </div>
     </nav>
   );
-}; 
+};

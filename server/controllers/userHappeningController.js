@@ -1,5 +1,7 @@
 import UserHappening from "../models/UserHappening.js";
 import User from "../models/User.js";
+import Group from "../models/Group.js"
+import UserGroup from "../models/UserGroups.js"
 
 const MAX_HAPPENINGS = 10;
 
@@ -64,6 +66,32 @@ export const getUserHappeningsByUser = async (req, res) => {
         if (!happenings.length) {
             return res.status(200).json([]);
         }
+
+        res.status(200).json(happenings);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+export const getUserHappeningsByGroup = async (req, res) => {
+    try {
+        const { groupId } = req.params;
+
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        const userGroups = await UserGroup.find({ groupId }).select("userId");
+        if(!userGroups.length){
+            return res.status(404).json({ message: "No users found in this group." });
+        }
+
+        const userIds = userGroups.map(ug => ug.userId);
+
+        const happenings = await UserHappening.find({ userId: { $in: userIds } })
+            .sort({ createdAt: -1 })
+            .populate("userId","username profilePicture");
 
         res.status(200).json(happenings);
     } catch (error) {

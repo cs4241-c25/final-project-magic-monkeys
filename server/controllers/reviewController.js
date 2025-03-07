@@ -66,7 +66,22 @@ export const getReviewsByUser = async (req, res) => {
     }
 };
 
-export const getGroupMovieAverageRating = async (req, res) => {
+export const getReviewByUserMovie = async (req, res) => {
+    try {
+        const { userId, movieId } = req.params;
+
+        const review = await Review.findOne({ userId, movieId });
+        if (!review) {
+            return res.status(404).json({ message: "Review not found." });
+        }
+
+        res.status(200).json(review);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
+
+export const getGroupAverageMovieReview = async (req, res) => {
     try {
         const { groupId, movieId } = req.params;
 

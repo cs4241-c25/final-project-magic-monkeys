@@ -175,10 +175,8 @@ export const useGroupData = (groupId) => {
                 setScores(mockScores);
             }
 
-            setActivity([
-                { id: '1', user: 'John', action: 'gave', movie: 'Nosferatu', rating: 4.5, timestamp: '2 hours ago' },
-                { id: '2', user: 'Sarah', action: 'gave', movie: 'Interstellar', rating: 5, timestamp: '1 day ago' }
-            ]);
+            const happenings = await groupAPI.getGroupHappenings(groupId);
+            setActivity(happenings);
 
         } catch (err) {
             console.error('Error fetching group data:', err);
@@ -257,8 +255,6 @@ export const useGroupData = (groupId) => {
         scores,
         movieNightSchedules,
         movieNights,
-        // showtime: getNextShowtime(),
-        showtime,
         loading,
         error,
         refreshData

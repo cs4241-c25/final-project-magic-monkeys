@@ -6,6 +6,7 @@ import { tmdbAPI } from '../services/tmdbAPI';
 import { omdbAPI } from '../services/omdbAPI';
 import { useUser } from '../context/UserContext';
 import { useAuth0 } from '@auth0/auth0-react';
+import { SideNav } from '../components/SideNav';
 import { useParams, useNavigate } from 'react-router-dom';
 
 export const MovieDemo = () => {
@@ -22,6 +23,7 @@ export const MovieDemo = () => {
   const [cast, setCast] = useState([]);
   const { movieId } = useParams();
   const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const { nowPlaying, upcoming, loading, error } = useMovieData();
 
@@ -58,7 +60,7 @@ export const MovieDemo = () => {
         }
       }
     };
-    
+
     loadMovieFromUrl();
   }, [movieId, fetchMovieDetails, movie]);
 
@@ -109,12 +111,11 @@ export const MovieDemo = () => {
   };
 
   const handleCloseMovie = () => {
-    setMovie(null);
-    setSelectedTrailer(null);
-    // If we're on a movie details URL, navigate back to the main movies page
-    if (movieId) {
-      navigate('/movies');
-    }
+    navigate('/movies', { replace: true });
+    setTimeout(() => {
+      setMovie(null);
+      setSelectedTrailer(null);
+    }, 0);
   };
 
   const scrollToTop = () => {
@@ -304,6 +305,9 @@ export const MovieDemo = () => {
 
   return (
     <div className="movie-demo">
+      {isAuthenticated && (
+          <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      )}
       <header className="App-header">
         <form onSubmit={searchMovie} className="search-form">
           <input

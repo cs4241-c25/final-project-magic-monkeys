@@ -6,15 +6,18 @@ import WatchList from "../models/WatchList.js";
 
 export const createUser = async (req, res) => {
     try {
-
-        console.log("Received request to create user: " + req.body);
-
         const { auth0Id, username, email, profilePicture, favoriteMovie } = req.body;
+
+        console.log("Received request to create user: { Auth0Id: ", auth0Id," }, { Email: ", email, " }, { Username: ", username, " }");
 
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             console.log("User already exists: " + existingUser);
             return res.status(400).json({ message: "Username or email already in use." });
+        }
+
+        if(!username){
+            username = email.split("@")[0];
         }
 
         let uniqueUsername = username;
@@ -26,7 +29,7 @@ export const createUser = async (req, res) => {
 
         const newUser = new User({
             auth0Id,
-            uniqueUsername,
+            username: uniqueUsername,
             email,
             profilePicture,
             favoriteMovie,
@@ -130,3 +133,17 @@ export const deleteUser = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+export const getUserByUsername = async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await User.findOne({ username });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
+  

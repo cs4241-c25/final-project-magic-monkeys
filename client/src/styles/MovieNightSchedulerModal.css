@@ -1,0 +1,13 @@
+.salmon-bg{
+    background-color: #4C4C4C;
+    color: var(--dark-text);
+    border: 2px solid #3A3A3A;
+}
+
+.other-salmon-bg{
+    background-color: #353232;
+}
+
+.hover-salmon:hover{
+    background-color: #353232;
+}

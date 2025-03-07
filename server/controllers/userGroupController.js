@@ -93,6 +93,31 @@ export const updateUserRole = async (req, res) => {
     }
 };
 
+export const updateUserRoleByJoin = async (req, res) => {
+    try{
+        const { userId, groupId } = req.params;
+        const { role } = req.body;
+
+        if(!["owner", "admin", "member"].includes(role)) {
+            return res.status(400).json({ message: "Invalid role specified." });
+        }
+
+        const updatedMembership = await UserGroup.findOneAndUpdate(
+            { userId, groupId },
+            { role },
+            { new: true }
+        );
+
+        if(!updatedMembership){
+            return res.status(404).json({ message: "User membership not found." });
+        }
+
+        res.status(200).json(updatedMembership);
+    } catch(error){
+        res.status(500).json({ message: "Sever error", error: error.message });
+    }
+};
+
 export const removeUserFromGroup = async (req, res) => {
     try {
         const { id } = req.params;
