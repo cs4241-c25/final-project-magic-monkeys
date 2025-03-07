@@ -1,8 +1,23 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 .dashboard-container {
   padding-left: 70px;
   height: 100vh;
-  background: #1a1a1a;
-  color: #ffffff;
+  background: var(--color-bg-darkest);
+  color: var(--color-text-bright);
   overflow: hidden;
 }
 
@@ -84,14 +99,20 @@
 }
 
 .content-section {
-  background: #2a2a2a;
+  background: var(--color-bg-darker);
   border-radius: 8px;
   padding: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 1px solid #333;
+  border: 1px solid var(--color-border-dark);
   height: 100%;
+}
+
+/* Override padding for showtime and groups sections */
+.content-section.showtime,
+.content-section.groups {
+  padding: 0;
 }
 
 .showtime, .groups, .happenings {
@@ -133,27 +154,27 @@
 }
 
 .content-section::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: var(--color-scrollbar-track);
   border-radius: 3px;
 }
 
 .content-section::-webkit-scrollbar-thumb {
-  background: #444;
+  background: var(--color-scrollbar-thumb);
   border-radius: 3px;
 }
 
 .content-section h2 {
   font-size: 1.1rem;
-  color: #fff;
+  color: var(--color-text-bright);
   opacity: 0.9;
   font-weight: 500;
   margin-bottom: 14px;
   padding-bottom: 12px;
   margin-top: 4px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--color-border-dark);
   position: sticky;
   top: 0;
-  background: #2a2a2a;
+  background: var(--color-bg-darker);
   z-index: 1;
   text-align: left;
   display: flex;
@@ -162,6 +183,18 @@
   padding-right: 8px;
 }
 
+/* Remove border-bottom from all content section headers except Happenings */
+.showtime h2,
+.groups h2,
+.mini-tierlist h2,
+.combined-card h2 {
+  border-bottom: none;
+}
+
+/* Keep the border-bottom only for Happenings */
+.happenings h2 {
+  border-bottom: 1px solid #333;
+}
 
 .mini-tier-container {
   display: flex;
@@ -551,4 +584,27 @@
 .section-chevron {
   margin-left: 8px;
   margin-right: auto;
-} 
+}
+
+/* Global chevron controls styling - with higher specificity */
+.content-section .chevron-controls {
+  display: flex;
+  gap: 2px; /* Reduced gap between arrows */
+  margin-left: auto;
+}
+
+.content-section .chevron-arrow {
+  font-size: 2rem;
+  color: #888 !important; /* Force the same color */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.content-section .chevron-arrow:hover {
+  color: #ff4b4b !important; /* Force the same hover color */
+}
+
+.content-section .chevron-arrow.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
