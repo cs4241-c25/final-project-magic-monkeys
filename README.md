@@ -1,4 +1,4 @@
-#Movie Mates
+<h1>Movie Mates</h1>
 
 Our project is a social movie app designed to make it easy for you and your friends to create movie-watching groups, schedule and plan out movie nights, and view each other’s reviews. The main page is the user’s Dashboard, allowing them to see their upcoming movie nights for all groups, a list of their groups, and a list of ‘Happenings’, those being notifications of actions related to users who are members of the user’s groups. The event and group cards link to the respective groups as well. Beneath that, a preview of that user’s full tier list, comprised of three tiers, is available to view, along with a button linking them to the full Tierlist page where they can edit the Tierlist itself. Beside that is the card containing either the user’s intended watchlist or a listing of reviews they have left for different movies. Swapping between either function in this card can let a user sort their watchlist or reviews.
 
