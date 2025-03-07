@@ -1,0 +1,169 @@
+/* PublicProfile.css */
+
+/* Overall page container, similar vibe to .dashboard-container */
+.public-profile-container {
+    margin: 0 auto;        /* Center horizontally */
+    max-width: 1200px;     /* Constrain the width */
+    padding: 20px;
+    background: #1a1a1a;   /* Match your dark background */
+    color: #fff;           /* White text on dark background */
+    min-height: 100vh;     /* Fill the vertical space */
+    font-family: Arial, sans-serif; /* Or your chosen font */
+  }
+  
+  /* Top Row (Avatar + Name/Joined) */
+  .profile-top-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Avatar: Large circle on the left 1/3 */
+  .profile-avatar {
+    width: 130px;
+    height: 130px;
+    background: #ff4b4b; /* accent color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 3rem;
+    font-weight: bold;
+    margin-right: 20px;
+    flex-shrink: 0;
+  }
+  
+  /* Right side of top row with username and joined date */
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: none;
+    background: none;
+    text-align: left;
+  }
+  
+  .profile-username {
+    font-size: 2rem;
+    margin: 0 0 8px 0;
+    font-weight: bold;
+  }
+  
+  .profile-joined {
+    font-size: 0.9rem;
+    color: #888;
+    margin: 0;
+  }
+  
+  /* Second row: left "Bio" half, right "Favorite Movie" half */
+  .profile-second-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  
+  .profile-bio-section,
+  .profile-favorite-movie {
+    flex: 1;
+    background: #2a2a2a;
+    border-radius: 8px;
+    border: 1px solid #333;
+    padding: 20px;
+  }
+  
+  .profile-bio-section h2,
+  .profile-favorite-movie h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    color: #ff4b4b; /* accent heading color if desired */
+  }
+  
+  /* Favorite movie details */
+  .favorite-movie-title {
+    font-size: 1rem;
+    margin: 0;
+  }
+  
+  /* Tier list section (below) */
+  .profile-tierlist-section {
+    background: #2a2a2a;
+    border-radius: 8px;
+    border: 1px solid #333;
+    padding: 20px;
+  }
+  
+  .profile-tierlist-section h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    color: #ff4b4b;
+  }
+  
+  /* Mini tier container styling borrowed from your Dashboard mini-tierlist */
+  .mini-tier-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Each row for a tier (e.g., S Tier row) */
+  .mini-tier-row {
+    display: flex;
+    align-items: center;
+    background: #333;
+    padding: 16px;
+    border-radius: 4px;
+  }
+  
+  /* Big colored label for the tier letter */
+  .mini-tier-label {
+    width: 45px;
+    height: 45px;
+    background: #ff4b4b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  
+  /* Container for the posters in that row */
+  .mini-tier-movies {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap; /* Wrap if too many posters */
+  }
+  
+  .mini-tier-movies img {
+    width: 75px;
+    height: 112px;
+    border-radius: 4px;
+    transition: transform 0.2s;
+    object-fit: cover;
+  }
+  
+  .mini-tier-movies img:hover {
+    transform: scale(1.05);
+  }
+  
+  /* If there's no poster, show a fallback box */
+  .no-poster {
+    width: 75px;
+    height: 112px;
+    background: #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.8rem;
+    border-radius: 4px;
+  }
+  
