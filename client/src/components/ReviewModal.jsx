@@ -90,6 +90,34 @@ export const ReviewModal = ({ isOpen, onClose, movieId, movieTitle, onReviewSubm
                 throw new Error('Failed to submit review');
             }
 
+            try {
+                console.log("Adding to tier list with rank U");
+                const response = await fetch(`${API_URL}/api/tier-lists`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: dbUser._id,
+                        movieId,
+                        rank: "U",
+                        order: 1
+                    })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Tier list entry created:", data);
+                    // setIsInTierList(true);
+                    // setTierListEntryId(data._id);
+                    // await checkMovieStatus();
+                    alert('Added to tier list successfully!');
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error adding to tier list:', error);
+                alert(`Failed to add to tier list: ${error.message}`);
+            }
+
             const happening = `${dbUser.username} ${existingReview ? 'updated their review of' : 'gave'} ${movieTitle} ${existingReview ? 'to' : ''} ${rating} ${rating === 1 ? 'ticket' : 'tickets'}`;
             await fetch(`${API_URL}/api/user-happenings`, {
                     method: "POST",
