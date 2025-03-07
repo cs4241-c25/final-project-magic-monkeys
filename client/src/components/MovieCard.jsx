@@ -32,9 +32,6 @@ export const MovieCard = ({ movie, cardRatings, isUpcoming, onClick }) => (
           {cardRatings[movie.id].imdb}
         </div>
       )}
-      <div className="card-rating tmdb">
-        ⭐ {movie.vote_average.toFixed(1)}
-      </div>
     </div>
     {isUpcoming && (
       <p>Release Date: <span className="release-date-date">{new Date(movie.release_date).toLocaleDateString('en-US', {
