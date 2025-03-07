@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { BiPlus, BiUserPlus } from 'react-icons/bi';
 import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -13,6 +14,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     const [loading, setLoading] = useState(false);
     const [groupToJoin, setGroupToJoin] = useState(null);
     const { dbUser } = useUser();
+    const navigate = useNavigate();
 
     const handleCreateGroup = async (e) => {
         e.preventDefault();
@@ -38,6 +40,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             });
             resetForm();
             onClose();
+            navigate(`/group/${groupData._id}`);
         } catch (err) {
             setError('Failed to create group. Please try again.');
             console.error('Group creation error:', err);
@@ -115,6 +118,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             });
             resetForm();
             onClose();
+            navigate(`/group/${groupToJoin._id}`);
         } catch (err) {
             setError('Failed to join group. Please try again.');
             console.error('Group join error:', err);
