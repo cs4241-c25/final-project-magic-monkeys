@@ -98,3 +98,19 @@
 .ticket-icon.pulse svg {
     animation: pulse 0.3s ease;
 }
+
+.ticket-rating-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 240px;
+}
+
+.ticket-rating-wrapper.condensed {
+    max-width: fit-content;
+}
+
+.ticket-rating.condensed {
+    gap: 3px;
+    padding: 0;
+}

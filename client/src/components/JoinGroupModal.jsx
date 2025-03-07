@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { BiPlus, BiUserPlus } from 'react-icons/bi';
 import { useUser } from '../context/UserContext';
+import { useToast } from './Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -13,6 +14,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
     const [loading, setLoading] = useState(false);
     const [groupToJoin, setGroupToJoin] = useState(null);
     const { dbUser } = useUser();
+    const { addToast } = useToast();
 
     const handleCreateGroup = async (e) => {
         e.preventDefault();
@@ -32,6 +34,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
                 throw new Error('Failed to create group');
             }
             const groupData = await response.json();
+            addToast('Group created successfully!', 'success');
 
             onGroupCreated({
                 ...groupData
@@ -109,6 +112,7 @@ export const JoinGroupModal = ({ isOpen, onClose, onGroupCreated }) => {
             }
 
             const memberData = await response.json();
+            addToast('Successfully joined group!', 'success');
             onGroupCreated({
                 ...groupToJoin,
                 membership: memberData

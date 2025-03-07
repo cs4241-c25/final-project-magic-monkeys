@@ -1,0 +1,53 @@
+/* Hide scrollbar but allow scrolling */
+.tier-movies {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.tier-movies::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Tier text colors - gradient from darker to lighter salmon with greater difference */
+.tier-text-S {
+  color: #ff4b4b; /* S Tier - Darkest salmon */
+}
+
+.tier-text-A {
+  color: #ff7676; /* A Tier */
+}
+
+.tier-text-B {
+  color: #ff9999; /* B Tier */
+}
+
+.tier-text-C {
+  color: #ff9999; /* C Tier */
+}
+
+.tier-text-D {
+  color: #ffbdbd; /* D Tier */
+}
+
+.tier-text-F {
+  color: #ffe0e0; /* F Tier - Lightest salmon */
+}
+
+/* Enhance empty tier message */
+.tier-movies span {
+  background-color: rgba(255, 255, 255, 0.03);
+  transition: background-color 0.2s;
+}
+
+.tier-movies span:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Alternating row colors */
+.tier-row-even {
+  background-color: #333;
+}
+
+.tier-row-odd {
+  background-color: #3a3a3a;
+} 
