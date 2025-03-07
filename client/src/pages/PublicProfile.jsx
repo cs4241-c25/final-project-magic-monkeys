@@ -154,10 +154,7 @@ export const PublicProfile = () => {
         <div className="profile-bio-section">
           <h2>Bio</h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-            Quisque fermentum felis in lectus gravida, nec pulvinar 
-            lacus convallis. Pellentesque habitant morbi tristique 
-            senectus et netus et malesuada fames ac turpis egestas.
+            {userData.bio}
           </p>
         </div>
 

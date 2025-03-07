@@ -112,8 +112,6 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
           <div className="sub-items">
             {loading ? (
               <div className="nav-subitem loading">Loading groups...</div>
-            ) : userGroups.length === 0 ? (
-              <div className="nav-subitem empty">No groups found</div>
             ) : (
               userGroups.map(group => (
                 <Link
