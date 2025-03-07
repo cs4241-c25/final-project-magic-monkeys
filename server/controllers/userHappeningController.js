@@ -22,7 +22,11 @@ export const createUserHappening = async (req, res) => {
             }
         }
 
-        const newHappening = new UserHappening({ userId, happening });
+        const newHappening = new UserHappening({ 
+            userId, 
+            happening,
+            username: user.username
+        });
         await newHappening.save();
 
         res.status(201).json(newHappening);
@@ -34,7 +38,7 @@ export const createUserHappening = async (req, res) => {
 export const getUserHappeningById = async (req, res) => {
     try {
         const { id } = req.params;
-        const happening = await UserHappening.findById(id).populate("userId", "username profilePicture");
+        const happening = await UserHappening.findById(id).populate("userId", "username");
 
         if (!happening) {
             return res.status(404).json({ message: "User happening not found." });
@@ -55,10 +59,12 @@ export const getUserHappeningsByUser = async (req, res) => {
             return res.status(404).json({ message: "User not found." });
         }
 
-        const happenings = await UserHappening.find({ userId }).sort({ createdAt: -1 });
+        const happenings = await UserHappening.find({ userId })
+            .sort({ createdAt: -1 })
+            .limit(10);
 
         if (!happenings.length) {
-            return res.status(404).json({ message: "No happenings found for this user." });
+            return res.status(200).json([]);
         }
 
         res.status(200).json(happenings);
@@ -96,9 +102,9 @@ export const getUserHappeningsByGroup = async (req, res) => {
 export const deleteUserHappening = async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedHappening = await UserHappening.findByIdAndDelete(id);
+        const happening = await UserHappening.findByIdAndDelete(id);
 
-        if (!deletedHappening) {
+        if (!happening) {
             return res.status(404).json({ message: "User happening not found." });
         }
 

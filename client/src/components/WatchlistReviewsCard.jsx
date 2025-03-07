@@ -6,7 +6,7 @@ import '../styles/WatchlistReviewsCard.css';
 import '../styles/LoadingAnimations.css';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { BiFilterAlt, BiX, BiCheck } from 'react-icons/bi';
+import { BiFilterAlt, BiX, BiCheck, BiTransfer, BiMenu, BiDotsVerticalRounded } from 'react-icons/bi';
 
 // Import the omdbAPI service
 import { omdbAPI } from '../services/omdbAPI';
@@ -382,263 +382,194 @@ export const WatchlistReviewsCard = ({
     </div>
   );
 
+  // Handle filter menu click
+  const handleFilterClick = () => {
+    setShowFilterMenu(!showFilterMenu);
+  };
+
   return (
-    <div className="flex-1 overflow-hidden relative" key={activeView}>
-      {/* Filter Dropdown Menu */}
-      {showFilterMenu && (
-        <div 
-          ref={filterMenuRef}
-          className="absolute right-0 mt-[-40px] w-64 bg-[#222] border border-[#444] rounded-md shadow-lg z-50 p-3"
-          style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}
-        >
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-white text-sm font-['Cabin']">Filter {activeView === 'watchlist' ? 'Watchlist' : 'Reviews'}</h3>
-            <div className="flex gap-2">
+    <div className="content-section combined-card">
+      <h2 className="flex items-center">
+        <span className="w-[5.2rem]">{activeView === 'watchlist' ? 'Watchlist' : 'Reviews'}</span>
+        <BiTransfer 
+          className="text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors -ml-1 -mt-0.5" 
+          onClick={toggleView}
+        />
+        <BiMenu 
+          className="ml-auto text-gray-400 text-2xl cursor-pointer hover:text-[#ff4b4b] transition-colors filter-menu-icon" 
+          onClick={handleFilterClick}
+        />
+      </h2>
+      
+      <div className="watchlist-reviews-card-container">
+        {/* Filter Menu */}
+        {showFilterMenu && (
+          <div 
+            ref={filterMenuRef}
+            className="filter-menu absolute right-4 top-[60px] p-3 z-10 w-[220px]"
+          >
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-white text-sm font-semibold font-['Cabin']">Filter {activeView === 'watchlist' ? 'Watchlist' : 'Reviews'}</h3>
               <BiX 
-                className="text-white hover:text-[#ff4b4b] cursor-pointer" 
-                onClick={closeFilterMenu}
+                className="text-lg text-[#888] hover:text-[#ff4b4b] cursor-pointer transition-colors" 
+                onClick={() => setShowFilterMenu(false)}
               />
             </div>
-          </div>
-          
-          {activeView === 'watchlist' ? (
-            // Watchlist Filters
-            <div className="space-y-3">
-              {/* Release Year Filter */}
-              <div>
-                <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Release Year</label>
-                <select 
-                  className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
-                  value={watchlistFilters.releaseYear}
-                  onChange={(e) => updateWatchlistFilter('releaseYear', e.target.value)}
-                >
-                  <option value="all">All Years</option>
-                  <option value="before2000">Before 2000</option>
-                  <option value="2000to2010">2000 - 2010</option>
-                  <option value="2010to2020">2010 - 2020</option>
-                  <option value="after2020">After 2020</option>
-                </select>
+            
+            {/* Watchlist Filters */}
+            {activeView === 'watchlist' && (
+              <div className="space-y-3">
+                {/* Release Year Filter */}
+                <div>
+                  <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Release Year</label>
+                  <select 
+                    className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
+                    value={watchlistFilters.releaseYear}
+                    onChange={(e) => updateWatchlistFilter('releaseYear', e.target.value)}
+                  >
+                    <option value="all">All Years</option>
+                    <option value="before2000">Before 2000</option>
+                    <option value="2000to2010">2000 - 2010</option>
+                    <option value="2010to2020">2010 - 2020</option>
+                    <option value="after2020">After 2020</option>
+                  </select>
+                </div>
+                
+                {/* Tomatoes Rating Filter */}
+                <div>
+                  <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Rotten Tomatoes</label>
+                  <select 
+                    className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
+                    value={watchlistFilters.tomatoesRating}
+                    onChange={(e) => updateWatchlistFilter('tomatoesRating', e.target.value)}
+                  >
+                    <option value="all">All Ratings</option>
+                    <option value="under60">Under 60%</option>
+                    <option value="60to75">60% - 75%</option>
+                    <option value="75to90">75% - 90%</option>
+                    <option value="above90">Above 90%</option>
+                  </select>
+                </div>
+                
+                {/* IMDb Score Filter */}
+                <div>
+                  <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">IMDb Score</label>
+                  <select 
+                    className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
+                    value={watchlistFilters.imdbScore}
+                    onChange={(e) => updateWatchlistFilter('imdbScore', e.target.value)}
+                  >
+                    <option value="all">All Scores</option>
+                    <option value="under5">Under 5</option>
+                    <option value="5to7">5 - 7</option>
+                    <option value="7to9">7 - 9</option>
+                    <option value="above9">Above 9</option>
+                  </select>
+                </div>
               </div>
-              
-              {/* Tomatoes Rating Filter */}
-              <div>
-                <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Rotten Tomatoes</label>
-                <select 
-                  className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
-                  value={watchlistFilters.tomatoesRating}
-                  onChange={(e) => updateWatchlistFilter('tomatoesRating', e.target.value)}
-                >
-                  <option value="all">All Ratings</option>
-                  <option value="under60">Under 60%</option>
-                  <option value="60to75">60% - 75%</option>
-                  <option value="75to90">75% - 90%</option>
-                  <option value="above90">Above 90%</option>
-                </select>
+            )}
+            
+            {/* Reviews Filters */}
+            {activeView === 'reviews' && (
+              <div className="space-y-3">
+                {/* Ticket Rating Filter */}
+                <div>
+                  <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Ticket Rating</label>
+                  <select 
+                    className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
+                    value={reviewsFilters.ticketRating}
+                    onChange={(e) => updateReviewsFilter('ticketRating', e.target.value)}
+                  >
+                    <option value="all">All Ratings</option>
+                    <option value="1star">1 Star</option>
+                    <option value="2stars">2 Stars</option>
+                    <option value="3stars">3 Stars</option>
+                    <option value="4stars">4 Stars</option>
+                    <option value="5stars">5 Stars</option>
+                  </select>
+                </div>
+                
+                {/* Date Added Filter */}
+                <div>
+                  <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Date Added</label>
+                  <select 
+                    className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
+                    value={reviewsFilters.dateAdded}
+                    onChange={(e) => updateReviewsFilter('dateAdded', e.target.value)}
+                  >
+                    <option value="all">All Time</option>
+                    <option value="lastWeek">Last Week</option>
+                    <option value="lastMonth">Last Month</option>
+                    <option value="last3Months">Last 3 Months</option>
+                    <option value="lastYear">Last Year</option>
+                  </select>
+                </div>
+                
+                {/* Release Year Filter */}
+                <div>
+                  <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Release Year</label>
+                  <select 
+                    className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
+                    value={reviewsFilters.releaseYear}
+                    onChange={(e) => updateReviewsFilter('releaseYear', e.target.value)}
+                  >
+                    <option value="all">All Years</option>
+                    <option value="before2000">Before 2000</option>
+                    <option value="2000to2010">2000 - 2010</option>
+                    <option value="2010to2020">2010 - 2020</option>
+                    <option value="after2020">After 2020</option>
+                  </select>
+                </div>
               </div>
-              
-              {/* IMDb Score Filter */}
-              <div>
-                <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">IMDb Score</label>
-                <select 
-                  className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
-                  value={watchlistFilters.imdbScore}
-                  onChange={(e) => updateWatchlistFilter('imdbScore', e.target.value)}
-                >
-                  <option value="all">All Scores</option>
-                  <option value="under5">Under 5</option>
-                  <option value="5to7">5 - 7</option>
-                  <option value="7to9">7 - 9</option>
-                  <option value="above9">Above 9</option>
-                </select>
-              </div>
-            </div>
-          ) : (
-            // Reviews Filters
-            <div className="space-y-3">
-              {/* Ticket Rating Filter */}
-              <div>
-                <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Ticket Rating</label>
-                <select 
-                  className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
-                  value={reviewsFilters.ticketRating}
-                  onChange={(e) => updateReviewsFilter('ticketRating', e.target.value)}
-                >
-                  <option value="all">All Ratings</option>
-                  <option value="1star">1 Star</option>
-                  <option value="2stars">2 Stars</option>
-                  <option value="3stars">3 Stars</option>
-                  <option value="4stars">4 Stars</option>
-                  <option value="5stars">5 Stars</option>
-                </select>
-              </div>
-              
-              {/* Date Added Filter */}
-              <div>
-                <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Date Added</label>
-                <select 
-                  className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
-                  value={reviewsFilters.dateAdded}
-                  onChange={(e) => updateReviewsFilter('dateAdded', e.target.value)}
-                >
-                  <option value="all">All Time</option>
-                  <option value="lastWeek">Last Week</option>
-                  <option value="lastMonth">Last Month</option>
-                  <option value="last3Months">Last 3 Months</option>
-                  <option value="lastYear">Last Year</option>
-                </select>
-              </div>
-              
-              {/* Release Year Filter */}
-              <div>
-                <label className="text-[#ddd] text-xs block mb-1 font-['Cabin']">Release Year</label>
-                <select 
-                  className="w-full bg-[#333] text-white text-xs p-1.5 rounded border border-[#555] font-['Cabin']"
-                  value={reviewsFilters.releaseYear}
-                  onChange={(e) => updateReviewsFilter('releaseYear', e.target.value)}
-                >
-                  <option value="all">All Years</option>
-                  <option value="before2000">Before 2000</option>
-                  <option value="2000to2010">2000 - 2010</option>
-                  <option value="2010to2020">2010 - 2020</option>
-                  <option value="after2020">After 2020</option>
-                </select>
-              </div>
-            </div>
-          )}
-          
-          {/* Applied Filters Count and Reset Button */}
-          <div className="mt-3 pt-2 border-t border-[#444] flex justify-between items-center">
-            <span className="text-xs text-[#aaa] font-['Cabin']">
-              {activeView === 'watchlist' ? (
-                Object.values(watchlistFilters).filter(v => v !== 'all').length
-              ) : (
-                Object.values(reviewsFilters).filter(v => v !== 'all').length
-              )} filter(s) applied
-            </span>
-            <button 
-              onClick={resetFilters}
-              className="text-xs bg-[#ff4b4b] hover:bg-[#ff6b6b] text-white py-1 px-3 rounded transition-colors font-['Cabin']"
-              disabled={activeView === 'watchlist' 
-                ? Object.values(watchlistFilters).every(v => v === 'all')
-                : Object.values(reviewsFilters).every(v => v === 'all')}
-            >
-              Reset All
-            </button>
-          </div>
-        </div>
-      )}
-      
-      <div className="h-full overflow-y-auto pr-2 grid grid-cols-2 gap-3 auto-rows-min" style={{ gridAutoFlow: 'row' }}>
-        {isWatchlistLoading && activeView === 'watchlist' && !watchlistLoaded ? (
-          renderWatchlistLoadingPlaceholder()
-        ) : activeView === 'watchlist' ? (
-          // Watchlist View
-          getFilteredWatchlist().length > 0 ? (
-            getFilteredWatchlist().map((movie, index) => (
-              <div 
-                key={movie._id} 
-                className={`flex ${index % 2 === 0 ? 'bg-[#333]' : 'bg-[#3a3a3a]'} p-2.5 rounded-md border border-[#444] font-['Cabin'] h-[10rem]`}
+            )}
+            
+            {/* Applied Filters Count and Reset Button */}
+            <div className="mt-3 pt-2 border-t border-[#444] flex justify-between items-center">
+              <span className="text-xs text-[#aaa] font-['Cabin']">
+                {activeView === 'watchlist' ? (
+                  Object.values(watchlistFilters).filter(v => v !== 'all').length
+                ) : (
+                  Object.values(reviewsFilters).filter(v => v !== 'all').length
+                )} filter(s) applied
+              </span>
+              <button 
+                onClick={resetFilters}
+                className="text-xs bg-[#ff4b4b] hover:bg-[#ff6b6b] text-white py-1 px-3 rounded transition-colors font-['Cabin']"
+                disabled={activeView === 'watchlist' 
+                  ? Object.values(watchlistFilters).every(v => v === 'all')
+                  : Object.values(reviewsFilters).every(v => v === 'all')}
               >
-                <div className="h-full mr-2.5" style={{ width: '100px' }}>
-                  <img 
-                    src={movie.poster_path 
-                      ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` 
-                      : '/placeholder-poster.jpg'
-                    } 
-                    alt={movie.title || 'Movie poster'} 
-                    className="h-full w-full object-cover rounded-md"
-                  />
-                </div>
-                <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="text-lg text-white m-0 truncate font-['Cabin']">
-                        {movie.title && movie.title.length > 20 
-                          ? `${movie.title.substring(0, 20)}...` 
-                          : movie.title}
-                      </h4>
-                      <div className="text-xs text-[#bbbbbb] text-left font-['Cabin']">
-                        {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
-                      </div>
-                    </div>
-                    <span className="text-xs text-[#888] ml-1 font-['Cabin']">2/22/24</span>
-                  </div>
-                  
-                  <div className="flex gap-2 mt-1 mb-1">
-                    <div className="flex items-center gap-1 text-xs font-['Cabin']">
-                      <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
-                        alt="IMDb"
-                        className="w-8 h-4 object-contain"
-                      />
-                      <span className="text-[#ff4b4b] text-xs">
-                        {watchlistRatings[movie._id]?.imdb || (movie.vote_average ? `${movie.vote_average.toFixed(1)}/10` : 'N/A')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs font-['Cabin']">
-                      <img 
-                        src="https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg"
-                        alt="Tomato Score"
-                        className="w-4 h-4 object-contain"
-                      />
-                      <span className="text-[#ff4b4b] text-xs">
-                        {watchlistRatings[movie._id]?.rt ? `${watchlistRatings[movie._id].rt}` : (Math.random() > 0.1 ? `${Math.round(Math.random() * 40 + 60)}%` : 'N/A')}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="relative flex-grow">
-                    <p className="text-xs text-[#ddd] mt-1 font-['Cabin'] text-left">
-                      {(() => {
-                        const text = movie.overview || 'No description available.';
-                        const maxLength = 184;
-                        const isTruncated = text.length > maxLength;
-                        return isTruncated ? `${text.substring(0, maxLength)}... ` : `${text} `;
-                      })()}
-                      <span 
-                        className="text-[#ff8080] cursor-pointer hover:text-[#ff4b4b]"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/movies/${movie.movieId}`);
-                        }}
-                      >
-                        Click to see movie details
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-2 flex items-center justify-center text-center p-4">
-              <p className="text-[#888] text-base font-['Cabin']">Your watchlist is empty. Add movies from the search page!</p>
+                Reset All
+              </button>
             </div>
-          )
-        ) : (
-          // Reviews View
-          isReviewsLoading && !reviewsLoaded ? (
-            renderReviewsLoadingPlaceholder()
-          ) : getFilteredReviews().length > 0 ? (
-            getFilteredReviews().map((review, index) => {
-              const movie = reviewMovies[review.movieId];
-              if (!movie) return null;
-              
-              return (
+          </div>
+        )}
+        
+        <div className="h-full overflow-y-auto grid grid-cols-2 gap-0 auto-rows-min" style={{ gridAutoFlow: 'row' }}>
+          {isWatchlistLoading && activeView === 'watchlist' && !watchlistLoaded ? (
+            renderWatchlistLoadingPlaceholder()
+          ) : activeView === 'watchlist' ? (
+            // Watchlist View
+            getFilteredWatchlist().length > 0 ? (
+              getFilteredWatchlist().map((movie, index) => (
                 <div 
-                  key={review._id} 
-                  className={`flex ${index % 2 === 0 ? 'bg-[#333]' : 'bg-[#3a3a3a]'} p-2.5 rounded-md  font-['Cabin'] h-[10rem]`}
+                  key={movie._id} 
+                  className={`flex ${index % 2 === 0 ? 'bg-[#1e1e1e]' : 'bg-[#1e1e1e]'} p-2.5 border border-[#292929] font-['Cabin'] h-[10.9rem] m-0`}
                 >
                   <div className="h-full mr-2.5" style={{ width: '100px' }}>
                     <img 
-                      src={movie.poster} 
-                      alt={movie.title} 
+                      src={movie.poster_path 
+                        ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` 
+                        : '/placeholder-poster.jpg'
+                      } 
+                      alt={movie.title || 'Movie poster'} 
                       className="h-full w-full object-cover rounded-md"
                     />
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="text-base text-white m-0 truncate font-['Cabin']">
+                        <h4 className="text-lg text-white m-0 truncate font-['Cabin']">
                           {movie.title && movie.title.length > 20 
                             ? `${movie.title.substring(0, 20)}...` 
                             : movie.title}
@@ -647,52 +578,139 @@ export const WatchlistReviewsCard = ({
                           {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
                         </div>
                       </div>
-                      <span className="text-xs text-[#888] ml-1 font-['Cabin']">
-                        {formatDate(review.createdAt)}
-                      </span>
+                      <BiDotsVerticalRounded className="text-[#888] text-xl cursor-pointer hover:text-[#ff4b4b] transition-colors" />
                     </div>
                     
-                    <div className="mt-1 mb-1">
-                      <div className="flex gap-2">
-                        <TicketRating
-                          rating={review.rating}
-                          interactive={false}
-                          size="md"
-                          color="#ff4b4b"
-                          className="scale-150 origin-left"
+                    <div className="flex gap-2 mt-1 mb-1">
+                      <div className="flex items-center gap-1 text-xs font-['Cabin']">
+                        <img 
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/575px-IMDB_Logo_2016.svg.png"
+                          alt="IMDb"
+                          className="w-8 h-4 object-contain"
                         />
+                        <span className="text-[#ff4b4b] text-xs">
+                          {watchlistRatings[movie._id]?.imdb || (movie.vote_average ? `${movie.vote_average.toFixed(1)}/10` : 'N/A')}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-['Cabin']">
+                        <img 
+                          src="https://www.rottentomatoes.com/assets/pizza-pie/images/icons/tomatometer/certified_fresh-notext.56a89734a59.svg"
+                          alt="Tomato Score"
+                          className="w-4 h-4 object-contain"
+                        />
+                        <span className="text-[#ff4b4b] text-xs">
+                          {watchlistRatings[movie._id]?.rt ? `${watchlistRatings[movie._id].rt}` : (Math.random() > 0.1 ? `${Math.round(Math.random() * 40 + 60)}%` : 'N/A')}
+                        </span>
                       </div>
                     </div>
                     
                     <div className="relative flex-grow">
-                      <p className="text-xs text-[#ddd] -mt-1 font-['Cabin'] text-left">
+                      <p className="text-xs text-gray-400  mt-1 font-['Cabin'] text-left">
                         {(() => {
-                          if (!review.reviewText) return 'No review text available. ';
-                          const maxLength = 202;
-                          const isTruncated = review.reviewText.length > maxLength;
-                          return isTruncated ? `${review.reviewText.substring(0, maxLength)}... ` : `${review.reviewText} `;
+                          const text = movie.overview || 'No description available.';
+                          const maxLength = 184;
+                          const isTruncated = text.length > maxLength;
+                          return isTruncated ? `${text.substring(0, maxLength)}... ` : `${text} `;
                         })()}
                         <span 
                           className="text-[#ff8080] cursor-pointer hover:text-[#ff4b4b]"
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/movies/${review.movieId}`);
+                            navigate(`/movies/${movie.movieId}`);
                           }}
                         >
-                          Click to see full review
+                          Click to see movie details
                         </span>
                       </p>
                     </div>
                   </div>
                 </div>
-              );
-            })
+              ))
+            ) : (
+              <div className="col-span-2 flex items-center justify-center text-center p-4">
+                <p className="text-[#888] text-base font-['Cabin']">Your watchlist is empty. Add movies from the search page!</p>
+              </div>
+            )
           ) : (
-            <div className="col-span-2 flex items-center justify-center text-center p-4">
-              <p className="text-[#888] text-base font-['Cabin']">No reviews available.</p>
-            </div>
-          )
-        )}
+            // Reviews View
+            isReviewsLoading && !reviewsLoaded ? (
+              renderReviewsLoadingPlaceholder()
+            ) : getFilteredReviews().length > 0 ? (
+              getFilteredReviews().map((review, index) => {
+                const movie = reviewMovies[review.movieId];
+                if (!movie) return null;
+                
+                return (
+                  <div 
+                    key={review._id} 
+                    className={`flex ${index % 2 === 0 ? 'bg-[#1e1e1e]' : 'bg-[#1e1e1e]'} p-2.5 border border-[#292929] font-['Cabin'] h-[10.9rem] m-0`}
+                  >
+                    <div className="h-full mr-2.5" style={{ width: '100px' }}>
+                      <img 
+                        src={movie.poster} 
+                        alt={movie.title} 
+                        className="h-full w-full object-cover rounded-md"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-base text-white m-0 truncate font-['Cabin']">
+                            {movie.title && movie.title.length > 20 
+                              ? `${movie.title.substring(0, 20)}...` 
+                              : movie.title}
+                          </h4>
+                          <div className="text-xs text-[#bbbbbb] text-left font-['Cabin']">
+                            {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
+                          </div>
+                        </div>
+                        <span className="text-xs text-[#888] ml-1 font-['Cabin']">
+                          {formatDate(review.createdAt)}
+                        </span>
+                      </div>
+                      
+                      <div className="mt-1 mb-1">
+                        <div className="flex gap-2">
+                          <TicketRating
+                            rating={review.rating}
+                            interactive={false}
+                            size="md"
+                            color="#ff4b4b"
+                            className="scale-150 origin-left"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="relative flex-grow">
+                        <p className="text-xs text-gray-400 -mt-1 font-['Cabin'] text-left">
+                          {(() => {
+                            if (!review.reviewText) return 'No review text available. ';
+                            const maxLength = 202;
+                            const isTruncated = review.reviewText.length > maxLength;
+                            return isTruncated ? `${review.reviewText.substring(0, maxLength)}... ` : `${review.reviewText} `;
+                          })()}
+                          <span 
+                            className="text-[#ff8080] cursor-pointer hover:text-[#ff4b4b]"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/movies/${review.movieId}`);
+                            }}
+                          >
+                            Click to see full review
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-2 flex items-center justify-center text-center p-4">
+                <p className="text-[#888] text-base font-['Cabin']">No reviews available.</p>
+              </div>
+            )
+          )}
+        </div>
       </div>
     </div>
   );
