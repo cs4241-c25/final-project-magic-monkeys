@@ -320,6 +320,9 @@ export const MovieDemo = () => {
 
   return (
     <div className="movie-demo">
+      {isAuthenticated && (
+          <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      )}
       <header className="App-header">
         <form onSubmit={searchMovie} className="search-form">
           <input
