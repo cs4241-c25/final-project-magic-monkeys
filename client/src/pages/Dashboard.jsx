@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SideNav } from '../components/SideNav';
 import '../styles/Dashboard.css';
-import { BiChevronDown, BiChevronUp, BiFilterAlt, BiChevronRight, BiTransfer } from 'react-icons/bi';
+import { BiChevronDown, BiChevronUp, BiFilterAlt, BiChevronRight, BiTransfer, BiMenu } from 'react-icons/bi';
 import { BsTicketFill, BsTicket } from "react-icons/bs";
 import { useAuth0 } from '@auth0/auth0-react';
 import { TicketRating } from '../components/TicketRating';
@@ -10,6 +10,13 @@ import { useUser } from '../context/UserContext';
 import { FaImdb } from 'react-icons/fa';
 import { SiRottentomatoes } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
+// Import the new card components
+import { ShowtimeCard } from '../components/ShowtimeCard';
+import { GroupCard } from '../components/GroupCard';
+import { HappeningsCard } from '../components/HappeningsCard';
+import { TierListCard } from '../components/TierListCard';
+import { WatchlistReviewsCard } from '../components/WatchlistReviewsCard';
+import { FiEdit } from 'react-icons/fi';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_API_URL;
 
@@ -30,9 +37,11 @@ export const Dashboard = () => {
     4: 5
   });
   const [activeView, setActiveView] = useState('watchlist');
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [watchlist, setWatchlist] = useState([]);
   const [isWatchlistLoading, setIsWatchlistLoading] = useState(false);
   const [userMovieNights, setUserMovieNights] = useState([]);
+  const [isMovieNightsLoading, setIsMovieNightsLoading] = useState(false);
   const [currentMovieNightIndex, setCurrentMovieNightIndex] = useState(0);
   const [isMovieNightAnimating, setIsMovieNightAnimating] = useState(false);
   const [movieNightAnimationDirection, setMovieNightAnimationDirection] = useState('');
@@ -45,13 +54,16 @@ export const Dashboard = () => {
     F: []
   });
   const [isTierListLoading, setIsTierListLoading] = useState(false);
+  const [isGroupsLoading, setIsGroupsLoading] = useState(false);
+  const [isHappeningsLoading, setIsHappeningsLoading] = useState(false);
 
   // Fetch user groups
   useEffect(() => {
+    if (!dbUser) return;
+
     const fetchUserGroups = async () => {
-      if (!dbUser) return;
-      
       try {
+        setIsGroupsLoading(true);
         const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/groups`);
         if (response.ok) {
           const data = await response.json();
@@ -61,6 +73,8 @@ export const Dashboard = () => {
         }
       } catch (error) {
         console.error('Error fetching user groups:', error);
+      } finally {
+        setIsGroupsLoading(false);
       }
     };
     
@@ -69,9 +83,9 @@ export const Dashboard = () => {
 
   // Fetch user's watchlist
   useEffect(() => {
+    if (!dbUser) return;
+    
     const fetchWatchlist = async () => {
-      if (!dbUser) return;
-      
       setIsWatchlistLoading(true);
       try {
         const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/watch-lists`);
@@ -126,10 +140,11 @@ export const Dashboard = () => {
 
   // Fetch user's movie nights
   useEffect(() => {
+    if (!dbUser) return;
+
     const fetchUserMovieNights = async () => {
-      if (!dbUser) return;
-      
       try {
+        setIsMovieNightsLoading(true);
         console.log("Fetching movie night schedules for user:", dbUser._id);
         const response = await fetch(`${BACKEND_URL}/api/users/${dbUser._id}/movie-night-schedules`);
         
@@ -202,10 +217,25 @@ export const Dashboard = () => {
         }
       } catch (error) {
         console.error('Error fetching movie night schedules:', error);
+      } finally {
+        setIsMovieNightsLoading(false);
       }
     };
     
     fetchUserMovieNights();
+  }, [dbUser]);
+
+  // Simulate happenings loading
+  useEffect(() => {
+    if (!dbUser) return;
+    
+    setIsHappeningsLoading(true);
+    // Simulate API call delay
+    const timer = setTimeout(() => {
+      setIsHappeningsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
   }, [dbUser]);
 
   // Add this temporary test function
@@ -233,35 +263,19 @@ export const Dashboard = () => {
   const handleNextGroup = () => {
     if (userGroups.length <= 1) return;
     
-    setAnimationDirection('next');
-    setIsAnimating(true);
-    
-    setTimeout(() => {
-      setCurrentGroupIndex((prevIndex) => 
-        prevIndex === userGroups.length - 1 ? 0 : prevIndex + 1
-      );
-      
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, 300);
-    }, 300);
+    setAnimationDirection('down');
+    setCurrentGroupIndex((prevIndex) => 
+      prevIndex === userGroups.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   const handlePrevGroup = () => {
     if (userGroups.length <= 1) return;
     
-    setAnimationDirection('prev');
-    setIsAnimating(true);
-    
-    setTimeout(() => {
-      setCurrentGroupIndex((prevIndex) => 
-        prevIndex === 0 ? userGroups.length - 1 : prevIndex - 1
-      );
-      
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, 300);
-    }, 300);
+    setAnimationDirection('up');
+    setCurrentGroupIndex((prevIndex) => 
+      prevIndex === 0 ? userGroups.length - 1 : prevIndex - 1
+    );
   };
 
   const handleRatingChange = (movieId, newRating) => {
@@ -274,7 +288,12 @@ export const Dashboard = () => {
   };
 
   const toggleView = () => {
-    setActiveView(prevView => prevView === 'watchlist' ? 'reviews' : 'watchlist');
+    setActiveView(prev => prev === 'watchlist' ? 'reviews' : 'watchlist');
+  };
+
+  const handleFilterClick = (e) => {
+    // Toggle the filter menu
+    setShowFilterMenu(prevState => !prevState);
   };
 
   const handleGroupCardClick = () => {
@@ -289,36 +308,20 @@ export const Dashboard = () => {
     if (e) e.stopPropagation();
     if (userMovieNights.length <= 1) return;
     
-    setMovieNightAnimationDirection('next');
-    setIsMovieNightAnimating(true);
-    
-    setTimeout(() => {
-      setCurrentMovieNightIndex((prevIndex) => 
-        prevIndex === userMovieNights.length - 1 ? 0 : prevIndex + 1
-      );
-      
-      setTimeout(() => {
-        setIsMovieNightAnimating(false);
-      }, 300);
-    }, 300);
+    setMovieNightAnimationDirection('down');
+    setCurrentMovieNightIndex((prevIndex) => 
+      prevIndex === userMovieNights.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   const handlePrevMovieNight = (e) => {
     if (e) e.stopPropagation();
     if (userMovieNights.length <= 1) return;
     
-    setMovieNightAnimationDirection('prev');
-    setIsMovieNightAnimating(true);
-    
-    setTimeout(() => {
-      setCurrentMovieNightIndex((prevIndex) => 
-        prevIndex === 0 ? userMovieNights.length - 1 : prevIndex - 1
-      );
-      
-      setTimeout(() => {
-        setIsMovieNightAnimating(false);
-      }, 300);
-    }, 300);
+    setMovieNightAnimationDirection('up');
+    setCurrentMovieNightIndex((prevIndex) => 
+      prevIndex === 0 ? userMovieNights.length - 1 : prevIndex - 1
+    );
   };
 
   const handleMovieNightClick = () => {
@@ -337,14 +340,32 @@ export const Dashboard = () => {
   const formatMovieNightDate = (dateString) => {
     if (!dateString) return "TBD";
     
-    // Create date in EST
+    // Create date object
+    const date = new Date(dateString);
+    
+    // Get the day number
+    const day = date.getDate();
+    
+    // Determine the ordinal suffix
+    let suffix = "th";
+    if (day % 10 === 1 && day !== 11) {
+      suffix = "st";
+    } else if (day % 10 === 2 && day !== 12) {
+      suffix = "nd";
+    } else if (day % 10 === 3 && day !== 13) {
+      suffix = "rd";
+    }
+    
+    // Format the month
     const options = { 
       timeZone: 'America/New_York',
-      month: 'short', 
-      day: 'numeric'
+      month: 'short'
     };
     
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    const month = date.toLocaleDateString('en-US', options);
+    
+    // Return formatted date with ordinal suffix
+    return `${month} ${day}${suffix}`;
   };
 
   // Format time for display in EST
@@ -460,11 +481,6 @@ export const Dashboard = () => {
     fetchTierList();
   }, [dbUser]);
 
-  // Add a function to handle tier list card click
-  const handleTierListClick = () => {
-    navigate('/tierlist');
-  };
-
   if (isLoading) return <div>Loading Dashboard...</div>;
 
   // Get current group name
@@ -493,6 +509,17 @@ export const Dashboard = () => {
       title: "Midsommar",
       poster: "https://image.tmdb.org/t/p/w200/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg"
     }
+    ,
+    {
+      id: 5,
+      title: "Arrival",
+      poster: "https://image.tmdb.org/t/p/w200/x2FJsf1ElAgr63Y3PNPtJrcmpoe.jpg"
+    },
+    {
+      id: 6,
+      title: "Midsommar",
+      poster: "https://image.tmdb.org/t/p/w200/7LEI8ulZzO5gy9Ww2NVCrKmHeDZ.jpg"
+    }
   ];
 
   const dummyMovies = Array(12).fill(null).map((_, i) => movieData[i % 4]);
@@ -514,246 +541,94 @@ export const Dashboard = () => {
       />
       <main className="dashboard-main">
         <header className="dashboard-header">
-          <h1>Welcome Back, {dbUser?.username || "User"}!</h1>
+          <h1 className="text-2xl font-['Cabin'] font-semibold">Welcome Back, {dbUser?.username || "User"}!</h1>
           <div className="user-avatar">{dbUser?.username ? dbUser.username.charAt(0) : "U"}</div>
         </header>
 
         <div className="dashboard-content">
+          {/* Showtime Card - col 1, row 1 */}
           <div className="content-section showtime">
             <h2>Showtimes</h2>
-            <div 
-              className="showtime-card"
-              onClick={handleMovieNightClick}
-              style={{ cursor: userMovieNights.length > 0 ? 'pointer' : 'default' }}
-            >
-              <div className="nav-arrows">
-                <BiChevronUp 
-                  className={`nav-arrow ${userMovieNights.length <= 1 ? 'disabled' : ''}`} 
-                  onClick={handlePrevMovieNight}
-                />
-                <BiChevronDown 
-                  className={`nav-arrow ${userMovieNights.length <= 1 ? 'disabled' : ''}`} 
-                  onClick={handleNextMovieNight}
-                />
-              </div>
-              <div className="showtime-card-content">
-                <div 
-                  className={`showtime-content ${isMovieNightAnimating ? `slide-${movieNightAnimationDirection}` : ''}`}
-                >
-                  {currentMovieNight ? (
-                    <>
-                      <h3>{formatMovieNightDate(currentMovieNight.displayDate)}</h3>
-                      <div className="time">{formatMovieNightTime(currentMovieNight)}</div>
-                      <div className="group-name">{currentMovieNight.groupName}</div>
-                    </>
-                  ) : (
-                    <h3>No Upcoming Showtimes</h3>
-                  )}
-                </div>
-                {userMovieNights.length > 0 && (
-                  <div className="showtime-pagination">
-                    {currentMovieNightIndex + 1} / {userMovieNights.length}
-                  </div>
-                )}
-              </div>
-            </div>
+            <ShowtimeCard
+              userMovieNights={userMovieNights}
+              currentMovieNight={currentMovieNight}
+              currentMovieNightIndex={currentMovieNightIndex}
+              isMovieNightAnimating={isMovieNightAnimating}
+              movieNightAnimationDirection={movieNightAnimationDirection}
+              handlePrevMovieNight={handlePrevMovieNight}
+              handleNextMovieNight={handleNextMovieNight}
+              handleMovieNightClick={handleMovieNightClick}
+              formatMovieNightDate={formatMovieNightDate}
+              formatMovieNightTime={formatMovieNightTime}
+              isLoading={isMovieNightsLoading}
+            />
           </div>
 
+          {/* Group Card - col 2, row 1 */}
           <div className="content-section groups">
-            <h2>Group(s)</h2>
-            <div 
-              className="group-card"
-              onClick={handleGroupCardClick}
-              style={{ cursor: userGroups.length > 0 ? 'pointer' : 'default' }}
-            >
-              <div className="nav-arrows">
-                <BiChevronUp 
-                  className={`nav-arrow ${userGroups.length <= 1 ? 'disabled' : ''}`} 
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the card click
-                    handlePrevGroup();
-                  }}
-                />
-                <BiChevronDown 
-                  className={`nav-arrow ${userGroups.length <= 1 ? 'disabled' : ''}`} 
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the card click
-                    handleNextGroup();
-                  }}
-                />
-              </div>
-              <div className="group-card-content">
-                <div 
-                  className={`group-name-container ${isAnimating ? `slide-${animationDirection}` : ''}`}
-                >
-                  {userGroups.length > 0 ? (
-                    <h3>{currentGroupName}</h3>
-                  ) : (
-                    <h3>No Groups</h3>
-                  )}
-                </div>
-                {userGroups.length > 0 && (
-                  <div className="group-pagination">
-                    {currentGroupIndex + 1} / {userGroups.length}
-                  </div>
-                )}
-              </div>
-            </div>
+            <h2>Groups</h2>
+            <GroupCard
+              userGroups={userGroups}
+              currentGroupName={currentGroupName}
+              currentGroupIndex={currentGroupIndex}
+              isAnimating={isAnimating}
+              animationDirection={animationDirection}
+              handlePrevGroup={handlePrevGroup}
+              handleNextGroup={handleNextGroup}
+              handleGroupCardClick={handleGroupCardClick}
+              isLoading={isGroupsLoading}
+            />
           </div>
 
+          {/* Happenings Card - col 3-4, row 1 */}
           <div className="content-section happenings">
             <h2>Happenings</h2>
-            <div className="happenings-content">
-              {dummyHappenings.map((event, index) => (
-                <div key={index} className="happening-item">
-                  <span className="user">{event.user}</span>
-                  <span className="action">gave</span>
-                  <span className="movie">{event.movie}</span>
-                  <span className="action">a</span>
-                  <span className="rating-value">{event.rating}</span>
-                  <span className="action">out of</span>
-                  <span className="rating-max">{event.tickets}</span>
-                  <span className="action">tickets</span>
-                </div>
-              ))}
-            </div>
+            <HappeningsCard 
+              happenings={dummyHappenings} 
+              isLoading={isHappeningsLoading}
+            />
           </div>
 
-          <div 
-            className="content-section mini-tierlist"
-            onClick={handleTierListClick}
-            style={{ cursor: 'pointer' }}
-          >
-            <h2>Tier List</h2>
-            {isTierListLoading ? (
-              <div className="loading-state">Loading tier list...</div>
-            ) : (
-              <div className="mini-tier-container">
-                {Object.entries(tierListData)
-                  // Remove the filter and just show all tiers, still limiting to 3
-                  .slice(0, 3) // Show at most 3 tiers to fit in the card
-                  .map(([tier, movies]) => (
-                    <div key={tier} className="mini-tier-row">
-                      <div className="mini-tier-label">{tier}</div>
-                      <div className="mini-tier-movies">
-                        {movies.length > 0 ? (
-                          // If there are movies, show them
-                          movies.map((movie, i) => (
-                      <img 
-                        key={`${tier}-${i}`}
-                        src={movie.poster}
-                        alt={movie.title}
-                      />
-                          ))
-                        ) : (
-                          // If there are no movies, show an empty state for this row
-                          <span className="empty-tier-message">No movies in this tier</span>
-                        )}
-                  </div>
-                </div>
-              ))}
-                {Object.values(tierListData).every(movies => movies.length === 0) && !isTierListLoading && (
-                  <div className="empty-state">
-                    <p>Click to create your tier list!</p>
-                  </div>
-                )}
-            </div>
-            )}
-          </div>
-
-          <div className="content-section combined-card">
+          {/* Tier List Card - col 1-2, row 2-3 */}
+          <div className="content-section mini-tierlist">
             <h2>
-              {activeView === 'watchlist' ? 'Watchlist' : 'Reviews'}
+              Tier List
+              <FiEdit 
+                className="ml-auto text-white text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/tierlist');
+                }}
+              />
+            </h2>
+            <TierListCard
+              tierListData={tierListData}
+              isTierListLoading={isTierListLoading}
+            />
+          </div>
+
+          {/* Watchlist/Reviews Card - col 3-4, row 2-3 */}
+          <div className="content-section combined-card">
+            <h2 className="flex items-center">
+              <span className="w-[5.2rem]">{activeView === 'watchlist' ? 'Watchlist' : 'Reviews'}</span>
               <BiTransfer 
-                className="view-toggle-icon" 
+                className="text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors -ml-1 -mt-0.5" 
                 onClick={toggleView}
               />
-              <BiFilterAlt className="menu-dots" />
+              <BiMenu 
+                className="ml-auto text-lg cursor-pointer hover:text-[#ff4b4b] transition-colors filter-menu-icon" 
+                onClick={handleFilterClick}
+              />
             </h2>
-            
-            {activeView === 'watchlist' ? (
-              <div className="reviews-list">
-                {isWatchlistLoading ? (
-                  <div className="loading-state">Loading watchlist...</div>
-                ) : watchlist.length > 0 ? (
-                  watchlist.map(movie => (
-                    <div key={movie._id} className="review-card">
-                      <img 
-                        src={movie.poster_path 
-                          ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` 
-                          : '/placeholder-poster.jpg'
-                        } 
-                        alt={movie.title || 'Movie poster'} 
-                      />
-                      <div className="review-content">
-                        <div className="movie-info">
-                          <h4>{movie.title || `Movie ID: ${movie.movieId}`}</h4>
-                          <div className="movie-year">
-                            {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
-            </div>
-          </div>
-
-                        <p className="movie-overview">
-                          {movie.overview || 'No description available.'}
-                        </p>
-
-                        <div className="external-ratings">
-                          {movie.imdb_id && (
-                            <div className="rating-item">
-                              <FaImdb className="rating-icon imdb" />
-                              <span className="rating-value">
-                                {movie.vote_average ? (movie.vote_average/2).toFixed(1) : 'N/A'}/5
-                              </span>
-                            </div>
-                          )}
-                          {movie.certification && (
-                            <div className="rating-item">
-                              <SiRottentomatoes className="rating-icon tomato" />
-                              <span className="rating-value">{movie.certification}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="empty-state">
-                    <p>Your watchlist is empty. Add movies from the search page!</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-            <div className="reviews-list">
-                {movieData.map((movie, i) => (
-                  <div key={movie.id} className="review-card">
-                    <img src={movie.poster} alt={movie.title} />
-                    <div className="review-content">
-                      <div className="movie-info">
-                        <h4>{movie.title}</h4>
-                        <span className="movie-year">(2018)</span>
-                      </div>
-                      
-                      <div className="review-date">2/22/25</div>
-                      
-                      <div className="ticket-rating-container">
-                        <TicketRating
-                          rating={5}
-                          interactive={false}
-                          size="sm"
-                          color="#ff4b4b"
-                        />
-                      </div>
-                      
-                      <p className="movie-overview">
-                        That is my only way of explaining why this film is so highly regarded. I went to the user review area of IMDB just to see if I was missing something or if others thought this good looking, atmospheric, well acted two hour slog sucked as well. To my relief I found I was not alone...
-                      </p>
-                      
-                      <a href="#" className="review-link">Click to see full review</a>
-                  </div>
-                </div>
-              ))}
-            </div>
-            )}
+            <WatchlistReviewsCard
+              activeView={activeView}
+              toggleView={toggleView}
+              watchlist={watchlist}
+              isWatchlistLoading={isWatchlistLoading}
+              setIsWatchlistLoading={setIsWatchlistLoading}
+              showFilterMenu={showFilterMenu}
+              setShowFilterMenu={setShowFilterMenu}
+            />
           </div>
         </div>
       </main>

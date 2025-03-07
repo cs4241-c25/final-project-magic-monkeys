@@ -8,6 +8,7 @@ import { useUser } from '../context/UserContext';
 import { useAuth0 } from '@auth0/auth0-react';
 import { NavBar } from '../components/NavBar';
 import { SideNav } from '../components/SideNav';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export const MovieDemo = () => {
   const { isLoading } = useAuth0();
@@ -21,6 +22,8 @@ export const MovieDemo = () => {
   const [cardRatings, setCardRatings] = useState({});
   const [scrollInterval, setScrollInterval] = useState(null);
   const [cast, setCast] = useState([]);
+  const { movieId } = useParams();
+  const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
 
 
@@ -43,6 +46,26 @@ export const MovieDemo = () => {
     }
   }, []);
 
+  // Load movie from URL parameter if present
+  useEffect(() => {
+    const loadMovieFromUrl = async () => {
+      if (movieId && !movie) {
+        try {
+          const movieData = await tmdbAPI.getMovie(movieId);
+          if (movieData) {
+            setMovie(movieData);
+            fetchMovieDetails(movieData.id, movieData.title);
+            scrollToTop();
+          }
+        } catch (err) {
+          console.error("Error loading movie from URL:", err);
+        }
+      }
+    };
+
+    loadMovieFromUrl();
+  }, [movieId, fetchMovieDetails, movie]);
+
   const fetchCardRatings = useCallback(async (movie) => {
     try {
       const ratings = await omdbAPI.getMovieRatings(movie.title);
@@ -52,7 +75,6 @@ export const MovieDemo = () => {
         [movie.id]: {
           imdb: ratings.imdb,
           rt: ratings.rt,
-          tmdb: movie.vote_average
         }
       }));
     } catch (err) {
@@ -87,15 +109,16 @@ export const MovieDemo = () => {
     setMovie(movie);
     fetchMovieDetails(movie.id, movie.title);
     scrollToTop();
+    navigate(`/movies/${movie.id}`, { replace: true });
   };
 
   const handleCloseMovie = () => {
     setMovie(null);
     setSelectedTrailer(null);
-    setWatchProviders(null);
-    setReviews([]);
-    setRatings({ rt: null, imdb: null, imdbId: null });
-    setCast([]);
+    // If we're on a movie details URL, navigate back to the main movies page
+    if (movieId) {
+      navigate('/movies');
+    }
   };
 
   const scrollToTop = () => {
@@ -296,101 +319,89 @@ export const MovieDemo = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className={isAuthenticated ? "dashboard-container" : ""}>
-      {isAuthenticated ? (
-          <SideNav
-              isExpanded={isExpanded}
-              setIsExpanded={setIsExpanded}
+    <div className="movie-demo">
+      <header className="App-header">
+        <form onSubmit={searchMovie} className="search-form">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search for a movie..."
+            className="search-input"
           />
-      ) : (
-          <NavBar />
-      )}
+          <button type="submit" className="search-button">Search</button>
+        </form>
 
-      <div className={isAuthenticated ? "dashboard-main" : "movie-demo"}>
-        <header className="App-header">
-          <form onSubmit={searchMovie} className="search-form">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search for a movie..."
-              className="search-input"
-            />
-            <button type="submit" className="search-button">Search</button>
-          </form>
+        {movie && (
+          <MovieDetails
+            movie={movie}
+            ratings={ratings}
+            selectedTrailer={selectedTrailer}
+            handleCloseMovie={handleCloseMovie}
+            renderWatchProviders={renderWatchProviders}
+            renderCast={renderCast}
+            renderReviews={renderReviews}
+          />
+        )}
 
-          {movie && (
-            <MovieDetails
-              movie={movie}
-              ratings={ratings}
-              selectedTrailer={selectedTrailer}
-              handleCloseMovie={handleCloseMovie}
-              renderWatchProviders={renderWatchProviders}
-              renderCast={renderCast}
-              renderReviews={renderReviews}
-            />
-          )}
-
-          <div className="now-playing">
-            <h2>Now Playing in Theaters</h2>
-            <div className="section-container">
-              <button
-                className="scroll-button scroll-left"
-                onMouseDown={() => startScrolling('left', 'now-playing-grid')}
-                onMouseUp={stopScrolling}
-                onMouseLeave={stopScrolling}
-              >←</button>
-              <div className="movie-grid" id="now-playing-grid">
-                {nowPlaying.map(movie => (
-                  <MovieCard
-                    key={movie.id}
-                    movie={movie}
-                    cardRatings={cardRatings}
-                    isUpcoming={false}
-                    onClick={handleMovieClick}
-                  />
-                ))}
-              </div>
-              <button
-                className="scroll-button scroll-right"
-                onMouseDown={() => startScrolling('right', 'now-playing-grid')}
-                onMouseUp={stopScrolling}
-                onMouseLeave={stopScrolling}
-              >→</button>
+        <div className="now-playing">
+          <h2>Now Playing in Theaters</h2>
+          <div className="section-container">
+            <button 
+              className="scroll-button scroll-left" 
+              onMouseDown={() => startScrolling('left', 'now-playing-grid')}
+              onMouseUp={stopScrolling}
+              onMouseLeave={stopScrolling}
+            >←</button>
+            <div className="movie-grid" id="now-playing-grid">
+              {nowPlaying.map(movie => (
+                <MovieCard 
+                  key={movie.id} 
+                  movie={movie} 
+                  cardRatings={cardRatings}
+                  isUpcoming={false}
+                  onClick={handleMovieClick}
+                />
+              ))}
             </div>
+            <button 
+              className="scroll-button scroll-right"
+              onMouseDown={() => startScrolling('right', 'now-playing-grid')}
+              onMouseUp={stopScrolling}
+              onMouseLeave={stopScrolling}
+            >→</button>
           </div>
+        </div>
 
-
-          <div className="upcoming-movies">
-            <h2>Coming Soon to Theaters</h2>
-            <div className="section-container">
-              <button
-                className="scroll-button scroll-left"
-                onMouseDown={() => startScrolling('left', 'upcoming-grid')}
-                onMouseUp={stopScrolling}
-                onMouseLeave={stopScrolling}
-              >←</button>
-              <div className="movie-grid" id="upcoming-grid">
-                {upcoming.map(movie => (
-                  <MovieCard
-                    key={movie.id}
-                    movie={movie}
-                    cardRatings={cardRatings}
-                    isUpcoming={true}
-                    onClick={handleMovieClick}
-                  />
-                ))}
-              </div>
-              <button
-                className="scroll-button scroll-right"
-                onMouseDown={() => startScrolling('right', 'upcoming-grid')}
-                onMouseUp={stopScrolling}
-                onMouseLeave={stopScrolling}
-              >→</button>
+        <div className="upcoming-movies">
+          <h2>Coming Soon to Theaters</h2>
+          <div className="section-container">
+            <button 
+              className="scroll-button scroll-left"
+              onMouseDown={() => startScrolling('left', 'upcoming-grid')}
+              onMouseUp={stopScrolling}
+              onMouseLeave={stopScrolling}
+            >←</button>
+            <div className="movie-grid" id="upcoming-grid">
+              {upcoming.map(movie => (
+                <MovieCard 
+                  key={movie.id} 
+                  movie={movie} 
+                  cardRatings={cardRatings}
+                  isUpcoming={true}
+                  onClick={handleMovieClick}
+                />
+              ))}
             </div>
+            <button 
+              className="scroll-button scroll-right"
+              onMouseDown={() => startScrolling('right', 'upcoming-grid')}
+              onMouseUp={stopScrolling}
+              onMouseLeave={stopScrolling}
+            >→</button>
           </div>
-        </header>
-      </div>
+        </div>
+      </header>
     </div>
   );
 }; 

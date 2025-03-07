@@ -21,9 +21,8 @@ app.use('/api', watchListRoutes);
 app.use('/api', groupRoutes);
 app.use('/api', userGroupRoutes);
 app.use('/api', movieNightRoutes);
-
-app.use('/api', movieNightScheduleRoutes);
 app.use('/api', reviewRoutes);
+app.use('/api', movieNightScheduleRoutes);
 
 // Example route
 app.get('/', (req, res) => {
