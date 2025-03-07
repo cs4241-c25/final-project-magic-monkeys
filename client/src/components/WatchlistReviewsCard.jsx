@@ -286,7 +286,7 @@ export const WatchlistReviewsCard = ({
       
       try {
         // Use the dbUser._id directly
-        const userId = '67c8c90e4255e8e3812db203';
+        const userId = dbUser._id;
         
         // Fetch reviews from the backend
         const response = await fetch(`${BACKEND_URL}/api/users/${userId}/reviews`);
