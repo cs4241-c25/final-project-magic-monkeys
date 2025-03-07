@@ -174,6 +174,7 @@ export const Tierlist = () => {
   return (
     <div className="tierlist-container">
       <SideNav isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      <h1 className="tierlist-header">Edit Your Tierlist</h1>
       <div className={`tierlist-main ${isExpanded ? 'expanded' : ''}`}>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="tier-container">
