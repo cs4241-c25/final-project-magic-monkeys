@@ -154,13 +154,25 @@
 
 .feature-icon {
   font-size: 3.5rem;
-  margin-bottom: 20px;
+  margin: 0 auto 20px; /* Center horizontally */
   color: var(--primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px; /* Fixed width for consistent centering */
+  height: 100px; /* Fixed height for perfect circle */
+  border-radius: 50%; /* Circular container */
+  background: rgba(255, 75, 75, 0.1); /* Subtle red background */
+  position: relative; /* For absolute positioning of icon */
 }
 
 .feature-icon svg {
-  width: 60px;
-  height: 60px;
+  width: 50px; /* Slightly smaller icon */
+  height: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Perfect center alignment */
 }
 
 .feature-card h3 {
@@ -227,7 +239,7 @@
 .cta-section {
   padding: 100px 20px;
   text-align: center;
-  background: var(--dark-card);
+  background: var(--dark-bg);
 }
 
 .cta-section h2 {
@@ -246,7 +258,7 @@
 .social-proof {
   padding: 100px 20px;
   text-align: center;
-  background: var(--dark-bg);
+  background: var(--dark-card);
 }
 
 .social-proof h2 {
@@ -318,10 +330,7 @@
 }
 
 .hero-buttons {
-  display: flex;
-  gap: 16px;
-  margin-top: 24px;
-  padding-left: 130px;
+  margin-bottom: 50px;
 }
 
 .cta-section .hero-buttons {

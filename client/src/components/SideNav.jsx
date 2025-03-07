@@ -156,7 +156,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
           className={`nav-item ${location.pathname === `/user/${dbUser.username}` ? 'active' : ''}`}
         >
           <span className="icon"><BiAward /></span>
-          <span className="text">My Public Profile</span>
+          <span className="text">Profile</span>
         </Link>
 
         <Link
@@ -164,7 +164,7 @@ export const SideNav = ({ isExpanded, setIsExpanded }) => {
           className={`nav-item ${location.pathname === '/profile' ? 'active' : ''}`}
         >
           <span className="icon"><CgProfile /></span>
-          <span className="text">Profile</span>
+          <span className="text">Settings</span>
         </Link>
       </nav>
 
