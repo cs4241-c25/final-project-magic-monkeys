@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal } from './Modal';
+import "../styles/MovieNightSchedulerModal.css";
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -156,7 +157,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                         <button
                             type="button"
                             onClick={() => setFormData((prev) => ({ ...prev, recurring: !prev.recurring }))}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition bg-gray-700 text-gray-300 hover:bg-gray-600`}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition salmon-bg hover-salmon`}
                         >
                             {formData.recurring ? "Recurring Event" : "One-Time Event"}
                         </button>
@@ -173,7 +174,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                 name="dateTime"
                                 value={formData.dateTime}
                                 onChange={handleChange}
-                                className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full p-2 rounded salmon-bg"
                                 required
                             />
                         </div>
@@ -194,7 +195,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                                 type="button"
                                                 onClick={() => handleRecurringDaysChange(day)}
                                                 className={`w-10 h-10 text-sm font-medium rounded-full transition-all duration-200 
-                                                    ${isSelected ? "bg-blue-500 text-white shadow-md" : "bg-gray-700 text-gray-300 hover:bg-gray-600"}`}
+                                                    ${isSelected ? "other-salmon-bg text-white shadow-md" : "salmon-bg hover-salmon"}`}
                                             >
                                                 {day.slice(0, 3)} {/* Show short version (Mon, Tue, etc.) */}
                                             </button>
@@ -213,7 +214,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                     name="startDate"
                                     value={formData.startDate}
                                     onChange={handleChange}
-                                    className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 rounded salmon-bg"
                                     required
                                 />
                             </div>
@@ -228,7 +229,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                     name="endDate"
                                     value={formData.endDate}
                                     onChange={handleChange}
-                                    className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 rounded salmon-bg"
                                 />
                             </div>
 
@@ -242,7 +243,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                                     name="startTime"
                                     value={formData.startTime}
                                     onChange={handleChange}
-                                    className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full p-2 rounded salmon-bg"
                                     required
                                 />
                             </div>
@@ -258,7 +259,7 @@ export const MovieNightSchedulerModal = ({ isOpen, onClose, groupId, refreshData
                             value={formData.duration}
                             onChange={handleChange}
                             min="1"
-                            className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2 rounded salmon-bg"
                             placeholder="Leave blank for no duration"
                         />
                     </div>

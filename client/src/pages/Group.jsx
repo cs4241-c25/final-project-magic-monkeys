@@ -433,7 +433,7 @@ export const Group = () => {
             <main className="dashboard-main">
                 <div className="group-header">
                     <h1>{groupData.name}</h1>
-                    <p className="group-invite-code">Invite Code: {groupData.inviteCode}</p>
+                    <p className="group-invite-code"><b>Invite Code:</b> {groupData.inviteCode}</p>
                     <div className="group-menu" ref={menuRef}>
                         <button
                             className="menu-button"
