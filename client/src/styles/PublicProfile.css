@@ -108,7 +108,7 @@
   .mini-tier-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 2px;
   }
   
   /* Each row for a tier (e.g., S Tier row) */
@@ -116,21 +116,21 @@
     display: flex;
     align-items: center;
     background: #333;
-    padding: 16px;
-    border-radius: 4px;
+    height: 120px;
+    padding-left: 0;
   }
   
   /* Big colored label for the tier letter */
   .mini-tier-label {
-    width: 45px;
-    height: 45px;
-    background: #ff4b4b;
+    width: 80px;
+    height: 120px;
+    background: #232323;
+    color: #ff4b4b;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 20px;
     border-radius: 4px;
-    font-weight: bold;
+    font-weight: lighter;
     font-size: 1.4rem;
     flex-shrink: 0;
   }
@@ -143,8 +143,8 @@
   }
   
   .mini-tier-movies img {
-    width: 75px;
-    height: 112px;
+    width: 60px;
+    height: 100px;
     border-radius: 4px;
     transition: transform 0.2s;
     object-fit: cover;
